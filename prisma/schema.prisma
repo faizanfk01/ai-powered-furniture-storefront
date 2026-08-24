@@ -1,0 +1,111 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+enum StockStatus {
+  IN_STOCK
+  OUT_OF_STOCK
+  MADE_TO_ORDER
+}
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+}
+
+// ---------------------------------------------------------------------------
+// Models
+// ---------------------------------------------------------------------------
+
+model Category {
+  id   String @id @default(cuid())
+  name String
+  slug String @unique
+
+  products Product[]
+}
+
+model Product {
+  id   String @id @default(cuid())
+  name String
+  slug String @unique
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  /// Whole rupees (PKR). No minor units — PKR is not transacted in paisa here.
+  price Int
+
+  /// Free-form, e.g. "72\" W x 34\" D x 30\" H".
+  dimensions  String?
+  description String  @db.Text
+
+  /// Cached Groq/Llama summary. Null until generated.
+  aiSummary String? @db.Text
+
+  stockStatus StockStatus @default(IN_STOCK)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  images  ProductImage[]
+  reviews Review[]
+
+  @@index([categoryId])
+}
+
+model ProductImage {
+  id String @id @default(cuid())
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  /// Cloudflare R2 object URL.
+  url String
+  alt String
+
+  sortOrder Int @default(0)
+
+  @@index([productId])
+}
+
+model Review {
+  id String @id @default(cuid())
+
+  /// Null = a general store review rather than a product review.
+  productId String?
+  product   Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  authorName String
+
+  /// 1-5. Not enforceable in Prisma schema — see note in review notes.
+  rating Int
+
+  body String @db.Text
+
+  status ReviewStatus @default(PENDING)
+
+  createdAt DateTime @default(now())
+
+  @@index([productId])
+  @@index([status])
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+}

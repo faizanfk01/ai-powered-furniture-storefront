@@ -46,12 +46,19 @@ export function notFound(message = "Not found") {
   return apiError(404, "NOT_FOUND", message);
 }
 
-/** 400 with a flat list of field errors — `path` is "" for root-level issues. */
-export function validationFailed(error: z.ZodError) {
+/**
+ * 400 with a flat list of field errors — `path` is "" for root-level issues.
+ * `message` is overridable so a bad query parameter doesn't report itself as
+ * a body problem.
+ */
+export function validationFailed(
+  error: z.ZodError,
+  message = "The request body failed validation",
+) {
   return apiError(
     400,
     "VALIDATION_FAILED",
-    "The request body failed validation",
+    message,
     error.issues.map((issue) => ({
       path: issue.path.join("."),
       message: issue.message,

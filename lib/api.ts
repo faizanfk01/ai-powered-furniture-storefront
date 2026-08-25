@@ -17,6 +17,7 @@ import { Prisma } from "./generated/prisma/client";
 export type ApiErrorCode =
   | "VALIDATION_FAILED"
   | "INVALID_JSON"
+  | "INVALID_REFERENCE"
   | "NOT_FOUND"
   | "CONFLICT"
   | "INTERNAL_ERROR";
@@ -97,7 +98,15 @@ export async function readJson(
 type ExpectedFailures = {
   /** A unique constraint rejected the write (here: a duplicate slug). */
   conflict?: string;
-  /** A foreign key still points at this row (onDelete: Restrict). */
+  /**
+   * The write points at a row that does not exist — e.g. a product created
+   * with a categoryId nobody owns. A client mistake in the body, so 400.
+   */
+  missingReference?: string;
+  /**
+   * Something still points at the row being deleted (onDelete: Restrict).
+   * The body is fine; the current state of the data refuses it, so 409.
+   */
   inUse?: string;
   /** The row the operation targeted does not exist. */
   notFound?: string;
@@ -136,10 +145,23 @@ export function handleApiError(error: unknown, expected: ExpectedFailures = {}) 
         }
         break;
       }
-      // P2003 is Postgres' foreign key violation; P2014 is the same situation
-      // caught on Prisma's side of the relation. Both mean "something still
-      // refers to this row".
-      case "P2003":
+      // P2003 — Postgres foreign key violation (SQLSTATE 23503). In this
+      // schema that is always the insert/update direction: the row you
+      // referenced isn't there. The delete direction is RESTRICT and arrives
+      // as P2039 below, so the two never collide. `inUse` is still honoured as
+      // a fallback for any relation added later without RESTRICT, where a
+      // blocked delete would surface here instead.
+      case "P2003": {
+        if (expected.missingReference) {
+          return apiError(400, "INVALID_REFERENCE", expected.missingReference);
+        }
+        if (expected.inUse) {
+          return apiError(409, "CONFLICT", expected.inUse);
+        }
+        break;
+      }
+      // P2014 — the same "something still refers to this row" caught on
+      // Prisma's side of the relation rather than Postgres'.
       case "P2014": {
         if (expected.inUse) {
           return apiError(409, "CONFLICT", expected.inUse);

@@ -4,13 +4,15 @@ import {
   handleApiError,
   notFound,
   readJson,
+  requireAdmin,
   validationFailed,
 } from "@/lib/api";
 import { db } from "@/lib/db";
 import { productInclude } from "@/lib/products";
 import { productUpdateSchema } from "@/lib/validations";
 
-// NOTE: unprotected until Phase 2.5 adds Auth.js. Local development only.
+// GET is public; PATCH and DELETE require an admin session. See the note in
+// ../route.ts for why the guard is per method rather than in proxy.ts.
 
 const NOT_FOUND_MESSAGE = "Product not found";
 
@@ -37,6 +39,9 @@ export async function PATCH(
   request: Request,
   context: RouteContext<"/api/products/[id]">,
 ) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
   const { id } = await context.params;
 
   const body = await readJson(request);
@@ -67,6 +72,9 @@ export async function DELETE(
   _request: Request,
   context: RouteContext<"/api/products/[id]">,
 ) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
   const { id } = await context.params;
 
   try {

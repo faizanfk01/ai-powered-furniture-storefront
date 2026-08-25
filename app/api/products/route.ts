@@ -1,11 +1,18 @@
 import { NextResponse } from "next/server";
 
-import { handleApiError, readJson, validationFailed } from "@/lib/api";
+import {
+  handleApiError,
+  readJson,
+  requireAdmin,
+  validationFailed,
+} from "@/lib/api";
 import { db } from "@/lib/db";
 import { productInclude } from "@/lib/products";
 import { productCreateSchema } from "@/lib/validations";
 
-// NOTE: unprotected until Phase 2.5 adds Auth.js. Local development only.
+// GET is public (the storefront reads it). Writes require an admin session —
+// this path has no admin-only prefix for proxy.ts to match on, so the guard is
+// per method, at the top of each mutating handler.
 
 export async function GET() {
   try {
@@ -20,6 +27,9 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
   const body = await readJson(request);
   if (!body.ok) return body.response;
 

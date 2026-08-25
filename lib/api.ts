@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import type { z } from "zod";
 
+import { auth } from "@/auth";
+
 import { Prisma } from "./generated/prisma/client";
 
 // ---------------------------------------------------------------------------
@@ -18,6 +20,7 @@ export type ApiErrorCode =
   | "VALIDATION_FAILED"
   | "INVALID_JSON"
   | "INVALID_REFERENCE"
+  | "UNAUTHORIZED"
   | "NOT_FOUND"
   | "CONFLICT"
   | "INTERNAL_ERROR";
@@ -64,6 +67,40 @@ export function validationFailed(
       message: issue.message,
     })),
   );
+}
+
+// ---------------------------------------------------------------------------
+// Authorization
+// ---------------------------------------------------------------------------
+
+/**
+ * Guard for a mutating handler. Returns a 401 response to return as-is, or
+ * `null` when the caller is a signed-in admin:
+ *
+ *   const denied = await requireAdmin();
+ *   if (denied) return denied;
+ *
+ * Returning the response rather than throwing keeps handlers flat and makes
+ * the guard visible at the top of each one — nothing is protected by a
+ * mechanism a reader of the file cannot see.
+ *
+ * WHY THIS EXISTS ALONGSIDE proxy.ts: the proxy matches on path, and these
+ * routes have no admin-only path to match. `/api/products` is a public GET
+ * and an admin-only POST at the same URL, so protection has to be decided per
+ * method, inside the handler.
+ *
+ * There is exactly one admin account, so being authenticated *is* being
+ * authorized. If a second role ever appears, this is the single place that
+ * has to learn the difference.
+ */
+export async function requireAdmin(): Promise<NextResponse<ApiErrorBody> | null> {
+  const session = await auth();
+
+  if (!session?.user) {
+    return apiError(401, "UNAUTHORIZED", "Authentication required");
+  }
+
+  return null;
 }
 
 // ---------------------------------------------------------------------------

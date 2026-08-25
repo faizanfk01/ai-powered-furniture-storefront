@@ -4,12 +4,14 @@ import {
   handleApiError,
   notFound,
   readJson,
+  requireAdmin,
   validationFailed,
 } from "@/lib/api";
 import { db } from "@/lib/db";
 import { categoryUpdateSchema } from "@/lib/validations";
 
-// NOTE: unprotected until Phase 2.5 adds Auth.js. Local development only.
+// GET is public; PATCH and DELETE require an admin session. See the note in
+// ../../products/route.ts for why the guard is per method rather than in proxy.ts.
 
 const NOT_FOUND_MESSAGE = "Category not found";
 
@@ -33,6 +35,9 @@ export async function PATCH(
   request: Request,
   context: RouteContext<"/api/categories/[id]">,
 ) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
   const { id } = await context.params;
 
   const body = await readJson(request);
@@ -63,6 +68,9 @@ export async function DELETE(
   _request: Request,
   context: RouteContext<"/api/categories/[id]">,
 ) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
   const { id } = await context.params;
 
   try {

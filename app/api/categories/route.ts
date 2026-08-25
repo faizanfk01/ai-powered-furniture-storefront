@@ -1,10 +1,16 @@
 import { NextResponse } from "next/server";
 
-import { handleApiError, readJson, validationFailed } from "@/lib/api";
+import {
+  handleApiError,
+  readJson,
+  requireAdmin,
+  validationFailed,
+} from "@/lib/api";
 import { db } from "@/lib/db";
 import { categoryCreateSchema } from "@/lib/validations";
 
-// NOTE: unprotected until Phase 2.5 adds Auth.js. Local development only.
+// GET is public; POST requires an admin session. See the note in
+// ../products/route.ts for why the guard is per method rather than in proxy.ts.
 
 export async function GET() {
   try {
@@ -16,6 +22,9 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
   const body = await readJson(request);
   if (!body.ok) return body.response;
 

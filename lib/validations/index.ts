@@ -4,3 +4,4 @@ export * from "./common";
 export * from "./category";
 export * from "./product";
 export * from "./review";
+export * from "./search";

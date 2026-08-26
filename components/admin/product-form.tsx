@@ -182,10 +182,25 @@ export function ProductForm({
         return;
       }
 
-      // The list is a Server Component reading the database, so it has to be
-      // told the data changed.
+      // Where to land afterwards.
+      //
+      // Editing returns to the list — the change is saved and the owner is
+      // most likely moving on to the next product.
+      //
+      // Creating goes to the NEW product's edit page instead, because a
+      // product without photographs is not finished: the storefront falls back
+      // to a dimensions plan until one exists. Landing on the screen that can
+      // add them turns "create" and "add photos" into one motion rather than
+      // two, and the owner is already looking at the thing they just made.
+      const created = mode === "create" ? await response.json() : null;
+      const destination = created
+        ? `/admin/products/${created.id}/edit`
+        : "/admin/products";
+
+      // The destination is a Server Component reading the database, so it has
+      // to be told the data changed.
       startTransition(() => {
-        router.push("/admin/products");
+        router.push(destination);
         router.refresh();
       });
     } catch (cause) {

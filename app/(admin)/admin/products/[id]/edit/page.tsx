@@ -3,11 +3,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { AdminPage } from "@/components/admin/admin-page";
+import { ImageManager } from "@/components/admin/image-manager";
 import {
   ProductForm,
   type ProductFormValues,
 } from "@/components/admin/product-form";
 import { db } from "@/lib/db";
+import { productInclude } from "@/lib/products";
 import { productPath } from "@/lib/url";
 
 export const metadata: Metadata = {
@@ -30,7 +32,9 @@ export default async function EditProductPage({
   // Both in one round trip. The categories are for the dropdown; without them
   // the form would render a select with nothing in it.
   const [product, categories] = await Promise.all([
-    db.product.findUnique({ where: { id } }),
+    // productInclude carries the images already ordered by sortOrder — the
+    // same ordering the storefront renders them in.
+    db.product.findUnique({ where: { id }, include: productInclude }),
     db.category.findMany({
       select: { id: true, name: true },
       orderBy: { name: "asc" },
@@ -78,6 +82,18 @@ export default async function EditProductPage({
         productId={product.id}
         initialValues={initialValues}
       />
+
+      {/* Images are a separate concern from the fields, and separately saved:
+          an upload takes effect immediately, with no Save step, because it is
+          already three requests deep by the time it lands. Keeping it visually
+          apart from the form stops that difference from being a surprise. */}
+      <div className="mt-12 border-t border-hairline pt-10">
+        <ImageManager
+          productId={product.id}
+          productName={product.name}
+          images={product.images}
+        />
+      </div>
     </AdminPage>
   );
 }

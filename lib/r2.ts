@@ -2,7 +2,9 @@ import { randomUUID } from "node:crypto";
 
 import {
   DeleteObjectCommand,
+  DeleteObjectsCommand,
   HeadObjectCommand,
+  ListObjectsV2Command,
   NotFound,
   PutObjectCommand,
   S3Client,
@@ -246,4 +248,64 @@ export async function imageObjectExists(key: string) {
  */
 export async function deleteImageObject(key: string) {
   await r2.send(new DeleteObjectCommand({ Bucket: R2_BUCKET, Key: key }));
+}
+
+/**
+ * Remove every object belonging to one product.
+ *
+ * Deleting a product cascades its ProductImage rows in Postgres, but Postgres
+ * has never heard of Cloudflare — without this, the files stayed in the bucket
+ * forever: invisible, unreferenced, and billable.
+ *
+ * BY PREFIX, not by the keys we read beforehand. Every key this app issues is
+ * `products/<productId>/<uuid>.<ext>` (see buildImageKey), so one prefix names
+ * exactly the objects belonging to one product. Three things follow:
+ *
+ *   - It cannot miss an object because of a race. Reading the image rows and
+ *     then deleting the files leaves a window where a confirm lands in
+ *     between; the row is cascaded away and its key is never seen. The prefix
+ *     does not care when the object arrived.
+ *   - It sweeps up objects already orphaned by deletes that happened before
+ *     this function existed.
+ *   - It is one LIST and one batched DELETE rather than N round trips.
+ *
+ * Paginated because ListObjectsV2 caps at 1000 keys per page, and
+ * DeleteObjects at 1000 per call — the same bound, so one page maps to one
+ * delete. Returns how many objects were removed.
+ */
+export async function deleteProductObjects(productId: string) {
+  const prefix = `products/${productId}/`;
+  let removed = 0;
+  let continuationToken: string | undefined;
+
+  do {
+    const listed = await r2.send(
+      new ListObjectsV2Command({
+        Bucket: R2_BUCKET,
+        Prefix: prefix,
+        ContinuationToken: continuationToken,
+      }),
+    );
+
+    const objects = (listed.Contents ?? []).flatMap((object) =>
+      object.Key ? [{ Key: object.Key }] : [],
+    );
+
+    if (objects.length > 0) {
+      await r2.send(
+        new DeleteObjectsCommand({
+          Bucket: R2_BUCKET,
+          // Quiet: only failures come back, which is all we would act on.
+          Delete: { Objects: objects, Quiet: true },
+        }),
+      );
+      removed += objects.length;
+    }
+
+    continuationToken = listed.IsTruncated
+      ? listed.NextContinuationToken
+      : undefined;
+  } while (continuationToken);
+
+  return removed;
 }

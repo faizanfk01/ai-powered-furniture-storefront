@@ -5,7 +5,7 @@ import { db } from "@/lib/db";
 import { reviewUpdateSchema } from "@/lib/validations";
 
 // ---------------------------------------------------------------------------
-// ADMIN — see the note in ../route.ts. UNPROTECTED TODAY, local only.
+// ADMIN — guarded by the proxy.ts path matcher; see the note in ../route.ts.
 // ---------------------------------------------------------------------------
 
 const NOT_FOUND_MESSAGE = "Review not found";

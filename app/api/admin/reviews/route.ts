@@ -6,10 +6,12 @@ import { db } from "@/lib/db";
 import { reviewStatusSchema } from "@/lib/validations";
 
 // ---------------------------------------------------------------------------
-// ADMIN. Everything under /api/admin/ is to be protected in Phase 2.5 by a
-// single path-prefix guard rather than per-route checks.
+// ADMIN. Protected by the `/api/admin/:path*` matcher in proxy.ts — a single
+// path-prefix guard rather than a per-route check. An unauthenticated request
+// never reaches these handlers.
 //
-// UNPROTECTED TODAY — local development only, do not deploy.
+// requireAdmin() from lib/api.ts is for the other case: a mutating handler
+// that shares a path with a public GET, which no matcher can separate.
 // ---------------------------------------------------------------------------
 
 /**

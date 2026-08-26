@@ -72,8 +72,18 @@ model ProductImage {
   productId String
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
-  /// Cloudflare R2 object URL.
+  /// Cloudflare R2 object key, e.g. `products/<productId>/<uuid>.webp`.
+  /// Generated server-side at presign time — never a client-supplied path.
+  /// Unique because it addresses exactly one object in the bucket; it is also
+  /// what DELETE uses to remove that object, so the row and the file cannot
+  /// drift apart.
+  key String @unique
+
+  /// Public URL the browser loads: R2_PUBLIC_BASE_URL + "/" + key. Stored
+  /// rather than recomputed so existing rows keep resolving if the public
+  /// domain is ever changed or a custom domain is bound to the bucket.
   url String
+
   alt String
 
   sortOrder Int @default(0)

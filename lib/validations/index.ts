@@ -3,6 +3,7 @@
 export * from "./common";
 export * from "./auth";
 export * from "./category";
+export * from "./image";
 export * from "./product";
 export * from "./review";
 export * from "./search";

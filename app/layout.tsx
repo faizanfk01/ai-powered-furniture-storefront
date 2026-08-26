@@ -1,10 +1,23 @@
 import type { Metadata } from "next";
 import { Archivo, IBM_Plex_Mono, Newsreader } from "next/font/google";
 
-import { SiteFooter } from "@/components/site/site-footer";
-import { SiteHeader } from "@/components/site/site-header";
-
 import "./globals.css";
+
+/**
+ * The document shell, and nothing else.
+ *
+ * Everything visible now lives in a route group's own layout:
+ *
+ *   app/(storefront)/layout.tsx — the public site's header and footer
+ *   app/(admin)/layout.tsx      — the admin tool's frame
+ *
+ * The two are deliberately unalike. The storefront is a showroom; the admin is
+ * a dense tool for entering data. They share this file so they share the
+ * fonts, the design tokens and the brand palette — and share nothing else.
+ *
+ * Route groups do not appear in the URL: `app/(storefront)/catalog/page.tsx`
+ * is still `/catalog`.
+ */
 
 /**
  * Three faces, three jobs. See the note in globals.css for why they are this
@@ -48,24 +61,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${archivo.variable} ${newsreader.variable} ${plexMono.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col">
-        {/* Keyboard and screen-reader users get past the nav on every page.
-            Hidden until focused, then it sits over the sticky header. */}
-        <a
-          href="#main"
-          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:bg-ink focus:px-4 focus:py-2 focus:font-display focus:text-sm focus:tracking-wide focus:text-paper focus:uppercase"
-        >
-          Skip to content
-        </a>
-
-        <SiteHeader />
-
-        <main id="main" className="flex-1">
-          {children}
-        </main>
-
-        <SiteFooter />
-      </body>
+      <body className="min-h-full">{children}</body>
     </html>
   );
 }

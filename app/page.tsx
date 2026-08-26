@@ -1,69 +1,123 @@
-import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Container } from "@/components/ui/container";
+import { Measure } from "@/components/ui/measure";
+import { Section } from "@/components/ui/section";
+import { WhatsAppIcon } from "@/components/site/whatsapp-icon";
+import { LOCATIONS, SITE, whatsappUrl } from "@/lib/site";
 
-export default function Home() {
+/**
+ * PLACEHOLDER HOME PAGE.
+ *
+ * Phase 4a step 2 owns the layout and the primitives, not the home page — the
+ * real one comes in a later sub-phase with photography and featured pieces.
+ * This exists because the alternative was leaving create-next-app's starter
+ * page under the new header, and because the layout cannot be reviewed against
+ * nothing.
+ *
+ * It is built only from the primitives, on purpose: if the shared components
+ * cannot carry a page this simple, they are the wrong components.
+ */
+
+const OFFERINGS = [
+  {
+    title: "Custom furniture",
+    body: "Sofas, beds, dining and office pieces built to your room's measurements in our own workshop.",
+  },
+  {
+    title: "Interior design",
+    body: "Room-by-room planning — layout, materials and finishes chosen against the space you actually have.",
+  },
+  {
+    title: "3D wallpapers",
+    body: "Textured wall panels and printed murals, fitted by the same team that installs the furniture.",
+  },
+  {
+    title: "PVC panels",
+    body: "Hard-wearing wall and ceiling panelling for rooms that need to take daily use.",
+  },
+];
+
+export default function HomePage() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+    <>
+      {/* Hero. The approved thesis: a workshop that keeps a showroom, in a
+          specific town — so the two addresses are the closing statement rather
+          than a detail in the footer. */}
+      <section className="bg-ink-deep text-paper">
+        <Container>
+          <div className="py-20 sm:py-28">
+            <Measure />
+
+            <p className="spec-label mt-6 text-brass">
+              {SITE.town}, {SITE.region}
+            </p>
+
+            <h1 className="display-wide mt-5 text-5xl leading-[0.95] font-semibold uppercase sm:text-7xl lg:text-8xl">
+              Standard
+              <br />
+              Furniture
+            </h1>
+
+            <p className="mt-8 max-w-xl text-lg leading-relaxed text-paper/75 sm:text-xl">
+              Custom furniture, interior design, 3D wallpapers and PVC panels.
+              Drawn to your room&apos;s measurements, built in Baghdada, shown
+              in Shen Gul Plaza.
+            </p>
+
+            <div className="mt-10 flex flex-wrap gap-3">
+              <Button variant="solid-invert" href="/catalog">
+                Browse the catalogue
+              </Button>
+              <Button
+                variant="outline-invert"
+                href={whatsappUrl(
+                  "Hello Standard Furniture — I have a question.",
+                )}
+              >
+                <WhatsAppIcon />
+                Message on WhatsApp
+              </Button>
+            </div>
+
+            <dl className="mt-16 grid max-w-2xl grid-cols-1 gap-8 border-t border-paper/15 pt-8 sm:grid-cols-2">
+              {LOCATIONS.map((location) => (
+                <div key={location.label}>
+                  <dt className="spec-label text-brass">{location.label}</dt>
+                  <dd className="mt-2 text-paper/80">
+                    {location.lines.map((line) => (
+                      <span key={line} className="block">
+                        {line}
+                      </span>
+                    ))}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        </Container>
+      </section>
+
+      <Section
+        eyebrow="What we make"
+        heading="Four things, done properly"
+        lede="Everything is measured, built and fitted by the same team — the showroom and the workshop are eight minutes apart."
+      >
+        <ul className="grid grid-cols-1 gap-px bg-hairline sm:grid-cols-2">
+          {OFFERINGS.map((offering) => (
+            <li key={offering.title}>
+              <Card className="h-full border-0 p-8">
+                <h3 className="display-wide text-lg font-medium">
+                  {offering.title}
+                </h3>
+                <p className="mt-3 leading-relaxed text-muted">
+                  {offering.body}
+                </p>
+              </Card>
+            </li>
+          ))}
+        </ul>
+      </Section>
+    </>
   );
 }

@@ -1,25 +1,88 @@
 @import "tailwindcss";
 
-/* Brand tokens */
+/* ---------------------------------------------------------------------------
+   Palette
+   ---------------------------------------------------------------------------
+   Two brand tokens are given (primary-dark, primary-light). Everything else is
+   pulled toward the same petrol-blue hue as the ink rather than taken from a
+   neutral grey ramp, so the greys read as part of the brand instead of as
+   Tailwind's defaults sitting next to it.
+
+   `brass` is the one warm value: the colour of furniture hardware and of the
+   workshop, against the cool showroom ink. It is a MARK colour, not a text
+   colour — 2.8:1 on paper, which is fine for rules, ticks and dividers and
+   nowhere near enough for body copy. On ink it clears 6:1 and can carry text.
+   --------------------------------------------------------------------------- */
 @theme {
   --color-primary-dark: #0e202c;
   --color-primary-light: #fbfbfb;
-}
 
-:root {
-  --background: var(--color-primary-light);
-  --foreground: var(--color-primary-dark);
-}
+  --color-ink: #0e202c; /* headings, dark bands */
+  --color-ink-deep: #081720; /* the deepest band — footer, hero */
+  --color-paper: #fbfbfb; /* page ground */
+  --color-muted: #5a6f7d; /* secondary text — 4.9:1 on paper */
+  --color-hairline: #e3e7ea; /* rules, card edges, quiet fills */
+  --color-brass: #b98d4e; /* the mark colour */
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Three voices, deliberately unlike each other:
+     display = wide grotesque (showroom signage)
+     body    = optical-size serif (catalogue prose)
+     mono    = the spec voice (dimensions, prices, status) */
+  --font-display: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-newsreader), ui-serif, Georgia, serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+}
+
+/* ---------------------------------------------------------------------------
+   The measure — this project's signature device
+   ---------------------------------------------------------------------------
+   A ruler edge: hairline with brass ticks. Furniture is bought on whether it
+   fits, so the vocabulary of measuring is the honest ornament here — it says
+   something true about the subject instead of decorating around it.
+
+   Used sparingly: above a section heading, along the top of a card. If it
+   appears on everything it stops meaning anything.
+   --------------------------------------------------------------------------- */
+@utility measure {
+  height: 0.5rem;
+  border-top: 1px solid currentColor;
+  background-image: repeating-linear-gradient(
+    to right,
+    currentColor 0 1px,
+    transparent 1px 0.75rem
+  );
+  background-repeat: no-repeat;
+  background-size: 100% 0.3125rem;
+  opacity: 0.55;
+}
+
+/* Small caps-ish label: the eyebrow voice, set in the spec face. */
+@utility spec-label {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* The display face's width axis is what makes the wordmark read as signage
+   rather than as a bold heading. Archivo carries wdth 62–125. */
+@utility display-wide {
+  font-family: var(--font-display);
+  font-variation-settings: "wdth" 118;
+  letter-spacing: -0.01em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

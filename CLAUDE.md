@@ -5,6 +5,24 @@
 Production website for a furniture & interior decor business (Mardan, PK).
 Local audience, English only.
 
+## Business identity
+
+Real business. Every page, title and piece of copy speaks as this company —
+not as a generic furniture store.
+
+- **Name:** Standard Furniture
+- **Offerings:** custom furniture, interior design, 3D wallpapers, PVC panels
+- **Showroom / office:** Shen Gul Plaza, Mardan
+- **Industry / workshop:** Sir Anjam Khan Market, Baghdada, Mardan
+- **WhatsApp:** +923009059052 (the only conversion path — see Payments)
+- **Audience:** Mardan, Pakistan. Local, English-language.
+- **Vibe:** sleek, modern, high-end showroom.
+
+Two addresses, two different jobs: the showroom is where customers come to
+look, the workshop is where the work happens. Copy that collapses them into
+one "location" loses the thing that makes a custom-furniture business
+credible.
+
 ## Stack (locked — do not change without asking)
 - Next.js 16 (App Router, TypeScript, Turbopack)
 - Tailwind CSS v4 (CSS-first config via @theme in app/globals.css)

@@ -3,81 +3,81 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { AdminPage } from "@/components/admin/admin-page";
+import {
+  ProductForm,
+  type ProductFormValues,
+} from "@/components/admin/product-form";
 import { db } from "@/lib/db";
-import { formatPrice, STOCK_LABEL } from "@/lib/format";
+import { productPath } from "@/lib/url";
 
 export const metadata: Metadata = {
   title: "Edit product",
 };
 
 /**
- * STUB — Phase 5b replaces this file wholesale with the real edit form.
+ * Edit a product. Replaces the 5a stub.
  *
- * It exists so the Edit link in the product list lands somewhere that names
- * the product and says what is coming, instead of a bare 404 that reads like
- * a broken admin. It deliberately does nothing: no fields, no save, nothing
- * that could be mistaken for a form that failed to submit.
- *
- * The 404 for an unknown id is real, not a placeholder — the id comes from a
- * URL, and a page that cheerfully renders "Edit product" for a row that does
- * not exist would be a worse stub than none.
+ * A server shell around the same ProductForm the create page uses — it reads
+ * the row and the categories, converts the row into form values, and hands
+ * both over. Everything else (fields, validation wiring, per-field errors,
+ * the slug rules) lives in the one shared component.
  */
-export default async function EditProductStubPage({
+export default async function EditProductPage({
   params,
 }: PageProps<"/admin/products/[id]/edit">) {
   const { id } = await params;
 
-  const product = await db.product.findUnique({
-    where: { id },
-    include: { category: true },
-  });
+  // Both in one round trip. The categories are for the dropdown; without them
+  // the form would render a select with nothing in it.
+  const [product, categories] = await Promise.all([
+    db.product.findUnique({ where: { id } }),
+    db.category.findMany({
+      select: { id: true, name: true },
+      orderBy: { name: "asc" },
+    }),
+  ]);
 
+  // The id comes from a URL. A deleted product, or a mistyped link, is a 404
+  // rather than an empty form that would create confusion on save.
   if (!product) notFound();
+
+  // Row -> form values. Every field is a string here because that is what an
+  // input holds; `price` becomes a number again in the submit payload, and a
+  // null `dimensions` becomes "" so the input is empty rather than the text
+  // "null".
+  const initialValues: ProductFormValues = {
+    name: product.name,
+    slug: product.slug,
+    categoryId: product.categoryId,
+    price: String(product.price),
+    dimensions: product.dimensions ?? "",
+    description: product.description,
+    stockStatus: product.stockStatus,
+  };
 
   return (
     <AdminPage
       title="Edit product"
-      description="The edit form arrives in the next sub-phase."
-    >
-      <div className="max-w-2xl border border-hairline p-6">
-        <p className="spec-label text-brass">Not built yet</p>
-
-        <h2 className="display-wide mt-3 text-xl font-medium uppercase">
-          {product.name}
-        </h2>
-
-        <dl className="mt-5 border-t border-hairline text-sm">
-          <Row label="Slug" value={product.slug} />
-          <Row label="Category" value={product.category.name} />
-          <Row label="Price" value={formatPrice(product.price)} />
-          <Row label="Stock" value={STOCK_LABEL[product.stockStatus]} />
-          <Row label="Dimensions" value={product.dimensions ?? "—"} />
-        </dl>
-
-        <p className="mt-5 text-sm text-muted">
-          Editing these fields is Phase 5b. Until then the API route{" "}
-          <span className="font-mono text-ink">
-            PATCH /api/products/{product.id}
-          </span>{" "}
-          is the way to change them.
-        </p>
-
+      description={product.name}
+      action={
+        // Straight to the live page. The owner is editing something customers
+        // can see, and checking the result should not mean hunting for it.
         <Link
-          href="/admin/products"
-          className="mt-6 inline-block text-sm text-muted underline decoration-hairline underline-offset-4 transition-colors hover:text-ink hover:decoration-brass"
+          href={productPath(product.slug)}
+          target="_blank"
+          rel="noreferrer"
+          className="border border-ink/25 px-4 py-2.5 font-display text-sm font-medium tracking-wide text-ink uppercase transition-colors hover:border-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
         >
-          ← Back to products
+          View on site ↗
         </Link>
-      </div>
+      }
+    >
+      <ProductForm
+        mode="edit"
+        categories={categories}
+        productId={product.id}
+        initialValues={initialValues}
+      />
     </AdminPage>
-  );
-}
-
-function Row({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex justify-between gap-6 border-b border-hairline py-2">
-      <dt className="spec-label text-muted">{label}</dt>
-      <dd className="text-right font-mono text-ink">{value}</dd>
-    </div>
   );
 }

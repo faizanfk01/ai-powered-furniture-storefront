@@ -39,6 +39,14 @@ export default async function AdminProductsPage() {
     <AdminPage
       title="Products"
       description={`${products.length} ${products.length === 1 ? "product" : "products"} in the catalogue.`}
+      action={
+        <Link
+          href="/admin/products/new"
+          className="bg-ink px-4 py-2.5 font-display text-sm font-medium tracking-wide text-paper uppercase transition-colors hover:bg-ink-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
+        >
+          Add product
+        </Link>
+      }
     >
       {products.length === 0 ? (
         <div className="border border-hairline p-8">
@@ -47,9 +55,13 @@ export default async function AdminProductsPage() {
           </h2>
           <p className="mt-2 max-w-md text-sm text-muted">
             The catalogue is empty, so the storefront has nothing to show.
-            Adding products from here arrives with the product form; until then
-            they are created through the API.
           </p>
+          <Link
+            href="/admin/products/new"
+            className="mt-5 inline-block bg-ink px-4 py-2.5 font-display text-sm font-medium tracking-wide text-paper uppercase transition-colors hover:bg-ink-deep"
+          >
+            Add the first product
+          </Link>
         </div>
       ) : (
         // Tables do not reflow, so the narrow-screen answer is a scroll

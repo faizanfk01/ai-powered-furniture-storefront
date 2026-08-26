@@ -171,7 +171,7 @@ export function ProductForm({
           // Not JSON — mapApiError falls back to the status.
         }
 
-        const mapped = mapApiError(response.status, body);
+        const mapped = mapApiError(response.status, body, { conflictField: "slug", referenceField: "categoryId" });
         setErrors(mapped);
 
         // Send the cursor to the first rejected field. On a form this long the

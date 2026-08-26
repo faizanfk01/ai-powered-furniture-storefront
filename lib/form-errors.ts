@@ -42,24 +42,36 @@ function add(fieldErrors: FieldErrors, field: string, message: string) {
 }
 
 /**
+ * Where a code with no `path` should be shown.
+ *
+ * CONFLICT and INVALID_REFERENCE name no field, so the CALLER says which of
+ * its own fields could have caused one. That is deliberately not a default:
+ * the same 409 means "duplicate slug" when submitting a form and "still has
+ * products" when deleting a category, and a mapper that guessed would file the
+ * second one under the slug input — which is exactly the bug this parameter
+ * exists to prevent. A caller that names nothing gets a banner, which is
+ * always honest if less precise.
+ */
+export type ConflictMapping = {
+  /** Field to blame for a 409. Forms pass "slug"; delete buttons pass nothing. */
+  conflictField?: string;
+  /** Field to blame for a 400 INVALID_REFERENCE — a foreign key. */
+  referenceField?: string;
+};
+
+/**
  * Map one non-2xx response to per-field messages.
  *
- * TWO CODES CARRY NO PATH and have to be attributed by what the schema makes
- * possible, rather than by what the response says:
- *
- *   CONFLICT (409) — a unique constraint. `slug` is the only unique column on
- *   Product, so a conflict is always the slug. If a second unique field is
- *   ever added, this mapping becomes wrong and the API would need to name the
- *   field; the assumption is asserted here rather than left implicit.
- *
- *   INVALID_REFERENCE (400) — a foreign key. `categoryId` is Product's only
- *   one, by the same reasoning.
- *
- * Both are far better attributed than not: "A product with the slug
- * 'karachi-sofa' already exists" belongs under the slug input, where the fix
- * is, not in a banner at the top of a long form.
+ * A message attributed to its field is worth far more than a banner: "A
+ * product with the slug 'karachi-sofa' already exists" belongs under the slug
+ * input, where the fix is, not at the top of a long form. But attribution has
+ * to be earned — see ConflictMapping above.
  */
-export function mapApiError(status: number, body: unknown): FormErrorState {
+export function mapApiError(
+  status: number,
+  body: unknown,
+  mapping: ConflictMapping = {},
+): FormErrorState {
   if (!isApiErrorBody(body)) {
     return {
       fieldErrors: {},
@@ -92,13 +104,17 @@ export function mapApiError(status: number, body: unknown): FormErrorState {
       };
     }
 
-    case "CONFLICT":
-      add(fieldErrors, "slug", message);
+    case "CONFLICT": {
+      if (!mapping.conflictField) return { fieldErrors: {}, formError: message };
+      add(fieldErrors, mapping.conflictField, message);
       return { fieldErrors, formError: null };
+    }
 
-    case "INVALID_REFERENCE":
-      add(fieldErrors, "categoryId", message);
+    case "INVALID_REFERENCE": {
+      if (!mapping.referenceField) return { fieldErrors: {}, formError: message };
+      add(fieldErrors, mapping.referenceField, message);
       return { fieldErrors, formError: null };
+    }
 
     case "UNAUTHORIZED":
       return {

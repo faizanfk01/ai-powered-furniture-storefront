@@ -66,12 +66,10 @@ export default async function AdminLayout({ children }: LayoutProps<"/"> ) {
               <AdminNavLink href="/admin/products" label="Products" />
             </li>
             <li>
-              {/* Phase 5c. */}
-              <AdminNavLink href="/admin/categories" label="Categories" pending />
+              <AdminNavLink href="/admin/categories" label="Categories" />
             </li>
             <li>
-              {/* Phase 5c. */}
-              <AdminNavLink href="/admin/reviews" label="Reviews" pending />
+              <AdminNavLink href="/admin/reviews" label="Reviews" />
             </li>
             <li className="mt-2 border-t border-paper/10 pt-2">
               <AdminNavLink href="/admin/upload" label="Image upload test" />

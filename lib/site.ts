@@ -34,6 +34,33 @@ export const LOCATIONS = [
 ] as const;
 
 /**
+ * The four things the business sells.
+ *
+ * Here rather than in a page file because the home page and the About page
+ * both list them, and a fifth offering added to one and not the other is the
+ * kind of drift nobody notices until a customer asks about something the site
+ * only half-mentions.
+ */
+export const OFFERINGS = [
+  {
+    title: "Custom furniture",
+    body: "Sofas, beds, dining and office pieces built to your room's measurements in our own workshop — not ordered in from somewhere else.",
+  },
+  {
+    title: "Interior design",
+    body: "Room-by-room planning: layout, materials and finishes chosen against the space you actually have, not a catalogue photograph.",
+  },
+  {
+    title: "3D wallpapers",
+    body: "Textured wall panels and printed murals, fitted by the same team that delivers the furniture.",
+  },
+  {
+    title: "PVC panels",
+    body: "Hard-wearing wall and ceiling panelling for rooms that take daily use — kitchens, corridors, shopfronts.",
+  },
+] as const;
+
+/**
  * PLACEHOLDER — NOT CONFIRMED WITH THE BUSINESS.
  *
  * Opening hours are a factual claim a customer will act on: someone reads
@@ -79,8 +106,8 @@ export function whatsappUrl(message?: string) {
  * spelling, which is what Pakistani English reads as correct, while the URL
  * stays at the shorter /catalog.
  *
- * NOTE: only "/" and "/catalog" exist today. The other three are built in
- * later sub-phases and 404 until then.
+ * NOTE: "/custom-orders" and "/contact" do not exist yet — both are forms, and
+ * forms are Phase 4c. They 404 until then.
  */
 export const NAV_LINKS = [
   { label: "Home", href: "/" },

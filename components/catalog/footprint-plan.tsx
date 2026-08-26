@@ -20,12 +20,21 @@ import { footprintScale, parseFootprint } from "@/lib/footprint";
  */
 export function FootprintPlan({
   dimensions,
+  size = "card",
   className = "",
 }: {
   dimensions: string | null;
+  /**
+   * `detail` is the same drawing with room to breathe — the product page gives
+   * it most of a column, where the card gives it a third of one. Only the
+   * padding changes: the plan stays on the catalogue's shared 120" ruler in
+   * both places, so a piece is not quietly bigger on its own page.
+   */
+  size?: "card" | "detail";
   className?: string;
 }) {
   const footprint = parseFootprint(dimensions);
+  const padding = size === "detail" ? "px-16 py-14" : "px-10 py-8";
 
   if (!footprint) {
     return (
@@ -35,7 +44,7 @@ export function FootprintPlan({
         {/* The measure, alone — the brand's mark standing in for the drawing
             we cannot make. */}
         <div aria-hidden="true" className="text-brass">
-          <div className="measure w-16" />
+          <div className={`measure ${size === "detail" ? "w-24" : "w-16"}`} />
         </div>
         <span className="spec-label text-muted">Photograph to come</span>
       </div>
@@ -46,7 +55,7 @@ export function FootprintPlan({
 
   return (
     <div
-      className={`flex aspect-4/3 items-center justify-center bg-hairline/60 px-10 py-8 ${className}`}
+      className={`flex aspect-4/3 items-center justify-center bg-hairline/60 ${padding} ${className}`}
       // One sentence for a screen reader, instead of it walking the tick marks
       // and axis labels of a drawing that means nothing read aloud.
       role="img"

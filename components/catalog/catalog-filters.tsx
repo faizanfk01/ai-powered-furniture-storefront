@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
 
+import { controlClass } from "@/components/ui/field";
 import { PRICE_BANDS, type CatalogParams } from "@/lib/catalog-filters";
 
 type CategoryOption = { slug: string; name: string };
@@ -81,10 +82,6 @@ export function CatalogFilters({
     // the debounce cancels itself after the navigation lands.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, params.q]);
-
-  const controlClass =
-    "w-full border border-hairline bg-paper px-4 py-3 font-body text-ink " +
-    "focus:border-ink focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass";
 
   return (
     <form

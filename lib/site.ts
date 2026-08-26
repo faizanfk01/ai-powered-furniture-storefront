@@ -33,6 +33,25 @@ export const LOCATIONS = [
   },
 ] as const;
 
+export type Location = (typeof LOCATIONS)[number];
+
+/**
+ * A Google Maps search for one of our addresses.
+ *
+ * A search URL rather than an embedded map or a pinned coordinate, because
+ * there is no verified business listing yet — an embed would either show the
+ * wrong pin with total confidence or an apologetic grey box, and both are
+ * worse than handing the address to Maps and letting it do what it does with
+ * any address someone types.
+ *
+ * "Pakistan" is appended because "Mardan" alone is ambiguous enough
+ * internationally to send somebody to the wrong country.
+ */
+export function directionsUrl(location: { lines: readonly string[] }) {
+  const query = [...location.lines, "Pakistan"].join(", ");
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+}
+
 /**
  * The four things the business sells.
  *

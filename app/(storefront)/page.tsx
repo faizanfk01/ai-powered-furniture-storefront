@@ -2,6 +2,7 @@ import Link from "next/link";
 import { connection } from "next/server";
 
 import { ProductCard } from "@/components/catalog/product-card";
+import { ReviewForm } from "@/components/reviews/review-form";
 import {
   Testimonial,
   type TestimonialReview,
@@ -254,6 +255,27 @@ export default async function HomePage() {
           </Container>
         </section>
       )}
+
+      {/* ------------------------------------------------------------------
+          LEAVE A REVIEW — a general store review, so productId is null.
+
+          OUTSIDE the testimonials block above on purpose. That section is not
+          rendered at all when nothing has been approved yet, and a review form
+          that disappears exactly while there are no reviews is a form that can
+          never collect the first one. This one is always here.
+
+          Kept to its own quiet band rather than folded into the ink section:
+          the testimonials are evidence being presented, this is a request
+          being made of the reader, and running them together would make the
+          evidence look solicited.
+         ------------------------------------------------------------------ */}
+      <section className="border-t border-hairline py-16 sm:py-20">
+        <Container>
+          <div className="max-w-2xl">
+            <ReviewForm />
+          </div>
+        </Container>
+      </section>
 
       {/* ------------------------------------------------------------------ */}
       <Section

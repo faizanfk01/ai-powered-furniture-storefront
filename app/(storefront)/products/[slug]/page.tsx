@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { AiSummary } from "@/components/product/ai-summary";
+import { ReviewForm } from "@/components/reviews/review-form";
 import { AskAiButton } from "@/components/product/ask-ai-button";
 import { ProductGallery } from "@/components/product/product-gallery";
 import { WhatsAppIcon } from "@/components/site/whatsapp-icon";
@@ -202,6 +203,24 @@ export default async function ProductPage({
               <WhatsAppIcon />
               Ask about a custom size
             </Button>
+          </div>
+        </div>
+
+        {/* REVIEWS — the form only, and last on the page.
+            
+            Here because this is where a product review can be attributed
+            correctly: the customer is looking at the piece, so `productId` is
+            known rather than guessed at. Last because everything above it is
+            for someone deciding, and this is for someone who already decided
+            and came back — putting it higher would sit a form for past
+            customers in front of the WhatsApp CTA for future ones.
+
+            NOTE: approved reviews are not shown on this page yet. They surface
+            on the home page, attributed and linked back here. Rendering them
+            per product is a display feature, not part of wiring the form. */}
+        <div className="mt-20 border-t border-hairline pt-10">
+          <div className="max-w-2xl">
+            <ReviewForm productId={product.id} productName={product.name} />
           </div>
         </div>
       </div>

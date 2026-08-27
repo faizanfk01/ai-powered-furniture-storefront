@@ -71,9 +71,6 @@ export default async function AdminLayout({ children }: LayoutProps<"/"> ) {
             <li>
               <AdminNavLink href="/admin/reviews" label="Reviews" />
             </li>
-            <li className="mt-2 border-t border-paper/10 pt-2">
-              <AdminNavLink href="/admin/upload" label="Image upload test" />
-            </li>
           </ul>
         </nav>
 

@@ -1,3 +1,4 @@
+import { ChatWidget } from "@/components/chat/chat-widget";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 
@@ -29,6 +30,14 @@ export default function StorefrontLayout({
       </main>
 
       <SiteFooter />
+
+      {/* Sitewide, and only here — the admin layout is a separate file, so the
+          widget cannot follow an admin into the dashboard. Mounted in the
+          layout rather than per page so the transcript survives navigation:
+          a layout does not remount when the page inside it changes, which is
+          what lets somebody open a recommended product and come back to the
+          conversation that recommended it. */}
+      <ChatWidget />
     </div>
   );
 }

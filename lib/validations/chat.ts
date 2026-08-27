@@ -1,10 +1,12 @@
 import { z } from "zod";
 
+import { CHAT_MAX_HISTORY, CHAT_MAX_MESSAGE_LENGTH } from "../chat-client";
+
 /**
  * The write boundary for POST /api/chat.
  *
  * "Write boundary" in the CLAUDE.md sense even though nothing is persisted:
- * this body is what decides how many tokens of a 12,000-per-minute budget the
+ * this body is what decides how many tokens of an 8,000-per-minute budget the
  * request spends. An unbounded `message` or a 400-turn `history` is not a
  * correctness bug, it is somebody emptying the day's Groq quota with one
  * curl. The caps below are the only thing standing between a public,
@@ -12,18 +14,15 @@ import { z } from "zod";
  */
 
 /**
- * Long enough for "do you have a six seater dining table under 90,000 that
- * would fit a narrow room?", short enough that a pasted essay is rejected
- * rather than forwarded to Groq.
+ * The caps come from lib/chat-client.ts, which the browser also imports.
+ *
+ * That direction is deliberate. The chat input needs a maxLength, the route
+ * needs a limit, and the two have to be the same number — but lib/chat-client
+ * is loaded by a Client Component, so the shared constant cannot live in a
+ * module that imports Zod. Putting it there and importing it here keeps one
+ * definition without shipping a validation library to a phone.
  */
-export const CHAT_MAX_MESSAGE_LENGTH = 600;
-
-/**
- * Turns of prior conversation the client may replay. Ten keeps a real
- * follow-up thread ("what about cheaper ones?") working while bounding the
- * prompt, and the server trims to the most recent few before sending.
- */
-export const CHAT_MAX_HISTORY = 10;
+export { CHAT_MAX_HISTORY, CHAT_MAX_MESSAGE_LENGTH } from "../chat-client";
 
 /**
  * A prior turn. `assistant` is allowed a longer body than a user message

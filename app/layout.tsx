@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Archivo, IBM_Plex_Mono, Newsreader } from "next/font/google";
 
 import "./globals.css";
@@ -53,6 +53,24 @@ export const metadata: Metadata = {
   },
   description:
     "Custom furniture, interior design, 3D wallpapers and PVC panels. Showroom at Shen Gul Plaza, Mardan; workshop at Sir Anjam Khan Market, Baghdada.",
+};
+
+/**
+ * Next already emits `width=device-width, initial-scale=1`. This adds the one
+ * part it does not.
+ *
+ * `interactiveWidget: "resizes-content"` tells the browser that opening the
+ * on-screen keyboard should shrink the viewport rather than slide the page up
+ * behind it. It matters for the chat panel, which is `position: fixed` and
+ * puts its text input at the very bottom: under the default behaviour the
+ * keyboard covers the composer on a phone, which is the one device most of
+ * this site's customers are on. It also helps the two WhatsApp form pages,
+ * whose submit sits below a textarea.
+ *
+ * Ignored by browsers that do not implement it, and harmless there.
+ */
+export const viewport: Viewport = {
+  interactiveWidget: "resizes-content",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Archivo, IBM_Plex_Mono, Newsreader } from "next/font/google";
+import { Inter } from "next/font/google";
 
 import "./globals.css";
 
@@ -20,30 +20,30 @@ import "./globals.css";
  */
 
 /**
- * Three faces, three jobs. See the note in globals.css for why they are this
- * unlike each other.
+ * One typeface.
  *
- * Archivo is loaded with its width axis: the wordmark and headings are set
- * expanded, which is what gives the type its showroom-signage feel. Without
- * `axes: ["wdth"]` next/font ships weight only and the width setting silently
- * does nothing.
+ * The three-voice system this replaces — Archivo on its width axis for
+ * signage, Newsreader for catalogue prose, IBM Plex Mono for specs — was built
+ * for a showroom identity. The brief for this pass is a clean modern
+ * storefront, and that look is carried by spacing, weight and hierarchy rather
+ * than by a change of face partway down the page.
+ *
+ * Inter is the whole system now. Its variable weight axis is what the old
+ * three faces were doing: 600 for a heading, 500 for a price, 400 for prose,
+ * and a small tracked uppercase for a label. Prices and dimensions that used
+ * to be set in mono are Inter too — a tabular figure in a heavier weight reads
+ * as a number without borrowing a code editor's voice.
+ *
+ * `--font-inter` is consumed by all three font tokens in globals.css, so
+ * `font-display`, `font-body` and `font-mono` keep working and all resolve to
+ * the same family. That is deliberate: it lets the pages convert in later
+ * sub-steps instead of all at once.
  */
-const archivo = Archivo({
-  variable: "--font-archivo",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
-  axes: ["wdth"],
-});
-
-const newsreader = Newsreader({
-  variable: "--font-newsreader",
-  subsets: ["latin"],
-  axes: ["opsz"],
-});
-
-const plexMono = IBM_Plex_Mono({
-  variable: "--font-plex-mono",
-  subsets: ["latin"],
-  weight: ["400", "500"],
+  // Explicit so `font-feature-settings` below has something to switch on.
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -77,7 +77,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${archivo.variable} ${newsreader.variable} ${plexMono.variable} h-full antialiased`}
+      className={`${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full">{children}</body>
     </html>

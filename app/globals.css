@@ -1,36 +1,67 @@
 @import "tailwindcss";
 
 /* ---------------------------------------------------------------------------
-   Palette
+   Tokens
    ---------------------------------------------------------------------------
-   Two brand tokens are given (primary-dark, primary-light). Everything else is
-   pulled toward the same petrol-blue hue as the ink rather than taken from a
-   neutral grey ramp, so the greys read as part of the brand instead of as
-   Tailwind's defaults sitting next to it.
+   A clean modern storefront: white page, dark brand chrome, one restrained
+   accent. This replaces the petrol-and-brass showroom palette, where the brand
+   colour was the ground everything sat on.
 
-   `brass` is the one warm value: the colour of furniture hardware and of the
-   workshop, against the cool showroom ink. It is a MARK colour, not a text
-   colour — 2.8:1 on paper, which is fine for rules, ticks and dividers and
-   nowhere near enough for body copy. On ink it clears 6:1 and can carry text.
+   THE NAMES ARE UNCHANGED ON PURPOSE. `ink`, `paper`, `muted`, `hairline` and
+   `brass` are referenced by every page and component in the app; re-pointing
+   what they MEAN converts the whole surface at once, while renaming them would
+   mean editing every page in this sub-step — which is exactly what the plan
+   says not to do yet. The pages inherit the new look; the later sub-steps then
+   change their layout, not their colours.
+
+   `surface`, `line-strong` and the accent tints are new, added for the
+   primitives below. Nothing is removed.
    --------------------------------------------------------------------------- */
 @theme {
+  /* The two given brand tokens. primary-light is now true white — the page is
+     white in this direction, not an off-white paper. */
   --color-primary-dark: #0e202c;
-  --color-primary-light: #fbfbfb;
+  --color-primary-light: #ffffff;
 
-  --color-ink: #0e202c; /* headings, dark bands */
-  --color-ink-deep: #081720; /* the deepest band — footer, hero */
-  --color-paper: #fbfbfb; /* page ground */
-  --color-muted: #5a6f7d; /* secondary text — 4.9:1 on paper */
-  --color-hairline: #e3e7ea; /* rules, card edges, quiet fills */
-  --color-brass: #b98d4e; /* the mark colour */
+  /* Chrome and type.
+     `ink` stays the brand dark: it is the header, the footer, the solid button
+     and the heading colour, which is what "dark chrome, not the whole page"
+     means in practice. At 16.5:1 on white it is also a perfectly good text
+     colour, so the brand stays present in the reading experience without
+     tinting the ground. */
+  --color-ink: #0e202c;
+  --color-ink-deep: #081720; /* the deepest band — footer */
 
-  /* Three voices, deliberately unlike each other:
-     display = wide grotesque (showroom signage)
-     body    = optical-size serif (catalogue prose)
-     mono    = the spec voice (dimensions, prices, status) */
-  --font-display: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
-  --font-body: var(--font-newsreader), ui-serif, Georgia, serif;
-  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+  --color-paper: #ffffff; /* the page */
+  --color-surface: #f6f7f8; /* subtle fills: quiet sections, inputs, cards */
+
+  /* Secondary text. Neutral-leaning slate rather than the old petrol-tinted
+     grey — 5.4:1 on white, comfortably past AA for body copy. */
+  --color-muted: #5a6a76;
+
+  --color-hairline: #e7eaec; /* default border: cards, rules, dividers */
+  --color-line-strong: #d3d8dc; /* inputs and anything that must read as an edge */
+
+  /* THE ACCENT, and it stays brass.
+     Kept rather than swapped for a cleaner hue because it is the one thing
+     carrying the business forward from the old identity — it is the colour of
+     furniture hardware — and because a muted gold on white is a standard,
+     unfussy premium-retail accent rather than a decorative leftover.
+
+     Still a MARK colour, not a text colour: 2.9:1 on white. Fine for rules,
+     ticks, focus rings and small emphasis; never body copy. `accent-strong` is
+     the darkened version for the rare case where it must carry text — 4.6:1. */
+  --color-brass: #b98d4e;
+  --color-accent-strong: #8a6532;
+  --color-accent-soft: #faf6ef; /* the tint, for quiet highlight panels */
+
+  /* One typeface. All three role tokens resolve to Inter so `font-display`,
+     `font-body` and `font-mono` keep working across pages that have not been
+     converted yet — see the note in app/layout.tsx. Once the page sub-steps
+     land, `font-mono` has no remaining callers and can go. */
+  --font-display: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 }
 
 body {
@@ -39,15 +70,55 @@ body {
   font-family: var(--font-body);
 }
 
-/* ---------------------------------------------------------------------------
-   The measure — this project's signature device
-   ---------------------------------------------------------------------------
-   A ruler edge: hairline with brass ticks. Furniture is bought on whether it
-   fits, so the vocabulary of measuring is the honest ornament here — it says
-   something true about the subject instead of decorating around it.
+/* Numbers that sit in a column — prices in a list, dimensions in a spec table —
+   line up when their digits share a width. Inter ships tabular figures; this is
+   the switch. Applied where numbers are compared, not globally, because
+   proportional figures read better inside a sentence. */
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}
 
-   Used sparingly: above a section heading, along the top of a card. If it
-   appears on everything it stops meaning anything.
+/* ---------------------------------------------------------------------------
+   Type utilities
+   ---------------------------------------------------------------------------
+   `display-wide` and `spec-label` were the two named voices of the old
+   three-face system. They are kept as NAMES because the pages call them
+   everywhere, and re-pointing them is what converts those pages without
+   editing them — the same argument as the colour tokens above. What they mean
+   has changed completely: both are Inter now, separated by weight, size and
+   tracking rather than by family.
+   --------------------------------------------------------------------------- */
+
+/* Headings. Was Archivo pushed to wdth 118 to read as showroom signage; now
+   Inter at a tight negative tracking, which is what stops a large sans heading
+   looking loose and default. The `uppercase` the pages pair this with is
+   theirs to drop in the later sub-steps. */
+@utility display-wide {
+  font-family: var(--font-display);
+  letter-spacing: -0.021em;
+}
+
+/* The eyebrow and small-label voice. Was IBM Plex Mono; now Inter, a little
+   larger and less tracked than the mono version needed, because a
+   proportional face at 0.14em looks gappy where a monospace one looked
+   deliberate. */
+@utility spec-label {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* ---------------------------------------------------------------------------
+   The measure — retained, not yet retired
+   ---------------------------------------------------------------------------
+   The ruler edge is the old identity's signature device, and it does not
+   belong in the clean direction. It is still defined because pages and the
+   Measure component call it, and this sub-step does not touch pages. Section
+   has already stopped rendering it; the remaining call sites go with their
+   pages, and then this block and components/ui/measure.tsx can be deleted
+   together.
    --------------------------------------------------------------------------- */
 @utility measure {
   height: 0.5rem;
@@ -60,22 +131,6 @@ body {
   background-repeat: no-repeat;
   background-size: 100% 0.3125rem;
   opacity: 0.55;
-}
-
-/* Small caps-ish label: the eyebrow voice, set in the spec face. */
-@utility spec-label {
-  font-family: var(--font-mono);
-  font-size: 0.6875rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-}
-
-/* The display face's width axis is what makes the wordmark read as signage
-   rather than as a bold heading. Archivo carries wdth 62–125. */
-@utility display-wide {
-  font-family: var(--font-display);
-  font-variation-settings: "wdth" 118;
-  letter-spacing: -0.01em;
 }
 
 /* ---------------------------------------------------------------------------

@@ -139,7 +139,7 @@ export default async function ProductPage({
             </div>
 
             <div className="mt-8">
-              <AskAiButton />
+              <AskAiButton productName={product.name} />
             </div>
 
             {/* Specifications. The mono voice, because these are the numbers

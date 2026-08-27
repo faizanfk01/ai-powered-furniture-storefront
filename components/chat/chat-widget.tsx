@@ -15,6 +15,7 @@ import {
 import { SITE, WHATSAPP_DISPLAY, whatsappUrl } from "@/lib/site";
 import type { ChatMessageInput } from "@/lib/validations/chat";
 
+import { seedMessage, useChat } from "./chat-context";
 import { ChatProductCard } from "./chat-product-card";
 import { ChatReply } from "./chat-reply";
 import { ChatThinking } from "./chat-thinking";
@@ -67,7 +68,10 @@ let entrySeq = 0;
 const nextId = () => `entry-${++entrySeq}`;
 
 export function ChatWidget() {
-  const [open, setOpen] = useState(false);
+  // Open state lives in the provider, not here, because the product page's
+  // "Ask AI about this piece" button needs to open this panel from a different
+  // branch of the tree. The transcript stays local — nothing outside needs it.
+  const { open, setOpen, registerAsk } = useChat();
   const [entries, setEntries] = useState<Entry[]>([]);
   const [pending, setPending] = useState(false);
   const [draft, setDraft] = useState("");
@@ -117,7 +121,7 @@ export function ChatWidget() {
       document.body.style.overflow = previousOverflow;
       document.removeEventListener("keydown", onKeyDown);
     };
-  }, [open]);
+  }, [open, setOpen]);
 
   // Focus the input when the panel opens, so a keyboard user can type at once
   // and a screen reader lands inside the dialog rather than behind it.
@@ -224,6 +228,34 @@ export function ChatWidget() {
     void send(message, base);
   }
 
+  /**
+   * "Ask AI about this piece", arriving from the product page.
+   *
+   * The seed is a sentence, not a special mode: it goes through send() and
+   * POST /api/chat exactly like something typed into the box, which is what
+   * keeps the grounding argument intact — the assistant answers by retrieving
+   * the product for real, and there is no second path into the model.
+   *
+   * ALREADY-ASKED CHECK. Clicking the button again after closing the panel
+   * should reopen the conversation, not append a second identical question and
+   * spend another Groq request on an answer that is already on screen. Both
+   * sides compose the sentence with seedMessage(), so the comparison is exact
+   * rather than a guess at what the text might have been.
+   *
+   * Registered on every render so the closure always sees the current
+   * transcript. The effect only writes to a ref — no state is set here, and
+   * nothing re-renders because of it.
+   */
+  useEffect(() => {
+    registerAsk((productName) => {
+      const message = seedMessage(productName);
+      const alreadyAsked = entries.some(
+        (entry) => entry.kind === "user" && entry.text === message,
+      );
+      if (!alreadyAsked) void send(message, entries);
+    });
+  });
+
   // The most recent turn's prefilled handoff, which carries the customer's own
   // question and the product the reply led with. Falls back to a plain opener
   // before anything has been asked.
@@ -242,7 +274,7 @@ export function ChatWidget() {
       <button
         ref={launcherRef}
         type="button"
-        onClick={() => setOpen((value) => !value)}
+        onClick={() => setOpen(!open)}
         aria-expanded={open}
         aria-controls={panelId}
         // The display utility is set ONLY in the conditional below, never in

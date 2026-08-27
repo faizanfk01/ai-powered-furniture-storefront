@@ -14,6 +14,11 @@
  *
  *   npm run test:chat -- --suite=stub
  *
+ * PRODUCT SEED SUITE — what the product page's "Ask AI about this piece"
+ * button actually does. Same requirements as the live suite:
+ *
+ *   npm run test:chat -- --suite=seed
+ *
  * Deliberately not an npm script: `VAR=x next dev` does not set a variable
  * under cmd.exe, which is what npm uses on Windows, and the alternative is a
  * cross-env dependency for one line of test setup.
@@ -33,6 +38,7 @@
  */
 import "dotenv/config";
 
+import { seedMessage } from "../components/chat/chat-context";
 import { db } from "../lib/db";
 import { startGroqStub, type StubMode } from "./groq-stub";
 
@@ -306,6 +312,32 @@ async function post(url: string, payload: unknown) {
   return { response, body };
 }
 
+/**
+ * post(), but waiting out the free tier instead of failing on it.
+ *
+ * The binding limit is tokens per minute, not requests per day: 8,000 TPM on
+ * openai/gpt-oss-120b, and a turn carrying a product fact block runs 1,500 to
+ * 2,500 of them. Four turns back to back is a 429, which is the harness
+ * outrunning the quota rather than anything wrong with the endpoint — and a
+ * suite that reports its own impatience as a product failure is worse than no
+ * suite.
+ *
+ * Groq's `retry-after` is honoured when present. Deliberately NOT used by the
+ * stub suite, which asserts that a 429 comes back as AI_BUSY and would be
+ * defeated by a harness that quietly waited for one to stop happening.
+ */
+async function postPatiently(url: string, payload: unknown, attempts = 3) {
+  for (let attempt = 1; ; attempt += 1) {
+    const result = await post(url, payload);
+    if (result.response.status !== 429 || attempt >= attempts) return result;
+
+    const header = Number(result.response.headers.get("retry-after"));
+    const wait = Number.isFinite(header) && header > 0 ? header : 25;
+    console.log(`   (rate limited — waiting ${wait}s and retrying)`);
+    await new Promise((resolve) => setTimeout(resolve, wait * 1000));
+  }
+}
+
 function report(name: string, checks: Check[]) {
   const failed = checks.filter((check) => !check.pass);
   console.log(`\n  ${failed.length === 0 ? "PASS" : "FAIL"}  ${name}`);
@@ -322,7 +354,7 @@ async function runLiveSuite(catalogue: Catalogue) {
   let failures = 0;
 
   for (const scenario of liveScenarios(catalogue)) {
-    const { response, body } = await post(LIVE_URL, {
+    const { response, body } = await postPatiently(LIVE_URL, {
       message: scenario.message,
       history: scenario.history ?? [],
     });
@@ -351,9 +383,10 @@ async function runLiveSuite(catalogue: Catalogue) {
       ...scenario.check(chat, response),
     ]);
 
-    // 30 RPM on the free tier, and two calls per turn. Spacing the scenarios
-    // keeps the suite from being its own rate-limit test.
-    await new Promise((resolve) => setTimeout(resolve, 2500));
+    // 8,000 tokens per minute, and a turn with a fact block costs 1,500-2,500
+    // of them. Roughly one turn every twelve seconds is what that allows;
+    // postPatiently() above covers the rest.
+    await new Promise((resolve) => setTimeout(resolve, 12_000));
   }
 
   return failures;
@@ -470,10 +503,129 @@ async function runStubSuite(catalogue: Catalogue) {
   return failures;
 }
 
+
+// ---------------------------------------------------------------------------
+// Product seed suite — the "Ask AI about this piece" button
+// ---------------------------------------------------------------------------
+
+/**
+ * The button sends seedMessage(product.name) and nothing else — no context
+ * field, no server-side pinning. This suite runs that exact two-turn sequence
+ * against real products and asserts the thing the feature promises: the
+ * opening answer is about the product whose page the button was on, and a
+ * follow-up that names nothing ("what is it made of?") still resolves to it.
+ *
+ * seedMessage is imported from the component rather than retyped, so a change
+ * to the wording cannot pass here and fail in the browser.
+ */
+async function runSeedSuite(catalogue: Catalogue) {
+  console.log(`
+=== PRODUCT SEED SUITE — real Groq, ${LIVE_URL} ===`);
+
+  const products = await db.product.findMany({
+    select: { id: true, name: true, slug: true },
+    orderBy: { price: "asc" },
+    take: 3,
+  });
+
+  let failures = 0;
+
+  for (const product of products) {
+    console.log(`
+${"-".repeat(78)}`);
+    console.log(`Product page: /products/${product.slug}`);
+
+    // Turn 1 — exactly what clicking the button sends.
+    const opening = seedMessage(product.name);
+    console.log(`Q1 (from the button): ${opening}`);
+
+    const first = await postPatiently(LIVE_URL, { message: opening, history: [] });
+    if (first.response.status !== 200) {
+      failures += report(`${product.name} — opening`, [
+        ok("HTTP 200", false, `got ${first.response.status}`),
+      ]);
+      continue;
+    }
+    const opened = first.body as ChatBody;
+    console.log(`A1: ${opened.reply}`);
+    console.log(`   [retrieval] matched=${opened.retrieval.matched} filters=${JSON.stringify(opened.retrieval.filters)}`);
+
+    failures += report(`${product.name} — the button lands on the right product`, [
+      ...universalChecks(opened, catalogue),
+      ok(
+        "this product was retrieved",
+        opened.products.some((candidate) => candidate.id === product.id),
+        opened.products.map((candidate) => candidate.name).join(", ") || "(none)",
+      ),
+      ok(
+        "the reply cited it",
+        opened.citations.some(
+          (ref) =>
+            opened.products.find((candidate) => candidate.ref === ref)?.id ===
+            product.id,
+        ),
+      ),
+      ok("the model's own reply passed the grounding check", opened.grounded),
+      ok(
+        "no OTHER product was cited",
+        opened.citations.every(
+          (ref) =>
+            opened.products.find((candidate) => candidate.ref === ref)?.id ===
+            product.id,
+        ),
+      ),
+    ]);
+
+    await new Promise((resolve) => setTimeout(resolve, 12_000));
+
+    // Turn 2 — a follow-up naming nothing, carrying the real transcript.
+    const followUp = "what is it made of?";
+    console.log(`
+Q2 (follow-up): ${followUp}`);
+
+    const second = await postPatiently(LIVE_URL, {
+      message: followUp,
+      history: [
+        { role: "user", content: opening },
+        { role: "assistant", content: opened.reply },
+      ],
+    });
+
+    if (second.response.status !== 200) {
+      failures += report(`${product.name} — follow-up`, [
+        ok("HTTP 200", false, `got ${second.response.status}`),
+      ]);
+      continue;
+    }
+    const answered = second.body as ChatBody;
+    console.log(`A2: ${answered.reply}`);
+    console.log(`   [retrieval] matched=${answered.retrieval.matched} filters=${JSON.stringify(answered.retrieval.filters)}`);
+
+    failures += report(`${product.name} — the follow-up stays on it`, [
+      ...universalChecks(answered, catalogue),
+      ok(
+        "still resolved to the same product",
+        answered.products.length > 0 &&
+          answered.products.every((candidate) => candidate.id === product.id),
+        answered.products.map((candidate) => candidate.name).join(", ") || "(none)",
+      ),
+      ok("the model's own reply passed the grounding check", answered.grounded),
+    ]);
+
+    await new Promise((resolve) => setTimeout(resolve, 12_000));
+  }
+
+  return failures;
+}
+
 // ---------------------------------------------------------------------------
 
 async function main() {
-  const suite = process.argv.includes("--suite=stub") ? "stub" : "live";
+  const suite = process.argv.includes("--suite=stub")
+    ? "stub"
+    : process.argv.includes("--suite=seed")
+      ? "seed"
+      : "live";
 
   const rows = await db.product.findMany({
     select: { id: true, name: true, slug: true, price: true },
@@ -485,7 +637,11 @@ async function main() {
   console.log("Every product in every reply is checked against this set.");
 
   const failures =
-    suite === "stub" ? await runStubSuite(catalogue) : await runLiveSuite(catalogue);
+    suite === "stub"
+      ? await runStubSuite(catalogue)
+      : suite === "seed"
+        ? await runSeedSuite(catalogue)
+        : await runLiveSuite(catalogue);
 
   console.log(`\n${"=".repeat(78)}`);
   console.log(failures === 0 ? "ALL CHECKS PASSED" : `${failures} CHECK(S) FAILED`);

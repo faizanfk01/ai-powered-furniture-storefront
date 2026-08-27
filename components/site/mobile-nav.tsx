@@ -4,8 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import { useChat } from "@/components/chat/chat-context";
+import { ChatGlyph } from "@/components/chat/chat-glyph";
 import { Button } from "@/components/ui/button";
-import { Measure } from "@/components/ui/measure";
 import { LOCATIONS, NAV_LINKS, whatsappUrl } from "@/lib/site";
 
 import { WhatsAppIcon } from "./whatsapp-icon";
@@ -13,17 +14,25 @@ import { WhatsAppIcon } from "./whatsapp-icon";
 /**
  * The small-screen navigation.
  *
- * A client component, and the only one in the site chrome — the header and
- * footer around it stay server-rendered. The interactive surface is this
- * panel and nothing else.
+ * A client component, and the only stateful one in the site chrome — the
+ * header and footer around it stay server-rendered.
  *
- * Opens to a full ink panel rather than a dropdown: on a phone this is the
- * whole screen anyway, and the ink ground makes it unmistakably a different
- * mode rather than a list floating over the page.
+ * Opens to a full ink panel below the bar. That was true before and stays
+ * true, but it means something different now: the header is dark too, so the
+ * panel reads as the bar unfolding rather than as a separate mode dropped over
+ * the page.
+ *
+ * Restyled only. The open/close state, the close-on-navigation pass, the
+ * Escape handler and the scroll lock are exactly as they were.
  */
 export function MobileNav() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+
+  // The global drawer's own open state — the same one the floating launcher
+  // and the header button use. Nothing new is wired; the panel just needs a
+  // way to hand off to it.
+  const { setOpen: setChatOpen } = useChat();
 
   // Close on navigation. Without this the panel stays open over the page the
   // visitor just asked for, which reads as a broken link.
@@ -59,24 +68,32 @@ export function MobileNav() {
 
   return (
     <div className="lg:hidden">
+      {/* Icon only now. The word "Menu" beside three rules was part of the
+          labelled-diagram language of the old identity; a hamburger needs no
+          caption, and the accessible name is carried by the sr-only span
+          rather than by visible text. */}
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
         aria-expanded={open}
         aria-controls="mobile-nav-panel"
-        className="spec-label -mr-2 inline-flex items-center gap-2 px-2 py-3 text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
+        className="-mr-2 inline-flex size-10 items-center justify-center rounded-lg text-paper transition-colors hover:bg-paper/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
       >
-        {open ? "Close" : "Menu"}
-        <span aria-hidden="true" className="flex flex-col gap-[3px]">
+        <span className="sr-only">{open ? "Close menu" : "Open menu"}</span>
+        <span aria-hidden="true" className="flex flex-col gap-[5px]">
           <span
-            className={`block h-px w-4 bg-current transition-transform ${
-              open ? "translate-y-[4px] rotate-45" : ""
+            className={`block h-0.5 w-5 rounded-full bg-current transition-transform ${
+              open ? "translate-y-[7px] rotate-45" : ""
             }`}
           />
-          <span className={`block h-px w-4 bg-current ${open ? "opacity-0" : ""}`} />
           <span
-            className={`block h-px w-4 bg-current transition-transform ${
-              open ? "-translate-y-[4px] -rotate-45" : ""
+            className={`block h-0.5 w-5 rounded-full bg-current transition-opacity ${
+              open ? "opacity-0" : ""
+            }`}
+          />
+          <span
+            className={`block h-0.5 w-5 rounded-full bg-current transition-transform ${
+              open ? "-translate-y-[7px] -rotate-45" : ""
             }`}
           />
         </span>
@@ -85,13 +102,14 @@ export function MobileNav() {
       {open && (
         <div
           id="mobile-nav-panel"
-          className="fixed inset-x-0 top-[var(--header-height)] bottom-0 z-50 overflow-y-auto bg-ink-deep text-paper"
+          className="fixed inset-x-0 top-[var(--header-height)] bottom-0 z-50 overflow-y-auto bg-ink text-paper"
         >
-          <div className="px-6 py-10 sm:px-10">
-            <Measure />
-
-            <nav aria-label="Main" className="mt-8">
-              <ul className="flex flex-col gap-1">
+          <div className="px-4 py-6 sm:px-6">
+            <nav aria-label="Main">
+              {/* Divided rows rather than a stack of tracked-out capitals:
+                  a phone nav is a list, and a list is what people expect to
+                  tap down. */}
+              <ul className="flex flex-col divide-y divide-paper/10 border-y border-paper/10">
                 {NAV_LINKS.map((link) => {
                   const active =
                     link.href === "/"
@@ -103,7 +121,7 @@ export function MobileNav() {
                       <Link
                         href={link.href}
                         aria-current={active ? "page" : undefined}
-                        className={`display-wide block py-3 text-2xl font-medium uppercase transition-colors ${
+                        className={`block py-4 text-lg font-medium transition-colors ${
                           active ? "text-brass" : "text-paper hover:text-brass"
                         }`}
                       >
@@ -115,9 +133,24 @@ export function MobileNav() {
               </ul>
             </nav>
 
-            <div className="mt-10">
+            <div className="mt-6 flex flex-col gap-3">
+              {/* Closes the panel before opening the drawer, so the drawer is
+                  not stacked over a nav the visitor has finished with. Same
+                  `setOpen` from ChatProvider the launcher already calls. */}
+              <button
+                type="button"
+                onClick={() => {
+                  setOpen(false);
+                  setChatOpen(true);
+                }}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-paper/25 px-5 py-2.5 text-sm font-medium text-paper transition-colors hover:border-paper/50 hover:bg-paper/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
+              >
+                <ChatGlyph className="size-4" />
+                Ask AI
+              </button>
+
               <Button
-                variant="outline-invert"
+                variant="solid-invert"
                 href={whatsappUrl(
                   "Hello Standard Furniture — I have a question.",
                 )}
@@ -128,11 +161,13 @@ export function MobileNav() {
               </Button>
             </div>
 
-            <dl className="mt-12 grid grid-cols-1 gap-8 border-t border-paper/15 pt-8 sm:grid-cols-2">
+            <dl className="mt-8 grid grid-cols-1 gap-6 border-t border-paper/10 pt-6 sm:grid-cols-2">
               {LOCATIONS.map((location) => (
                 <div key={location.label}>
-                  <dt className="spec-label text-brass">{location.label}</dt>
-                  <dd className="mt-2 text-paper/80">
+                  <dt className="text-sm font-semibold text-paper">
+                    {location.label}
+                  </dt>
+                  <dd className="mt-1 text-sm leading-relaxed text-paper/65">
                     {location.lines.map((line) => (
                       <span key={line} className="block">
                         {line}

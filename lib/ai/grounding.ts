@@ -122,7 +122,16 @@ function foldSpaces(text: string) {
  */
 const SIGNIFICANT_FIGURE = 1000;
 
-function numbersIn(text: string): Set<number> {
+/**
+ * Every figure in `text` big enough to be a price.
+ *
+ * Exported because lib/ai/summary.ts needs exactly this, applied to a product
+ * row instead of a chat fact block. Two copies of "what counts as a number
+ * here" would drift the first time one of them learned about a new separator,
+ * and the whole guarantee rests on both sides of a comparison extracting
+ * identically.
+ */
+export function significantFiguresIn(text: string): Set<number> {
   const found = new Set<number>();
 
   for (const match of foldSpaces(text).matchAll(NUMBER_PATTERN)) {
@@ -170,8 +179,8 @@ export function checkGrounding(
   // model repeats the planted figure and the check waves it through. The
   // customer's own current sentence is safe to allow because the reply needs
   // to be able to quote a budget back ("nothing under Rs 15,000, but…").
-  const allowed = new Set([...numbersIn(facts), ...numbersIn(userText)]);
-  const used = numbersIn(reply);
+  const allowed = new Set([...significantFiguresIn(facts), ...significantFiguresIn(userText)]);
+  const used = significantFiguresIn(reply);
 
   for (const value of used) {
     if (!allowed.has(value)) {

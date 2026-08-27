@@ -8,6 +8,7 @@ import {
   ProductForm,
   type ProductFormValues,
 } from "@/components/admin/product-form";
+import { SummaryManager } from "@/components/admin/summary-manager";
 import { db } from "@/lib/db";
 import { productInclude } from "@/lib/products";
 import { productPath } from "@/lib/url";
@@ -92,6 +93,21 @@ export default async function EditProductPage({
           productId={product.id}
           productName={product.name}
           images={product.images}
+        />
+      </div>
+
+      {/* Below the images, and separate for the same reason: `aiSummary` is
+          not a field on this form and must not become one. It is generated
+          from the fields above rather than typed, so it saves through its own
+          endpoint, on its own button, with a draft the owner reads first.
+          Putting it inside ProductForm would make it look like something you
+          fill in — and would put arbitrary text one keystroke away from a
+          column the storefront labels as machine-written. */}
+      <div className="mt-12 border-t border-hairline pt-10">
+        <SummaryManager
+          productId={product.id}
+          productName={product.name}
+          published={product.aiSummary}
         />
       </div>
     </AdminPage>

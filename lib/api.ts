@@ -30,7 +30,13 @@ export type ApiErrorCode =
   // are expected operating states of a free-tier upstream, so neither is an
   // INTERNAL_ERROR — a 500 here would mean a bug on our side, and it isn't.
   | "AI_BUSY"
-  | "AI_UNAVAILABLE";
+  | "AI_UNAVAILABLE"
+  // A generated draft was refused because it said something the source data
+  // does not support (Phase 3 Step 3). 422 rather than 400: the request was
+  // well-formed and the caller did nothing wrong — the content could not be
+  // processed. Distinct from AI_UNAVAILABLE because the fix is different, and
+  // the admin screen says so: regenerate, do not wait.
+  | "AI_UNGROUNDED";
 
 export type ApiErrorBody = {
   error: {

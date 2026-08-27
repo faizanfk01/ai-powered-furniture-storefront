@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
 
-import { controlClass } from "@/components/ui/field";
+import { storefrontControlClass } from "@/components/ui/field";
 import { PRICE_BANDS, type CatalogParams } from "@/lib/catalog-filters";
 
 type CategoryOption = { slug: string; name: string };
@@ -24,6 +24,12 @@ type CategoryOption = { slug: string; name: string };
  * Everything below writes to the URL and reads nothing back — the server owns
  * the results. The only local state is the text in the search box, which needs
  * to stay responsive between keystrokes.
+ *
+ * RESTYLED ONLY. Every line of behaviour above and below — the GET form, the
+ * debounce, the replace-vs-push choice, the transition, the live count — is
+ * exactly as it was. What changed is that the controls now sit in a panel
+ * instead of between two page-wide rules, and the labels read as words rather
+ * than as tracked-out capitals.
  */
 export function CatalogFilters({
   categories,
@@ -88,7 +94,7 @@ export function CatalogFilters({
       ref={formRef}
       action="/catalog"
       method="get"
-      className="border-y border-hairline py-6"
+      className="rounded-xl border border-hairline bg-surface p-4 sm:p-5"
       // With JS the submit is redundant, but Enter in the text field still
       // fires it — send it through the router instead of a full page load.
       onSubmit={(event) => {
@@ -96,9 +102,14 @@ export function CatalogFilters({
         navigate({ ...params, q: query || undefined }, { replace: true });
       }}
     >
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_auto] lg:items-end">
+      {/* No `items-end` on this grid: an <input> and a <select> do not compute
+          to the same height, and bottom-aligning the cells threw the three
+          labels onto three different baselines. Top-aligned, the labels line
+          up and the few pixels the select gives back fall at the bottom, where
+          nobody is reading. */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_auto]">
         <div>
-          <label htmlFor="catalog-q" className="spec-label block text-muted">
+          <label htmlFor="catalog-q" className="block text-sm font-medium text-ink">
             Search
           </label>
           <input
@@ -108,14 +119,14 @@ export function CatalogFilters({
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Sofa, sheesham, office…"
-            className={`${controlClass} mt-2`}
+            className={`${storefrontControlClass} mt-2`}
           />
         </div>
 
         <div>
           <label
             htmlFor="catalog-category"
-            className="spec-label block text-muted"
+            className="block text-sm font-medium text-ink"
           >
             Category
           </label>
@@ -126,7 +137,7 @@ export function CatalogFilters({
             onChange={(event) =>
               navigate({ ...params, category: event.target.value || undefined })
             }
-            className={`${controlClass} mt-2`}
+            className={`${storefrontControlClass} mt-2`}
           >
             <option value="">All categories</option>
             {categories.map((category) => (
@@ -138,7 +149,7 @@ export function CatalogFilters({
         </div>
 
         <div>
-          <label htmlFor="catalog-price" className="spec-label block text-muted">
+          <label htmlFor="catalog-price" className="block text-sm font-medium text-ink">
             Price
           </label>
           <select
@@ -152,7 +163,7 @@ export function CatalogFilters({
                   undefined) as CatalogParams["price"],
               })
             }
-            className={`${controlClass} mt-2`}
+            className={`${storefrontControlClass} mt-2`}
           >
             <option value="">Any price</option>
             {PRICE_BANDS.map((band) => (
@@ -166,7 +177,7 @@ export function CatalogFilters({
         <noscript>
           <button
             type="submit"
-            className="mt-2 w-full bg-ink px-6 py-3 font-display text-sm font-medium tracking-wide text-paper uppercase"
+            className="mt-2 w-full rounded-lg bg-ink px-5 py-2.5 text-sm font-medium text-paper"
           >
             Apply
           </button>
@@ -177,7 +188,7 @@ export function CatalogFilters({
           screen reader hears the result change without moving focus. */}
       <p
         aria-live="polite"
-        className={`spec-label mt-5 transition-opacity ${
+        className={`mt-4 text-sm transition-opacity ${
           isPending ? "text-muted opacity-50" : "text-muted"
         }`}
       >

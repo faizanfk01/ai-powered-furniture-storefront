@@ -9,22 +9,32 @@ import { SITE } from "@/lib/site";
 import { isBackdropClick } from "./backdrop-click";
 import { ChatConversation } from "./chat-conversation";
 import { useChat } from "./chat-context";
-import { ChatGlyph } from "./chat-glyph";
 
 /**
- * The GLOBAL assistant: a floating launcher and a right-hand slide-over.
+ * The GLOBAL assistant: a right-hand slide-over, and nothing else.
  *
  * Mounted once in app/(storefront)/layout.tsx, so it is on every public page
  * and on none of the admin ones — and so its transcript survives client-side
  * navigation, because a layout does not remount when the page inside it
  * changes.
  *
- * This file is now only the CONTAINER: the launcher, the drawer shell, and
- * what the drawer opens onto. Everything that makes it a chat — the
- * transcript, the composer, grounded replies, the degradation notices — lives
- * in ChatConversation, which the product modal renders too. The two surfaces
- * are meant to look and sit differently; they are not meant to answer
- * differently.
+ * NO LAUNCHER. This file used to render a floating ink button in the
+ * bottom-right corner as well. It is gone: the header carries an Ask AI button
+ * (components/site/ask-ai-button.tsx) and the mobile panel carries another,
+ * and two permanent handles on one door is one too many — the floating one was
+ * also the one that sat over the footer's last column and the catalogue's last
+ * row of cards.
+ *
+ * Nothing about the drawer changed when it went. Open state lives in
+ * ChatProvider, every trigger calls the same `setOpen`, and this component
+ * only ever read that state — it never owned the launcher's behaviour, so
+ * deleting the markup deleted the whole of it.
+ *
+ * This file is only the CONTAINER: the drawer shell and what it opens onto.
+ * Everything that makes it a chat — the transcript, the composer, grounded
+ * replies, the degradation notices — lives in ChatConversation, which the
+ * product modal renders too. The two surfaces are meant to look and sit
+ * differently; they are not meant to answer differently.
  */
 
 const EXAMPLE_PROMPTS = [
@@ -40,7 +50,6 @@ export function ChatWidget() {
   const { open, setOpen } = useChat();
 
   const panelId = useId();
-  const launcherRef = useRef<HTMLButtonElement>(null);
   const drawerRef = useRef<HTMLDialogElement>(null);
   const pathname = usePathname();
 
@@ -77,91 +86,63 @@ export function ChatWidget() {
     if (!drawer) return;
 
     // No manual refocus: closing a dialog restores focus to the element that
-    // had it when showModal() was called, which is the launcher.
+    // had it when showModal() was called — the header's Ask AI button, or the
+    // one in the mobile panel. That is why removing the floating launcher cost
+    // nothing here: the browser tracks the opener, this file never did.
     const handleClose = () => setOpen(false);
 
     drawer.addEventListener("close", handleClose);
     return () => drawer.removeEventListener("close", handleClose);
   }, [setOpen]);
 
+  // THE DRAWER. A native <dialog>, slid in from the right edge — see the
+  // .chat-drawer rules in app/globals.css. Always mounted rather than
+  // conditionally rendered, so the transcript is never torn down and rebuilt,
+  // and so there is something for the closing transition to animate.
   return (
-    <>
-      {/* LAUNCHER. Square, ink, display face — the same geometry as Button.
-          Sits above the footer's content on z-40 like the header, and clear of
-          the iOS home indicator via safe-area insets. */}
-      <button
-        ref={launcherRef}
-        type="button"
-        onClick={() => setOpen(!open)}
-        aria-expanded={open}
-        aria-controls={panelId}
-        // The display utility is set ONLY in the conditional below, never in
-        // the base. `inline-flex ... hidden` in one class string is a coin
-        // toss: both are unprefixed display utilities, so which one wins comes
-        // from Tailwind's own ordering of the generated CSS rather than from
-        // the order they are written here.
-        //
-        // Hidden while the drawer is open, at every size. The drawer is modal,
-        // so the launcher behind it is inert anyway — leaving it showing
-        // through the scrim would be a button that looks pressable and is not.
-        className={`fixed right-4 bottom-4 z-40 items-center gap-2.5 bg-ink px-5 py-3.5 font-display text-sm font-medium tracking-wide text-paper uppercase shadow-lg shadow-ink/20 transition-colors hover:bg-ink-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass sm:right-6 sm:bottom-6 ${
-          open ? "hidden" : "inline-flex"
-        }`}
-        style={{ marginBottom: "env(safe-area-inset-bottom)" }}
-      >
-        <ChatGlyph />
-        Ask AI
-      </button>
-
-      {/* THE DRAWER. A native <dialog>, slid in from the right edge — see the
-          .chat-drawer rules in app/globals.css. Always mounted rather than
-          conditionally rendered, so the transcript is never torn down and
-          rebuilt, and so there is something for the closing transition to
-          animate. */}
-      <dialog
-        ref={drawerRef}
-        id={panelId}
-        aria-labelledby={`${panelId}-title`}
-        onClick={(event) => {
-          if (isBackdropClick(event)) setOpen(false);
-        }}
-        // Full width on a phone, a fixed column on anything larger. The
-        // height, position and slide come from .chat-drawer.
-        className="chat-drawer w-full shadow-2xl shadow-ink/30 sm:w-[26rem] sm:border-l sm:border-ink/15"
-      >
-        {/* HEADER — an ink band, so the drawer reads as a different mode of
-            the site rather than a card floating on the page. */}
-        <div className="flex items-start justify-between gap-4 bg-ink-deep px-5 py-4 text-paper">
-          <div>
-            <Measure width="w-12" />
-            <h2
-              id={`${panelId}-title`}
-              className="display-wide mt-2.5 text-base leading-tight font-medium uppercase"
-            >
-              Ask {SITE.name}
-            </h2>
-            <p className="spec-label mt-1 text-paper/55">
-              Answers from our catalogue
-            </p>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => setOpen(false)}
-            className="spec-label -mr-2 -mt-1 shrink-0 px-2 py-2 text-paper/70 transition-colors hover:text-paper focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
+    <dialog
+      ref={drawerRef}
+      id={panelId}
+      aria-labelledby={`${panelId}-title`}
+      onClick={(event) => {
+        if (isBackdropClick(event)) setOpen(false);
+      }}
+      // Full width on a phone, a fixed column on anything larger. The
+      // height, position and slide come from .chat-drawer.
+      className="chat-drawer w-full shadow-2xl shadow-ink/30 sm:w-[26rem] sm:border-l sm:border-ink/15"
+    >
+      {/* HEADER — an ink band, so the drawer reads as a different mode of
+          the site rather than a card floating on the page. */}
+      <div className="flex items-start justify-between gap-4 bg-ink-deep px-5 py-4 text-paper">
+        <div>
+          <Measure width="w-12" />
+          <h2
+            id={`${panelId}-title`}
+            className="display-wide mt-2.5 text-base leading-tight font-medium uppercase"
           >
-            Close
-          </button>
+            Ask {SITE.name}
+          </h2>
+          <p className="spec-label mt-1 text-paper/55">
+            Answers from our catalogue
+          </p>
         </div>
 
-        <ChatConversation
-          active={open}
-          placeholder="Ask about a piece, a budget, or how to order"
-          inputLabel="Ask a question about our furniture"
-          emptyState={(ask) => <EntryState onPick={ask} />}
-        />
-      </dialog>
-    </>
+        <button
+          type="button"
+          onClick={() => setOpen(false)}
+          className="spec-label -mr-2 -mt-1 shrink-0 px-2 py-2 text-paper/70 transition-colors hover:text-paper focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
+        >
+          Close
+        </button>
+      </div>
+
+      <ChatConversation
+        active={open}
+        placeholder="Ask about a piece, a budget, or how to order"
+        inputLabel="Ask a question about our furniture"
+        emptyState={(ask) => <EntryState onPick={ask} />}
+      />
+    </dialog>
   );
 }
 

@@ -11,7 +11,6 @@ import { WhatsAppIcon } from "@/components/site/whatsapp-icon";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Container } from "@/components/ui/container";
-import { Measure } from "@/components/ui/measure";
 import { Section } from "@/components/ui/section";
 import { db } from "@/lib/db";
 import { productInclude } from "@/lib/products";
@@ -109,37 +108,42 @@ export default async function HomePage() {
     <>
       {/* ------------------------------------------------------------------
           HERO — the approved thesis. A workshop that keeps a showroom, in a
-          named town. The two addresses are the closing statement, not a
-          detail buried in the footer, because the pair IS the proposition:
-          you can see the work, and you can see where it is made.
-         ------------------------------------------------------------------ */}
-      <section className="bg-ink-deep text-paper">
-        <Container>
-          <div className="py-20 sm:py-28 lg:py-32">
-            <Measure />
+          named town.
 
-            <p className="spec-label mt-6 text-brass">
+          ON WHITE NOW. It was a full ink band opening with the ruler mark and
+          the name set as signage at 8xl uppercase — an editorial cover, which
+          is what the showroom identity wanted. A storefront opens on its own
+          page ground and leads with what it sells; the brand dark is spent on
+          the header and the footer, which is where a customer looks for it.
+
+          The headline is the second half of the old lede, promoted. No new
+          claim is made here: the workshop-and-showroom pair was already the
+          hero's copy, it was just sitting underneath a wordmark.
+         ------------------------------------------------------------------ */}
+      <section>
+        <Container>
+          <div className="py-16 sm:py-24 lg:py-28">
+            <p className="text-sm font-medium text-accent-strong">
               {SITE.town}, {SITE.region}
             </p>
 
-            <h1 className="display-wide mt-5 text-5xl leading-[0.95] font-semibold uppercase sm:text-7xl lg:text-8xl">
-              Standard
-              <br />
-              Furniture
+            <h1 className="display-wide mt-4 max-w-3xl text-4xl leading-[1.08] font-semibold text-balance sm:text-5xl lg:text-6xl">
+              Built in Baghdada, shown in Shen Gul Plaza.
             </h1>
 
-            <p className="mt-8 max-w-xl text-lg leading-relaxed text-paper/75 sm:text-xl">
-              Custom furniture, interior design, 3D wallpapers and PVC panels.
-              Drawn to your room&apos;s measurements, built in Baghdada, shown
-              in Shen Gul Plaza.
+            <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted">
+              Custom furniture, interior design, 3D wallpapers and PVC panels —
+              drawn to your room&rsquo;s measurements by the same team that
+              builds them.
             </p>
 
-            <div className="mt-10 flex flex-wrap gap-3">
-              <Button variant="solid-invert" href="/catalog">
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Button size="lg" href="/catalog">
                 Browse the catalogue
               </Button>
               <Button
-                variant="outline-invert"
+                size="lg"
+                variant="outline"
                 href={whatsappUrl(
                   "Hello Standard Furniture — I have a question.",
                 )}
@@ -148,25 +152,40 @@ export default async function HomePage() {
                 Message on WhatsApp
               </Button>
             </div>
+          </div>
+        </Container>
+      </section>
 
-            <dl className="mt-16 grid max-w-2xl grid-cols-1 gap-8 border-t border-paper/15 pt-8 sm:grid-cols-2">
-              {LOCATIONS.map((location) => (
-                <div key={location.label}>
-                  <dt className="spec-label text-brass">{location.label}</dt>
-                  <dd className="mt-2 text-paper/80">
-                    <span className="mb-1 block text-sm text-paper/50">
-                      {location.role}
-                    </span>
+      {/* ------------------------------------------------------------------
+          THE TWO ADDRESSES — kept directly under the hero, because the pair IS
+          the proposition: you can see the work, and you can see where it is
+          made. That decision is unchanged; only the treatment is. It was a
+          bordered <dl> inside the ink band, and is now the page's first quiet
+          band, which separates it from the hero without another dark stripe.
+         ------------------------------------------------------------------ */}
+      <section className="border-y border-hairline bg-surface">
+        <Container>
+          <dl className="grid grid-cols-1 gap-8 py-10 sm:grid-cols-2 sm:gap-12">
+            {LOCATIONS.map((location) => (
+              <div key={location.label}>
+                <dt className="text-sm font-semibold text-ink">
+                  {location.label}
+                </dt>
+                <dd className="mt-1">
+                  <span className="block text-sm text-muted">
+                    {location.role}
+                  </span>
+                  <address className="mt-2 text-ink not-italic">
                     {location.lines.map((line) => (
                       <span key={line} className="block">
                         {line}
                       </span>
                     ))}
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          </div>
+                  </address>
+                </dd>
+              </div>
+            ))}
+          </dl>
         </Container>
       </section>
 
@@ -176,14 +195,17 @@ export default async function HomePage() {
         heading="Four things, done properly"
         lede="Everything is measured, built and fitted by the same team — the showroom and the workshop are a few minutes apart."
       >
-        <ul className="grid grid-cols-1 gap-px bg-hairline sm:grid-cols-2">
+        {/* Real cards with real gaps. The `gap-px` on a hairline ground this
+            replaces drew a ruled table, which is a way of presenting data, not
+            a way of presenting four things you can buy. */}
+        <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {OFFERINGS.map((offering) => (
             <li key={offering.title}>
-              <Card className="h-full border-0 p-8">
-                <h3 className="display-wide text-lg font-medium">
+              <Card padded className="h-full">
+                <h3 className="display-wide text-base font-semibold">
                   {offering.title}
                 </h3>
-                <p className="mt-3 leading-relaxed text-muted">
+                <p className="mt-2 text-sm leading-relaxed text-muted">
                   {offering.body}
                 </p>
               </Card>
@@ -192,14 +214,20 @@ export default async function HomePage() {
         </ul>
       </Section>
 
-      {/* ------------------------------------------------------------------ */}
+      {/* ------------------------------------------------------------------
+          FEATURED — the self-curating breadth selection from getFeatured()
+          above, untouched. On the quiet band so the white product cards read
+          as objects sitting on the page rather than as regions of it.
+         ------------------------------------------------------------------ */}
       {featured.length > 0 && (
         <Section
+          tone="surface"
+          width="wide"
           eyebrow="A piece from each room"
           heading="From the catalogue"
           lede="One from every category we build. Each is listed at its finished size, and each can be rebuilt to yours."
         >
-          <ul className="grid grid-cols-1 gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {featured.map((product) => (
               <li key={product.id}>
                 <ProductCard product={product} />
@@ -207,7 +235,7 @@ export default async function HomePage() {
             ))}
           </ul>
 
-          <div className="mt-14 border-t border-hairline pt-8">
+          <div className="mt-10">
             <Button variant="outline" href="/catalog">
               See the full catalogue
             </Button>
@@ -224,36 +252,28 @@ export default async function HomePage() {
           There is nothing for a visitor to act on here either, so an empty
           panel would be decoration standing in for evidence.
 
-          The layout adapts to how much evidence there actually is: a single
-          approved review becomes one large pull quote, which reads as an
-          editorial choice; several become a grid.
+          The layout still adapts to how much evidence there actually is: a
+          single approved review becomes one large pull quote, several become a
+          grid. What is gone is the ink band with a white panel inset into it —
+          a card floating in a dark frame, which put a border around the
+          evidence and made it look staged.
          ------------------------------------------------------------------ */}
       {testimonials.length > 0 && (
-        <section className="bg-ink-deep py-20 text-paper sm:py-28">
-          <Container>
-            <Measure />
-            <p className="spec-label mt-6 text-brass">In their words</p>
-            <h2 className="display-wide mt-4 text-3xl font-semibold uppercase sm:text-4xl">
-              From the showroom floor
-            </h2>
-
-            <div className="mt-12 rounded-none bg-paper p-8 text-ink sm:p-12">
-              {testimonials.length === 1 ? (
-                <div className="max-w-3xl">
-                  <Testimonial review={testimonials[0]!} featured />
-                </div>
-              ) : (
-                <ul className="grid grid-cols-1 gap-x-10 gap-y-10 md:grid-cols-2 lg:grid-cols-3">
-                  {testimonials.map((review) => (
-                    <li key={review.id}>
-                      <Testimonial review={review} />
-                    </li>
-                  ))}
-                </ul>
-              )}
+        <Section eyebrow="In their words" heading="From the showroom floor">
+          {testimonials.length === 1 ? (
+            <div className="max-w-3xl">
+              <Testimonial review={testimonials[0]!} featured />
             </div>
-          </Container>
-        </section>
+          ) : (
+            <ul className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {testimonials.map((review) => (
+                <li key={review.id}>
+                  <Testimonial review={review} />
+                </li>
+              ))}
+            </ul>
+          )}
+        </Section>
       )}
 
       {/* ------------------------------------------------------------------
@@ -264,18 +284,14 @@ export default async function HomePage() {
           that disappears exactly while there are no reviews is a form that can
           never collect the first one. This one is always here.
 
-          Kept to its own quiet band rather than folded into the ink section:
+          Kept to its own quiet band rather than folded into the section above:
           the testimonials are evidence being presented, this is a request
           being made of the reader, and running them together would make the
           evidence look solicited.
          ------------------------------------------------------------------ */}
-      <section className="border-t border-hairline py-16 sm:py-20">
-        <Container>
-          <div className="max-w-2xl">
-            <ReviewForm />
-          </div>
-        </Container>
-      </section>
+      <Section tone="surface" width="narrow">
+        <ReviewForm />
+      </Section>
 
       {/* ------------------------------------------------------------------ */}
       <Section
@@ -283,37 +299,42 @@ export default async function HomePage() {
         heading="Two addresses, eight minutes apart"
         lede="Sit on the sofa before you buy it, then watch the next one being built. Most customers do both in the same afternoon."
       >
-        <div className="flex flex-col gap-8 border-t border-hairline pt-8 sm:flex-row sm:items-end sm:justify-between">
-          <dl className="grid grid-cols-1 gap-8 sm:grid-cols-2 sm:gap-16">
-            {LOCATIONS.map((location) => (
-              <div key={location.label}>
-                <dt className="spec-label text-muted">{location.label}</dt>
-                <dd className="mt-2 text-ink">
-                  {location.lines.map((line) => (
-                    <span key={line} className="block">
-                      {line}
-                    </span>
-                  ))}
-                </dd>
-              </div>
-            ))}
-          </dl>
+        <Card padded className="sm:p-8">
+          <div className="flex flex-col gap-8 sm:flex-row sm:items-end sm:justify-between">
+            <dl className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-12">
+              {LOCATIONS.map((location) => (
+                <div key={location.label}>
+                  <dt className="text-sm font-semibold text-ink">
+                    {location.label}
+                  </dt>
+                  <dd className="mt-1.5 text-sm text-muted">
+                    {location.lines.map((line) => (
+                      <span key={line} className="block">
+                        {line}
+                      </span>
+                    ))}
+                  </dd>
+                </div>
+              ))}
+            </dl>
 
-          <Button
-            href={whatsappUrl(
-              "Hello Standard Furniture — I would like to visit the showroom.",
-            )}
-          >
-            <WhatsAppIcon />
-            Message the showroom
-          </Button>
-        </div>
+            <Button
+              href={whatsappUrl(
+                "Hello Standard Furniture — I would like to visit the showroom.",
+              )}
+              className="shrink-0"
+            >
+              <WhatsAppIcon />
+              Message the showroom
+            </Button>
+          </div>
+        </Card>
 
-        <p className="mt-8 text-sm text-muted">
+        <p className="mt-6 text-sm text-muted">
           Planning something bigger?{" "}
           <Link
             href="/catalog"
-            className="underline decoration-hairline underline-offset-4 transition-colors hover:text-ink hover:decoration-brass"
+            className="underline decoration-line-strong underline-offset-4 transition-colors hover:text-ink hover:decoration-ink"
           >
             Browse the catalogue
           </Link>{" "}

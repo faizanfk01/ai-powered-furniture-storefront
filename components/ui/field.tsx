@@ -8,13 +8,34 @@ import type { ReactNode } from "react";
  * props and behave differently, and hiding that behind one polymorphic
  * component buys nothing.
  *
- * Square, hairline, no radius: the same geometry as the buttons, the cards and
- * the footprint plans. Extracted because it is now used by the catalogue
- * filters and both form pages, and three copies of a border colour drift.
+ * THIS IS NOW THE ADMIN CONTROL. Square, hairline, no radius — the geometry of
+ * the showroom identity. It is left exactly as it was because the dashboard
+ * forms and the login page use it, and the admin is deliberately a different
+ * surface from the storefront (see the note in app/(storefront)/layout.tsx).
+ * Restyling it here would convert the dashboard as a side effect of a
+ * storefront pass.
  */
 export const controlClass =
   "w-full border border-hairline bg-paper px-4 py-3 font-body text-ink placeholder:text-muted/60 " +
   "focus:border-ink focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass";
+
+/**
+ * The storefront control: rounded, a real edge, and the same 0.5rem radius the
+ * Button and Card primitives settled on in 6a.
+ *
+ * `line-strong` rather than `hairline` on purpose. An input has to read as
+ * something you can type into before it is focused, and the hairline that is
+ * right for a divider disappears against white as a field boundary.
+ *
+ * A second export rather than a `variant` argument: these are two different
+ * design systems that happen to live in one repo, and a function that picks
+ * between them would invite call sites to pick wrong.
+ */
+export const storefrontControlClass =
+  "w-full rounded-lg border border-line-strong bg-paper px-3.5 py-2.5 text-ink transition-colors " +
+  "placeholder:text-muted/70 " +
+  "hover:border-muted/50 focus:border-ink focus:outline-none " +
+  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass";
 
 /**
  * Label, control, and an optional hint underneath.
@@ -39,9 +60,14 @@ export function Field({
 }) {
   return (
     <div>
-      <label htmlFor={id} className="spec-label block text-muted">
+      {/* Sentence case at a normal reading weight. The uppercase, letter-spaced
+          label this replaces was showroom signage; on a storefront form the
+          label is read as a question, not displayed as a plaque. */}
+      <label htmlFor={id} className="block text-sm font-medium text-ink">
         {label}
-        {optional && <span className="ml-2 text-muted/60">Optional</span>}
+        {optional && (
+          <span className="ml-2 font-normal text-muted">Optional</span>
+        )}
       </label>
 
       <div className="mt-2">{children}</div>

@@ -2,8 +2,9 @@
 
 import { useId, useState } from "react";
 
-import { Field } from "@/components/ui/field";
-import { Measure } from "@/components/ui/measure";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Field, storefrontControlClass } from "@/components/ui/field";
 import { mapApiError, NO_ERRORS, type FormErrorState } from "@/lib/form-errors";
 
 /**
@@ -119,9 +120,8 @@ export function ReviewForm({
 
   if (submitted) {
     return (
-      <div className="border border-hairline bg-hairline/25 p-6 sm:p-8">
-        <Measure width="w-16" />
-        <h3 className="display-wide mt-4 text-lg font-semibold uppercase">
+      <Card padded className="sm:p-8">
+        <h3 className="display-wide text-xl font-semibold">
           Thank you — it&rsquo;s with us
         </h3>
 
@@ -129,41 +129,41 @@ export function ReviewForm({
             vague delay, because "awaiting approval" is what is actually
             happening and a customer looking for their words tomorrow should
             know why they are not there yet. */}
-        <p className="mt-3 leading-relaxed text-ink">
-          Your review has been sent and is <strong>awaiting approval</strong>{" "}
+        <p className="mt-3 leading-relaxed text-muted">
+          Your review has been sent and is{" "}
+          <strong className="font-semibold text-ink">awaiting approval</strong>{" "}
           before it appears on the site. Someone at the shop reads every review
           first, so it will not show up straight away.
         </p>
 
-        <button
+        <Button
           type="button"
+          variant="outline"
           onClick={() => setSubmitted(false)}
-          className="mt-5 border border-ink/25 px-5 py-2.5 font-display text-xs font-medium tracking-wide text-ink uppercase transition-colors hover:border-ink hover:bg-ink/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
+          className="mt-6"
         >
           Write another
-        </button>
-      </div>
+        </Button>
+      </Card>
     );
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      noValidate
-      className="border border-hairline p-6 sm:p-8"
-    >
-      <Measure width="w-16" />
-      <h3 className="display-wide mt-4 text-lg font-semibold uppercase">
-        {productName ? `Reviewed the ${productName}?` : "Been to the showroom?"}
-      </h3>
-      <p className="mt-2 text-sm text-muted">
-        Every review is read by someone at the shop before it appears here.
-      </p>
+    <Card padded className="sm:p-8">
+      <form onSubmit={handleSubmit} noValidate>
+        <h3 className="display-wide text-xl font-semibold">
+          {productName
+            ? `Reviewed the ${productName}?`
+            : "Been to the showroom?"}
+        </h3>
+        <p className="mt-2 text-sm text-muted">
+          Every review is read by someone at the shop before it appears here.
+        </p>
 
       {errors.formError && (
         <p
           role="alert"
-          className="mt-5 border border-brass/50 bg-brass/10 p-3 text-sm leading-relaxed text-ink"
+          className="mt-5 rounded-lg border border-brass/40 bg-accent-soft px-3.5 py-3 text-sm leading-relaxed text-ink"
         >
           {errors.formError}
         </p>
@@ -238,29 +238,35 @@ export function ReviewForm({
           {/* Only once it is close enough to matter. A counter that watches
               from the first character is noise on a field almost nobody fills. */}
           {values.body.length > BODY_LIMIT - 200 && (
-            <p className="spec-label mt-2 text-muted">
+            <p className="mt-2 text-sm text-muted">
               {BODY_LIMIT - values.body.length} characters left
             </p>
           )}
         </Field>
       </div>
 
-      <button
-        type="submit"
-        disabled={submitting}
-        className="mt-6 w-full bg-ink px-6 py-3 font-display text-sm font-medium tracking-wide text-paper uppercase transition-colors hover:bg-ink-deep disabled:cursor-not-allowed disabled:bg-ink/25 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass sm:w-auto"
-      >
-        {submitting ? "Sending…" : "Send review"}
-      </button>
-    </form>
+        <Button
+          type="submit"
+          disabled={submitting}
+          className="mt-6 w-full sm:w-auto"
+        >
+          {submitting ? "Sending…" : "Send review"}
+        </Button>
+      </form>
+    </Card>
   );
 }
 
 // ---------------------------------------------------------------------------
 
+/**
+ * The storefront control, with the border swapped when the server rejected the
+ * field. Built by overriding the shared class rather than by restating it, so
+ * a change to the control's padding or radius cannot miss the error variant.
+ */
 function controlWithError(invalid: boolean) {
-  return `w-full border bg-paper px-4 py-3 font-body text-ink placeholder:text-muted/60 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass ${
-    invalid ? "border-brass" : "border-hairline focus:border-ink"
+  return `${storefrontControlClass} ${
+    invalid ? "border-accent-strong hover:border-accent-strong" : ""
   }`;
 }
 
@@ -268,7 +274,7 @@ function FieldErrors({ id, messages }: { id: string; messages?: string[] }) {
   if (!messages?.length) return null;
 
   return (
-    <p id={id} role="alert" className="mt-2 text-sm text-brass">
+    <p id={id} role="alert" className="mt-2 text-sm text-accent-strong">
       {messages.join(" ")}
     </p>
   );
@@ -300,7 +306,7 @@ function StarRating({
 }) {
   return (
     <fieldset>
-      <legend className="spec-label text-muted">Your rating</legend>
+      <legend className="text-sm font-medium text-ink">Your rating</legend>
 
       <div className="mt-2 flex items-center gap-1">
         {[1, 2, 3, 4, 5].map((mark) => (
@@ -334,7 +340,7 @@ function StarRating({
           </label>
         ))}
 
-        <span aria-hidden="true" className="ml-2 font-mono text-sm text-muted">
+        <span aria-hidden="true" className="tabular ml-2 text-sm text-muted">
           {value > 0 ? `${value} / 5` : "—"}
         </span>
       </div>

@@ -56,8 +56,11 @@ export function Section({
         {(eyebrow || heading) && (
           <header className="mb-10 sm:mb-12">
             {eyebrow && (
+              // Sentence case, like the heading under it. `spec-label` set
+              // this in tracked-out capitals, which was the last of the
+              // showroom's signage voice left in the primitive.
               <p
-                className={`spec-label ${dark ? "text-brass" : "text-accent-strong"}`}
+                className={`text-sm font-medium ${dark ? "text-brass" : "text-accent-strong"}`}
               >
                 {eyebrow}
               </p>

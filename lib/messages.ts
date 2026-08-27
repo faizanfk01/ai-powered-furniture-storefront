@@ -101,3 +101,36 @@ export function buildContactMessage(draft: ContactDraft) {
 export function contactIsReady(draft: ContactDraft) {
   return Boolean(tidy(draft.name) || tidy(draft.message));
 }
+
+export type AssistantHandoff = {
+  /** What the visitor asked the assistant. */
+  question: string;
+  /** The product the reply led with, when it cited one. */
+  productName?: string;
+};
+
+/**
+ * The handoff from the assistant to a person.
+ *
+ * The assistant is not the conversion path — WhatsApp is — so every reply ends
+ * up next to a link, and the link has to arrive carrying context. Two things
+ * make that message worth reading at the shop's end: the product, if the
+ * answer was about one, and the visitor's own question, which is usually
+ * phrased better than any summary of it.
+ *
+ * The question is quoted rather than paraphrased. It arrives from a chat box
+ * as a whole sentence with its own punctuation, and the tidy() pass is enough
+ * — rewriting it into a third-person summary would lose the detail ("would it
+ * fit a narrow room?") that makes the message answerable.
+ */
+export function buildAssistantHandoffMessage(handoff: AssistantHandoff) {
+  const question = tidy(handoff.question);
+  const productName = handoff.productName ? tidy(handoff.productName) : "";
+
+  return sentences([
+    productName
+      ? `Hello, I was reading about the ${productName} on your website.`
+      : "Hello, I was using the assistant on your website.",
+    question && `I asked: ${question}`,
+  ]);
+}

@@ -28,7 +28,7 @@ credible.
 - Tailwind CSS v4 (CSS-first config via @theme in app/globals.css)
 - Prisma + Neon Postgres
 - Auth.js (single admin account) — added in a later phase
-- Groq (Llama) for AI chat + cached product summaries
+- Groq for AI chat + cached product summaries — see the note below on models
 - Cloudflare R2 for images
 - Postgres full-text + pg_trgm for search. NO vector DB.
 
@@ -59,6 +59,24 @@ in schema.prisma: the `pg_trgm` extension and the `Review_rating_check`
 constraint. `db push` does not know about them and would drop or skip them.
 `prisma db pull` will not recover them either. Always use
 `prisma migrate dev` / `prisma migrate deploy`.
+
+## Rule carried forward from Phase 3
+
+**Groq's model list is a claim, not a fact. Check the API.**
+This stack originally said "Groq (Llama)". On 2026-08-27 Groq's own docs still
+advertised `llama-3.3-70b-versatile` and `llama-3.1-8b-instant` as current
+production models, and both returned `404 model_not_found` on a real free-tier
+key — Meta has no chat model left on this account. The provider decision is
+unchanged; the model within it could not be. The assistant now runs on
+`openai/gpt-oss-20b` (intent extraction, strict JSON schema) and
+`openai/gpt-oss-120b` (the reply). Before changing either, run:
+
+    curl -H "Authorization: Bearer $GROQ_API_KEY" https://api.groq.com/openai/v1/models
+
+`groq/compound` and `groq/compound-mini` are disqualified regardless of
+availability: they carry built-in web search and code execution, which is a
+second, ungrounded source of facts arriving behind the retrieval the whole AI
+layer is built on.
 
 **Validate with Zod at every write boundary.**
 `Review.rating` has a DB-level `CHECK (rating BETWEEN 1 AND 5)`, but it is a

@@ -8,6 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "create-admin": "tsx scripts/create-admin.ts",
+    "groq-stub": "tsx scripts/groq-stub.ts",
+    "test:chat": "tsx scripts/test-chat.ts",
     "postinstall": "prisma generate"
   },
   "dependencies": {

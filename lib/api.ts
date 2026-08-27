@@ -23,7 +23,14 @@ export type ApiErrorCode =
   | "UNAUTHORIZED"
   | "NOT_FOUND"
   | "CONFLICT"
-  | "INTERNAL_ERROR";
+  | "INTERNAL_ERROR"
+  // The AI layer's two failure modes (Phase 3). Separate codes rather than one
+  // "AI_ERROR" because the UI says different things: AI_BUSY is "try again in
+  // a moment", AI_UNAVAILABLE is "don't wait for us, message WhatsApp". Both
+  // are expected operating states of a free-tier upstream, so neither is an
+  // INTERNAL_ERROR — a 500 here would mean a bug on our side, and it isn't.
+  | "AI_BUSY"
+  | "AI_UNAVAILABLE";
 
 export type ApiErrorBody = {
   error: {

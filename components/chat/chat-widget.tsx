@@ -78,6 +78,7 @@ export function ChatWidget() {
 
   const panelId = useId();
   const launcherRef = useRef<HTMLButtonElement>(null);
+  const drawerRef = useRef<HTMLDialogElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const transcriptRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
@@ -96,32 +97,42 @@ export function ChatWidget() {
     setOpen(false);
   }
 
-  // Escape closes and returns focus to the launcher; the page behind does not
-  // scroll while the panel is fullscreen.
+  /**
+   * React state into the dialog's imperative API.
+   *
+   * `.open` is checked before each call because showModal() on an
+   * already-open dialog throws, and close() on a closed one fires a spurious
+   * `close` event. Same pattern as components/admin/confirm-dialog.tsx.
+   *
+   * What used to live here and no longer needs to: a keydown listener for
+   * Escape, and a body-scroll lock. A modal dialog does both itself, and does
+   * them better — the background is genuinely inert rather than merely
+   * unscrollable.
+   */
   useEffect(() => {
-    if (!open) return;
+    const drawer = drawerRef.current;
+    if (!drawer) return;
 
-    function onKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        setOpen(false);
-        launcherRef.current?.focus();
-      }
-    }
+    if (open && !drawer.open) drawer.showModal();
+    if (!open && drawer.open) drawer.close();
+  }, [open]);
 
-    document.addEventListener("keydown", onKeyDown);
+  /**
+   * The dialog closing for any reason — Escape, or our own close() — puts the
+   * React state back in step and returns focus to the launcher that opened it.
+   */
+  useEffect(() => {
+    const drawer = drawerRef.current;
+    if (!drawer) return;
 
-    // Only below `sm`, where the panel is fullscreen. On a desktop the panel
-    // is a card in the corner and the page behind it is still the page —
-    // freezing its scroll would be taking something away for no reason.
-    const fullscreen = window.matchMedia("(max-width: 639px)");
-    const previousOverflow = document.body.style.overflow;
-    if (fullscreen.matches) document.body.style.overflow = "hidden";
+    // No manual refocus: closing a dialog restores focus to the element that
+    // had it when showModal() was called, which is the launcher. Doing it by
+    // hand as well would race the browser for the same outcome.
+    const handleClose = () => setOpen(false);
 
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      document.removeEventListener("keydown", onKeyDown);
-    };
-  }, [open, setOpen]);
+    drawer.addEventListener("close", handleClose);
+    return () => drawer.removeEventListener("close", handleClose);
+  }, [setOpen]);
 
   // Focus the input when the panel opens, so a keyboard user can type at once
   // and a screen reader lands inside the dialog rather than behind it.
@@ -283,144 +294,158 @@ export function ChatWidget() {
         // from Tailwind's own ordering of the generated CSS rather than from
         // the order they are written here.
         //
-        // Open on a phone, the panel is the whole screen and has its own Close
-        // — a second one floating over it is just clutter. Open on a desktop,
-        // the launcher stays put and becomes the toggle back.
+        // Hidden while the drawer is open, at every size. The drawer is modal
+        // now, so the launcher behind it is inert anyway — leaving it showing
+        // through the scrim would be a button that looks pressable and is not.
         className={`fixed right-4 bottom-4 z-40 items-center gap-2.5 bg-ink px-5 py-3.5 font-display text-sm font-medium tracking-wide text-paper uppercase shadow-lg shadow-ink/20 transition-colors hover:bg-ink-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass sm:right-6 sm:bottom-6 ${
-          open ? "hidden sm:inline-flex" : "inline-flex"
+          open ? "hidden" : "inline-flex"
         }`}
         style={{
           marginBottom: "env(safe-area-inset-bottom)",
         }}
       >
         <ChatGlyph />
-        {open ? "Close" : "Ask us"}
+        Ask AI
       </button>
 
-      {open && (
-        <div
-          id={panelId}
-          role="dialog"
-          aria-label={`Ask ${SITE.name}`}
-          // `h-[100dvh]` rather than `inset-0`: the dynamic viewport unit
-          // tracks the mobile browser's collapsing address bar, so the
-          // composer sits on the real bottom edge instead of under a toolbar.
-          // Above `sm` it becomes a fixed-size card in the corner, and the
-          // page behind it stays usable.
-          className="fixed inset-x-0 top-0 z-50 flex h-[100dvh] flex-col bg-paper sm:inset-auto sm:top-auto sm:right-6 sm:bottom-24 sm:h-[min(34rem,calc(100dvh-9rem))] sm:w-[23rem] sm:border sm:border-ink/15 sm:shadow-2xl sm:shadow-ink/25"
-        >
-          {/* HEADER — an ink band, so the panel reads as a different mode of
-              the site rather than a card floating on the page. */}
-          <div className="flex items-start justify-between gap-4 bg-ink-deep px-5 py-4 text-paper">
-            <div>
-              <Measure width="w-12" />
-              <h2 className="display-wide mt-2.5 text-base leading-tight font-medium uppercase">
-                Ask {SITE.name}
-              </h2>
-              <p className="spec-label mt-1 text-paper/55">
-                Answers from our catalogue
-              </p>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => {
-                setOpen(false);
-                launcherRef.current?.focus();
-              }}
-              className="spec-label -mr-2 -mt-1 shrink-0 px-2 py-2 text-paper/70 transition-colors hover:text-paper focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
+      {/* THE DRAWER. A native <dialog>, slid in from the right edge — see the
+          .chat-drawer rules in app/globals.css for the transition and the
+          reasoning. Always mounted rather than conditionally rendered, so the
+          transcript is never torn down and rebuilt, and so there is something
+          for the closing transition to animate. */}
+      <dialog
+        ref={drawerRef}
+        id={panelId}
+        aria-labelledby={`${panelId}-title`}
+        // Clicking the scrim closes. A dialog's backdrop is not a child
+        // element, so a click on it lands on the <dialog> itself — this is the
+        // standard way to tell the two apart, by asking whether the click
+        // landed outside the drawer's own box.
+        onClick={(event) => {
+          if (event.target !== event.currentTarget) return;
+          const box = event.currentTarget.getBoundingClientRect();
+          const outside =
+            event.clientX < box.left ||
+            event.clientX > box.right ||
+            event.clientY < box.top ||
+            event.clientY > box.bottom;
+          if (outside) setOpen(false);
+        }}
+        // Full width on a phone, a fixed column on anything larger. The
+        // height, position and slide come from .chat-drawer.
+        className="chat-drawer w-full shadow-2xl shadow-ink/30 sm:w-[26rem] sm:border-l sm:border-ink/15"
+      >
+        {/* HEADER — an ink band, so the panel reads as a different mode of
+            the site rather than a card floating on the page. */}
+        <div className="flex items-start justify-between gap-4 bg-ink-deep px-5 py-4 text-paper">
+          <div>
+            <Measure width="w-12" />
+            <h2
+              id={`${panelId}-title`}
+              className="display-wide mt-2.5 text-base leading-tight font-medium uppercase"
             >
-              Close
-            </button>
+              Ask {SITE.name}
+            </h2>
+            <p className="spec-label mt-1 text-paper/55">
+              Answers from our catalogue
+            </p>
           </div>
 
-          {/* TRANSCRIPT */}
-          <div
-            ref={transcriptRef}
-            className="flex-1 space-y-5 overflow-y-auto px-5 py-5"
+          <button
+            type="button"
+            onClick={() => setOpen(false)}
+            className="spec-label -mr-2 -mt-1 shrink-0 px-2 py-2 text-paper/70 transition-colors hover:text-paper focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
           >
-            {empty && <EntryState onPick={(prompt) => void send(prompt, entries)} />}
-
-            {/* Rendered unconditionally, even while empty. A live region that
-                appears at the same moment its first content does is not
-                reliably announced — several screen readers only watch regions
-                that were already in the tree. Mounting it with the panel means
-                the first reply is announced like every one after it. */}
-            <div role="log" aria-live="polite" className="space-y-5">
-              {entries.map((entry) => (
-                <TranscriptEntry key={entry.id} entry={entry} onRetry={retry} />
-              ))}
-            </div>
-
-            {pending && <ChatThinking />}
-          </div>
-
-          {/* COMPOSER + the WhatsApp line, which stays visible in every state
-              because it is the only actual conversion path (CLAUDE.md →
-              Payments). The assistant answers questions; it does not take
-              orders, and the panel should never look like it does. */}
-          <div
-            className="border-t border-hairline bg-hairline/25 px-5 pt-4 pb-4"
-            style={{ paddingBottom: "calc(1rem + env(safe-area-inset-bottom))" }}
-          >
-            <form
-              onSubmit={(event) => {
-                event.preventDefault();
-                if (!overLimit) void send(draft, entries);
-              }}
-              className="flex items-stretch gap-2"
-            >
-              <label htmlFor={`${panelId}-input`} className="sr-only">
-                Ask a question about our furniture
-              </label>
-              <input
-                ref={inputRef}
-                id={`${panelId}-input`}
-                value={draft}
-                onChange={(event) => setDraft(event.target.value)}
-                placeholder="Ask about a piece, a budget, or how to order"
-                autoComplete="off"
-                // Not `maxLength`: a hard cap silently swallows keystrokes and
-                // the customer cannot tell why. The counter below appears
-                // instead, and the button disables — the limit becomes
-                // something they can see rather than something that happens.
-                aria-invalid={overLimit || undefined}
-                aria-describedby={overLimit ? `${panelId}-limit` : undefined}
-                className={`min-w-0 flex-1 border bg-paper px-3 py-2.5 text-sm text-ink placeholder:text-muted/70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass ${
-                  overLimit ? "border-brass" : "border-ink/20"
-                }`}
-              />
-              <button
-                type="submit"
-                disabled={pending || draft.trim() === "" || overLimit}
-                className="shrink-0 bg-ink px-4 font-display text-xs font-medium tracking-wide text-paper uppercase transition-colors hover:bg-ink-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass disabled:cursor-not-allowed disabled:bg-ink/25"
-              >
-                Send
-              </button>
-            </form>
-
-            {overLimit && (
-              <p id={`${panelId}-limit`} className="spec-label mt-2 text-brass">
-                {draft.length - CHAT_MAX_MESSAGE_LENGTH} characters over — please
-                shorten
-              </p>
-            )}
-
-            <a
-              href={latestHandoff}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-3 flex items-center gap-2 text-xs text-muted transition-colors hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
-            >
-              <WhatsAppIcon className="size-4 shrink-0" />
-              <span>
-                To order or confirm a price, message us on{" "}
-                <span className="font-mono">{WHATSAPP_DISPLAY}</span>
-              </span>
-            </a>
-          </div>
+            Close
+          </button>
         </div>
-      )}
+
+        {/* TRANSCRIPT */}
+        <div
+          ref={transcriptRef}
+          className="flex-1 space-y-5 overflow-y-auto px-5 py-5"
+        >
+          {empty && <EntryState onPick={(prompt) => void send(prompt, entries)} />}
+
+          {/* Rendered unconditionally, even while empty. A live region that
+              appears at the same moment its first content does is not
+              reliably announced — several screen readers only watch regions
+              that were already in the tree. Mounting it with the panel means
+              the first reply is announced like every one after it. */}
+          <div role="log" aria-live="polite" className="space-y-5">
+            {entries.map((entry) => (
+              <TranscriptEntry key={entry.id} entry={entry} onRetry={retry} />
+            ))}
+          </div>
+
+          {pending && <ChatThinking />}
+        </div>
+
+        {/* COMPOSER + the WhatsApp line, which stays visible in every state
+            because it is the only actual conversion path (CLAUDE.md →
+            Payments). The assistant answers questions; it does not take
+            orders, and the panel should never look like it does. */}
+        <div
+          className="border-t border-hairline bg-hairline/25 px-5 pt-4 pb-4"
+          style={{ paddingBottom: "calc(1rem + env(safe-area-inset-bottom))" }}
+        >
+          <form
+            onSubmit={(event) => {
+              event.preventDefault();
+              if (!overLimit) void send(draft, entries);
+            }}
+            className="flex items-stretch gap-2"
+          >
+            <label htmlFor={`${panelId}-input`} className="sr-only">
+              Ask a question about our furniture
+            </label>
+            <input
+              ref={inputRef}
+              id={`${panelId}-input`}
+              value={draft}
+              onChange={(event) => setDraft(event.target.value)}
+              placeholder="Ask about a piece, a budget, or how to order"
+              autoComplete="off"
+              // Not `maxLength`: a hard cap silently swallows keystrokes and
+              // the customer cannot tell why. The counter below appears
+              // instead, and the button disables — the limit becomes
+              // something they can see rather than something that happens.
+              aria-invalid={overLimit || undefined}
+              aria-describedby={overLimit ? `${panelId}-limit` : undefined}
+              className={`min-w-0 flex-1 border bg-paper px-3 py-2.5 text-sm text-ink placeholder:text-muted/70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass ${
+                overLimit ? "border-brass" : "border-ink/20"
+              }`}
+            />
+            <button
+              type="submit"
+              disabled={pending || draft.trim() === "" || overLimit}
+              className="shrink-0 bg-ink px-4 font-display text-xs font-medium tracking-wide text-paper uppercase transition-colors hover:bg-ink-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass disabled:cursor-not-allowed disabled:bg-ink/25"
+            >
+              Send
+            </button>
+          </form>
+
+          {overLimit && (
+            <p id={`${panelId}-limit`} className="spec-label mt-2 text-brass">
+              {draft.length - CHAT_MAX_MESSAGE_LENGTH} characters over — please
+              shorten
+            </p>
+          )}
+
+          <a
+            href={latestHandoff}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-3 flex items-center gap-2 text-xs text-muted transition-colors hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
+          >
+            <WhatsAppIcon className="size-4 shrink-0" />
+            <span>
+              To order or confirm a price, message us on{" "}
+              <span className="font-mono">{WHATSAPP_DISPLAY}</span>
+            </span>
+          </a>
+        </div>
+      </dialog>
     </>
   );
 }

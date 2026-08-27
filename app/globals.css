@@ -78,6 +78,104 @@ body {
   letter-spacing: -0.01em;
 }
 
+/* ---------------------------------------------------------------------------
+   The chat drawer
+   ---------------------------------------------------------------------------
+   A native <dialog> opened with showModal(), slid in from the right edge.
+
+   WHY <dialog> AND NOT A POSITIONED DIV. Focus trapping, Escape-to-close, an
+   inert background and correct modal semantics all come from the browser —
+   the same argument components/admin/confirm-dialog.tsx makes for the delete
+   confirmations. The chat panel this replaces was a plain div and carried a
+   known gap because of it: nothing stopped Tab from wandering out of the open
+   panel and into the page behind. That gap closes here for free.
+
+   The rules below are plain CSS rather than Tailwind utilities because two of
+   the things being styled — ::backdrop, and the @starting-style entry state —
+   are not expressible as classes on the element.
+
+   `allow-discrete` is what lets a dialog animate OUT. Without it `display`
+   flips from block to none the instant close() is called and the transform
+   never runs; with it, display is held until the transition finishes.
+   `overlay` does the same job for the top layer the dialog is promoted into.
+   --------------------------------------------------------------------------- */
+.chat-drawer {
+  /* THIS RULE OWNS `display`, and it has to.
+     A dialog is hidden while closed by the UA stylesheet's
+     `dialog:not([open]) { display: none }` — but ANY author declaration of
+     display beats a UA one regardless of specificity. Putting Tailwind's
+     `flex` class on the element was therefore enough to leave the drawer
+     permanently on screen, open or not. Declaring both states here, and
+     keeping display utilities off the element, is what makes it hidden when
+     closed AND what gives `transition-behavior: allow-discrete` two values to
+     animate between. */
+  display: none;
+  flex-direction: column;
+
+  /* Overrides the centred, auto-margined box a dialog is by default. */
+  position: fixed;
+  inset: 0 0 auto auto;
+  margin: 0;
+  padding: 0;
+  border: none;
+  max-width: none;
+  max-height: none;
+  /* dvh, so the drawer ends at the real bottom edge on a phone rather than
+     underneath the browser's collapsing toolbar. */
+  height: 100dvh;
+  background: var(--color-paper);
+  color: var(--color-ink);
+
+  transform: translateX(100%);
+  transition-property: transform, display, overlay;
+  transition-duration: 280ms;
+  /* Decelerating, so it arrives rather than stops — the same easing feel as a
+     drawer being pulled out. */
+  transition-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+  transition-behavior: allow-discrete;
+}
+
+.chat-drawer[open] {
+  display: flex;
+  transform: translateX(0);
+}
+
+/* The state it animates FROM on open. Without this the drawer would appear
+   already in place, because there is no previous style to interpolate from. */
+@starting-style {
+  .chat-drawer[open] {
+    transform: translateX(100%);
+  }
+}
+
+.chat-drawer::backdrop {
+  background: color-mix(in srgb, var(--color-ink-deep) 55%, transparent);
+  opacity: 0;
+  transition-property: opacity, display, overlay;
+  transition-duration: 280ms;
+  transition-behavior: allow-discrete;
+}
+
+.chat-drawer[open]::backdrop {
+  opacity: 1;
+}
+
+@starting-style {
+  .chat-drawer[open]::backdrop {
+    opacity: 0;
+  }
+}
+
+/* The reduced-motion block at the end of this file matches `*`, which does not
+   reach ::backdrop — and a dialog still needs its display transition to be
+   instant rather than absent, or it would never leave the DOM. */
+@media (prefers-reduced-motion: reduce) {
+  .chat-drawer,
+  .chat-drawer::backdrop {
+    transition-duration: 0.01ms;
+  }
+}
+
 /* The thinking indicator in the chat panel: the measure's ticks, rising and
    settling. Defined here rather than inline because Tailwind v4 has no
    arbitrary @keyframes — `animate-[chat-tick_...]` names this.

@@ -15,17 +15,29 @@ import type { SearchedProduct } from "@/lib/product-search";
  *
  * `images` arrives ordered by sortOrder via productInclude, so "first" means
  * the one the admin put first.
+ *
+ * RESTYLED ONLY. The no-JS structure, the eager lead image and the sizes
+ * hints are unchanged; the frames are now rounded on the light neutral surface
+ * rather than square on the hairline tint, matching the catalogue cards.
  */
 export function ProductGallery({ product }: { product: SearchedProduct }) {
   const [lead, ...rest] = product.images;
 
   if (!lead) {
-    return <FootprintPlan dimensions={product.dimensions} size="detail" />;
+    // The same drawing the catalogue cards use, given the detail padding and
+    // the gallery's radius. The parser and the shared 120" ruler are untouched.
+    return (
+      <FootprintPlan
+        dimensions={product.dimensions}
+        size="detail"
+        className="rounded-xl border border-hairline"
+      />
+    );
   }
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="relative aspect-4/3 overflow-hidden bg-hairline/60">
+      <div className="relative aspect-4/3 overflow-hidden rounded-xl border border-hairline bg-surface">
         <Image
           src={lead.url}
           alt={lead.alt || product.name}
@@ -45,7 +57,7 @@ export function ProductGallery({ product }: { product: SearchedProduct }) {
         <ul className="grid grid-cols-3 gap-4">
           {rest.map((image) => (
             <li key={image.id}>
-              <div className="relative aspect-square overflow-hidden bg-hairline/60">
+              <div className="relative aspect-square overflow-hidden rounded-lg border border-hairline bg-surface">
                 <Image
                   src={image.url}
                   alt={image.alt || product.name}

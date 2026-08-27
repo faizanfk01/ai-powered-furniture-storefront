@@ -8,8 +8,8 @@ import { AskAiButton } from "@/components/product/ask-ai-button";
 import { ProductGallery } from "@/components/product/product-gallery";
 import { WhatsAppIcon } from "@/components/site/whatsapp-icon";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Container } from "@/components/ui/container";
-import { Measure } from "@/components/ui/measure";
 import { db } from "@/lib/db";
 import { parseFootprint } from "@/lib/footprint";
 import { formatPrice, STOCK_LABEL } from "@/lib/format";
@@ -75,50 +75,56 @@ export default async function ProductPage({
 
   const madeToOrder = product.stockStatus === "MADE_TO_ORDER";
 
+  const outOfStock = product.stockStatus === "OUT_OF_STOCK";
+
+  // The same three tones the catalogue card uses, so a piece does not change
+  // its availability language between the grid and its own page.
+  const stockTone = madeToOrder
+    ? "bg-accent-soft text-accent-strong"
+    : outOfStock
+      ? "bg-surface text-muted"
+      : "bg-surface text-ink";
+
   return (
     <Container>
-      <div className="py-10 sm:py-14">
+      <div className="py-8 sm:py-12">
         {/* Back to where they came from. A product page reached from a filtered
             catalogue loses the filter; that is the price of not tracking
             history here, and a plain link back is honest about it. */}
         <Link
           href="/catalog"
-          className="spec-label text-muted transition-colors hover:text-ink"
+          className="text-sm text-muted transition-colors hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brass"
         >
           ← Catalogue
         </Link>
 
-        <div className="mt-8 grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-16">
+        <div className="mt-6 grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-14">
           <ProductGallery product={product} />
 
           <div className="flex flex-col">
-            <Measure />
-
-            <div className="mt-6 flex items-baseline justify-between gap-4">
+            <div className="flex items-center justify-between gap-4">
               <Link
                 href={`/catalog?category=${product.category.slug}`}
-                className="spec-label text-muted transition-colors hover:text-ink"
+                className="text-sm text-muted underline decoration-hairline underline-offset-4 transition-colors hover:text-ink hover:decoration-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brass"
               >
                 {product.category.name}
               </Link>
               <span
-                className={`spec-label ${
-                  madeToOrder
-                    ? "text-brass"
-                    : product.stockStatus === "OUT_OF_STOCK"
-                      ? "text-muted/60"
-                      : "text-muted"
-                }`}
+                className={`rounded-full px-2.5 py-1 text-xs font-medium whitespace-nowrap ${stockTone}`}
               >
                 {STOCK_LABEL[product.stockStatus]}
               </span>
             </div>
 
-            <h1 className="display-wide mt-4 text-3xl leading-tight font-semibold uppercase sm:text-4xl">
+            <h1 className="display-wide mt-3 text-3xl leading-tight font-semibold text-balance sm:text-4xl">
               {product.name}
             </h1>
 
-            <p className="mt-5 font-mono text-2xl text-ink">{price}</p>
+            {/* `tabular` rather than the old mono face: the price is compared
+                against other prices, which is what tabular figures are for. */}
+            <p className="tabular mt-4 text-3xl font-semibold text-ink">
+              {price}
+            </p>
 
             {madeToOrder && (
               <p className="mt-2 text-sm text-muted">
@@ -126,26 +132,27 @@ export default async function ProductPage({
               </p>
             )}
 
-            {/* THE conversion action. First thing under the price, biggest
-                thing in the column, and the only solid button on the page. */}
-            <div className="mt-8">
-              <Button href={enquiry} className="w-full sm:w-auto">
+            {/* THE conversion action. First thing under the price, and the only
+                solid button on the page. */}
+            <div className="mt-7">
+              <Button size="lg" href={enquiry} className="w-full sm:w-auto">
                 <WhatsAppIcon />
                 Enquire on WhatsApp
               </Button>
-              <p className="mt-2 text-sm text-muted">
+              <p className="mt-3 text-sm leading-relaxed text-muted">
                 Opens a chat with the workshop, with this piece and its price
                 already written in.
               </p>
             </div>
 
-            <div className="mt-8">
+            <div className="mt-6">
               <AskAiButton productName={product.name} />
             </div>
 
-            {/* Specifications. The mono voice, because these are the numbers
-                you compare between pieces. */}
-            <dl className="mt-10 border-t border-hairline">
+            {/* Specifications. A card with hairline-divided rows — the same
+                object the rest of the site builds panels from, rather than a
+                bare table ruled top and bottom. */}
+            <Card className="mt-8 divide-y divide-hairline px-5">
               <SpecRow label="Price" value={price} />
               <SpecRow label="Category" value={product.category.name} />
               <SpecRow
@@ -162,33 +169,46 @@ export default async function ProductPage({
                   value={`${footprint.width}" × ${footprint.depth}"`}
                 />
               )}
-            </dl>
+            </Card>
           </div>
         </div>
 
         {/* Below the fold: the two accounts of the piece — the short one a
-            machine will write, and the long one the workshop wrote. */}
-        <div className="mt-16 grid grid-cols-1 gap-12 lg:mt-24 lg:grid-cols-2 lg:gap-16">
+            machine wrote, and the long one the workshop wrote. Side by side and
+            on different grounds, so which is which is legible before either is
+            read. */}
+        <div className="mt-14 grid grid-cols-1 gap-8 lg:mt-20 lg:grid-cols-2 lg:gap-12">
           <AiSummary summary={product.aiSummary} />
 
-          <section aria-labelledby="description-heading">
-            <Measure width="w-16" />
-            <h2 id="description-heading" className="spec-label mt-4 text-muted">
+          {/* Top padding matched to the panel beside it, so the two headings
+              start on the same line. No horizontal padding: this column is
+              flush with the grid, which is what keeps the tinted panel reading
+              as the inset one of the pair. */}
+          <section
+            aria-labelledby="description-heading"
+            className="pt-6 sm:pt-8"
+          >
+            <h2
+              id="description-heading"
+              className="display-wide text-xl font-semibold"
+            >
               About this piece
             </h2>
-            <p className="mt-4 text-lg leading-relaxed whitespace-pre-line text-ink">
+            <p className="mt-3 leading-relaxed whitespace-pre-line text-muted">
               {product.description}
             </p>
           </section>
         </div>
 
-        <div className="mt-20 border-t border-hairline pt-10">
+        {/* The made-to-measure CTA, in the same tinted panel the catalogue
+            closes its grid with. */}
+        <div className="mt-14 rounded-xl border border-hairline bg-surface p-6 sm:p-8">
           <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
             <div className="max-w-md">
-              <h2 className="display-wide text-2xl font-medium uppercase">
+              <h2 className="display-wide text-xl font-semibold sm:text-2xl">
                 Want it in another size?
               </h2>
-              <p className="mt-3 leading-relaxed text-muted">
+              <p className="mt-2 leading-relaxed text-muted">
                 This piece can be rebuilt to your measurements, in a different
                 fabric or a different wood. Send us the room and we will quote
                 it.
@@ -199,6 +219,7 @@ export default async function ProductPage({
               href={whatsappUrl(
                 `Hello Standard Furniture — could you build ${product.name} to different measurements?`,
               )}
+              className="shrink-0"
             >
               <WhatsAppIcon />
               Ask about a custom size
@@ -207,7 +228,7 @@ export default async function ProductPage({
         </div>
 
         {/* REVIEWS — the form only, and last on the page.
-            
+
             Here because this is where a product review can be attributed
             correctly: the customer is looking at the piece, so `productId` is
             known rather than guessed at. Last because everything above it is
@@ -218,22 +239,22 @@ export default async function ProductPage({
             NOTE: approved reviews are not shown on this page yet. They surface
             on the home page, attributed and linked back here. Rendering them
             per product is a display feature, not part of wiring the form. */}
-        <div className="mt-20 border-t border-hairline pt-10">
-          <div className="max-w-2xl">
-            <ReviewForm productId={product.id} productName={product.name} />
-          </div>
+        <div className="mt-14 max-w-2xl">
+          <ReviewForm productId={product.id} productName={product.name} />
         </div>
       </div>
     </Container>
   );
 }
 
-/** One line of the spec table. Label left, value right, hairline between. */
+/** One line of the spec table. Label left, value right. */
 function SpecRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-baseline justify-between gap-6 border-b border-hairline py-3">
-      <dt className="spec-label text-muted">{label}</dt>
-      <dd className="text-right font-mono text-sm text-ink">{value}</dd>
+    <div className="flex items-baseline justify-between gap-6 py-3">
+      <dt className="text-sm text-muted">{label}</dt>
+      <dd className="tabular text-right text-sm font-medium text-ink">
+        {value}
+      </dd>
     </div>
   );
 }

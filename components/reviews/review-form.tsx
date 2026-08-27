@@ -261,13 +261,26 @@ export function ReviewForm({
 
 /**
  * The storefront control, with the border swapped when the server rejected the
- * field. Built by overriding the shared class rather than by restating it, so
- * a change to the control's padding or radius cannot miss the error variant.
+ * field.
+ *
+ * IT REPLACES THE BORDER UTILITIES, IT DOES NOT APPEND ONE. Appending
+ * `border-accent-strong` after the shared class left two border-color
+ * utilities on the element, and Tailwind resolves that by CSS source order,
+ * not by the order they were written into the string — `border-line-strong`
+ * won, and a rejected field kept its resting border while the message
+ * underneath said something was wrong. The same trap the chat drawer's
+ * `display` rule documents in app/globals.css.
+ *
+ * Derived from the shared class rather than restated, so a change to the
+ * control's padding or radius still cannot miss the error variant.
  */
 function controlWithError(invalid: boolean) {
-  return `${storefrontControlClass} ${
-    invalid ? "border-accent-strong hover:border-accent-strong" : ""
-  }`;
+  if (!invalid) return storefrontControlClass;
+
+  return storefrontControlClass
+    .replace("border-line-strong", "border-accent-strong")
+    .replace("hover:border-muted/50", "hover:border-accent-strong")
+    .replace("focus:border-ink", "focus:border-accent-strong");
 }
 
 function FieldErrors({ id, messages }: { id: string; messages?: string[] }) {

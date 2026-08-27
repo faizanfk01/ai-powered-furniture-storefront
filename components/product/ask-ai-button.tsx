@@ -6,6 +6,7 @@ import type { ChatHandle } from "@/components/chat/chat-conversation";
 import { ChatGlyph } from "@/components/chat/chat-glyph";
 import { ProductChatModal } from "@/components/chat/product-chat-modal";
 import { seedMessage } from "@/components/chat/seed";
+import { Button } from "@/components/ui/button";
 
 /**
  * "Ask AI about this piece" — opens a centred modal scoped to this product.
@@ -17,9 +18,9 @@ import { seedMessage } from "@/components/chat/seed";
  * what page you are on — and would mean opening the product assistant showed
  * you whatever you had last asked the global one.
  *
- * SECONDARY, AND IT STAYS SECONDARY. The outline treatment is unchanged and
- * the solid "Enquire on WhatsApp" above it is still the only filled button on
- * the page. Nothing here should suggest the assistant is how you buy: it
+ * SECONDARY, AND IT STAYS SECONDARY. It renders the Button primitive's
+ * `outline` variant, and the solid "Enquire on WhatsApp" above it is still the
+ * only filled button on the page. Nothing here should suggest the assistant is how you buy: it
  * answers questions about the piece, and every path to an actual order still
  * goes through a person on WhatsApp (CLAUDE.md → Payments).
  *
@@ -40,21 +41,26 @@ export function AskAiButton({ productName }: { productName: string }) {
 
   return (
     <div>
-      <button
+      {/* The `outline` variant, and the WhatsApp button above it is `solid`.
+          That pairing is the whole of "secondary" here — same size, same
+          radius, one filled and one not. */}
+      <Button
         type="button"
+        variant="outline"
+        size="lg"
         onClick={() => {
           setOpen(true);
           chatRef.current?.ask(seedMessage(productName));
         }}
         aria-haspopup="dialog"
         aria-expanded={open}
-        className="inline-flex w-full items-center justify-center gap-2.5 border border-ink/25 px-6 py-3 font-display text-sm font-medium tracking-wide text-ink uppercase transition-colors hover:border-ink hover:bg-ink/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass sm:w-auto"
+        className="w-full sm:w-auto"
       >
         <ChatGlyph />
         Ask AI about this piece
-      </button>
+      </Button>
 
-      <p className="mt-2 text-sm text-muted">
+      <p className="mt-3 text-sm leading-relaxed text-muted">
         Answers about size, materials and options, from this page&rsquo;s own
         details. For a price, availability or an order, the workshop answers on
         WhatsApp.

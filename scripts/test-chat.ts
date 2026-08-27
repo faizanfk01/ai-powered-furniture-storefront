@@ -38,7 +38,7 @@
  */
 import "dotenv/config";
 
-import { seedMessage } from "../components/chat/chat-context";
+import { seedMessage } from "../components/chat/seed";
 import { db } from "../lib/db";
 import { startGroqStub, type StubMode } from "./groq-stub";
 

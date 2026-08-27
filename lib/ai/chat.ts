@@ -9,7 +9,12 @@ import {
   toChatProducts,
   type ChatProduct,
 } from "./facts";
-import { checkGrounding, fallbackReply, normaliseCitations } from "./grounding";
+import {
+  checkGrounding,
+  fallbackReply,
+  normaliseCitations,
+  withNamedProducts,
+} from "./grounding";
 import { GROQ_MODELS, groqChat, type GroqFailure, type GroqMessage } from "./groq";
 import { answerSystemPrompt } from "./prompts";
 import { extractIntent, retrieve, type ChatTopic } from "./retrieval";
@@ -181,8 +186,10 @@ export async function runChat(input: ChatRequestInput): Promise<ChatResult> {
   }
 
   const finalReply = verdict.grounded ? reply : fallbackReply(products);
+  // Tagged citations, plus any product the reply named without tagging — see
+  // withNamedProducts(). Both only ever contain refs of retrieved rows.
   const citations = verdict.grounded
-    ? verdict.citations
+    ? withNamedProducts(reply, verdict.citations, products)
     : products.map((product) => product.ref);
 
   return {

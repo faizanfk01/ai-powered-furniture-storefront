@@ -142,6 +142,47 @@ export function significantFiguresIn(text: string): Set<number> {
   return found;
 }
 
+/**
+ * Products the reply plainly discussed but forgot to tag.
+ *
+ * The prompt asks for a [P1] after the first mention of every product and the
+ * model usually complies — but not always. Measured on the same question twice
+ * in a row: one reply opened "The Gulbahar Study Desk & Chair Set [P1] is an
+ * office set…", the next opened with the identical sentence and no tag. That
+ * is temperature, not a bug, and no amount of prompt rewriting removes it.
+ *
+ * The cost of an untagged mention is not cosmetic: `citations` drives which
+ * product CARDS render, so a dropped tag means a customer reads a paragraph
+ * about a sofa with nothing to tap. Recovering it here is safe in a way that
+ * guessing never is — the only names searched for are those of rows the
+ * database already returned for this turn, so a ref can still only point at a
+ * product that was actually retrieved.
+ *
+ * Names are compared with typography folded. gpt-oss writes "Karachi 3‑Seater"
+ * with a non-breaking hyphen where the row has an ASCII one, and an exact
+ * match would miss every product whose name contains a hyphen.
+ */
+export function withNamedProducts(
+  reply: string,
+  tagged: number[],
+  products: { ref: number; name: string }[],
+): number[] {
+  const fold = (text: string) =>
+    foldSpaces(text)
+      .replace(/[‐‑‒–—]/g, "-")
+      .toLowerCase();
+
+  const haystack = fold(reply);
+  const citations = [...tagged];
+
+  for (const product of products) {
+    if (citations.includes(product.ref)) continue;
+    if (haystack.includes(fold(product.name))) citations.push(product.ref);
+  }
+
+  return citations;
+}
+
 export type GroundingVerdict =
   | { grounded: true; citations: number[] }
   | { grounded: false; reason: string };

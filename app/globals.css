@@ -176,6 +176,80 @@ body {
   }
 }
 
+/* ---------------------------------------------------------------------------
+   The product chat modal
+   ---------------------------------------------------------------------------
+   The second AI container: centred, for the "Ask AI about this piece" button
+   on a product page. Same <dialog> approach as the drawer above and the same
+   `display` caution — this rule owns display, and no display utility goes on
+   the element, or an author `.flex` would beat the UA's
+   `dialog:not([open]) { display: none }` and leave it permanently on screen.
+
+   Rises and fades rather than sliding. The drawer comes from the edge because
+   it belongs to the whole site; this arrives in the middle because it belongs
+   to the thing you are already looking at, and the two should not be mistaken
+   for each other at a glance.
+   --------------------------------------------------------------------------- */
+.chat-modal {
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+
+  /* `inset: 0` plus `margin: auto` is what centres a dialog in both axes;
+     the default UA margin only centres it horizontally. */
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  padding: 0;
+  background: var(--color-paper);
+  color: var(--color-ink);
+
+  opacity: 0;
+  transform: translateY(0.75rem) scale(0.98);
+  transition-property: opacity, transform, display, overlay;
+  transition-duration: 200ms;
+  transition-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+  transition-behavior: allow-discrete;
+}
+
+.chat-modal[open] {
+  display: flex;
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+@starting-style {
+  .chat-modal[open] {
+    opacity: 0;
+    transform: translateY(0.75rem) scale(0.98);
+  }
+}
+
+.chat-modal::backdrop {
+  background: color-mix(in srgb, var(--color-ink-deep) 55%, transparent);
+  opacity: 0;
+  transition-property: opacity, display, overlay;
+  transition-duration: 200ms;
+  transition-behavior: allow-discrete;
+}
+
+.chat-modal[open]::backdrop {
+  opacity: 1;
+}
+
+@starting-style {
+  .chat-modal[open]::backdrop {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chat-modal,
+  .chat-modal::backdrop {
+    transition-duration: 0.01ms;
+  }
+}
+
 /* The thinking indicator in the chat panel: the measure's ticks, rising and
    settling. Defined here rather than inline because Tailwind v4 has no
    arbitrary @keyframes — `animate-[chat-tick_...]` names this.

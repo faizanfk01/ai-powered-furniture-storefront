@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef } from "react";
 
 import { SITE } from "@/lib/site";
 
@@ -46,18 +46,40 @@ export function ChatWidget() {
   const drawerRef = useRef<HTMLDialogElement>(null);
   const pathname = usePathname();
 
-  // Close on navigation, keeping the transcript.
-  //
-  // Adjusted during render rather than in an effect — the same pattern as
-  // components/site/mobile-nav.tsx, and for the same reason: an effect would
-  // paint the stale open drawer first. On a phone the drawer covers the whole
-  // screen, so leaving it open over the page somebody just tapped through to
-  // would look like the tap failed.
-  const [renderedPathname, setRenderedPathname] = useState(pathname);
-  if (renderedPathname !== pathname) {
-    setRenderedPathname(pathname);
+  /**
+   * Close on navigation, keeping the transcript.
+   *
+   * IN AN EFFECT, AND IT HAS TO BE. This was written as a render-phase
+   * adjustment — compare the previous pathname, and if it changed, set state
+   * on the spot — copied from components/site/mobile-nav.tsx, which does
+   * exactly that and is correct.
+   *
+   * The difference is WHOSE STATE IS BEING SET, and it is the whole bug.
+   * Adjusting state during render is a documented React pattern, but only for
+   * the component's OWN state: React can re-run the render it is already in
+   * the middle of and nothing outside notices. `setOpen` is not ours. It comes
+   * from ChatProvider through useChat(), so calling it here asked React to
+   * schedule an update on a component further up the tree while this one was
+   * still rendering — which is unresolvable, and which React reports as
+   * "Cannot update a component (ChatProvider) while rendering a different
+   * component (ChatWidget)". MobileNav's `setOpen` is its own useState, which
+   * is why the same shape is fine there and not here.
+   *
+   * A ref rather than state for the comparison: this value is only ever read
+   * to answer "did the path change since last time", and holding it in state
+   * would mean a second update in the same effect for no visible benefit.
+   *
+   * Guarded so it fires on a real navigation only. Without the check, this
+   * would also run on mount, and closing an already-closed drawer on every
+   * mount is a no-op that invites someone to wonder whether it is.
+   */
+  const previousPathname = useRef(pathname);
+
+  useEffect(() => {
+    if (previousPathname.current === pathname) return;
+    previousPathname.current = pathname;
     setOpen(false);
-  }
+  }, [pathname, setOpen]);
 
   /**
    * React state into the dialog's imperative API.

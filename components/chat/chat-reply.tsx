@@ -19,8 +19,8 @@ import type { ChatProduct } from "@/lib/ai/facts";
  * again would stutter; finding the name in the prose and linking it in place
  * would mean string-matching model output against a row, which is exactly the
  * kind of guessing this codebase avoids. A numbered mark is honest about what
- * it is: a reference to the card below, in the same brass the rest of the site
- * uses for marks.
+ * it is: a reference to the card below, in the same accent the rest of the
+ * site uses for marks.
  *
  * A tag with no matching product is dropped rather than shown. It should never
  * arrive — lib/ai/grounding.ts rejects any reply citing outside the retrieved
@@ -56,10 +56,15 @@ export function ChatReply({
       <Link
         key={`ref-${key++}`}
         href={product.href}
-        // `align-super` rather than a <sup>: the mono face at this size sits
-        // correctly on the serif baseline without the browser's own font-size
+        // `align-super` rather than a <sup>: at this size the mark sits
+        // correctly on the baseline without the browser's own font-size
         // reduction making it unreadable on a phone.
-        className="ml-0.5 inline-block align-super font-mono text-[0.65em] text-brass underline decoration-brass/40 underline-offset-2 transition-colors hover:decoration-brass focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
+        //
+        // `accent-strong` rather than `brass`: brass is 2.9:1 on white, which
+        // is fine for a rule or a tick and not for a number somebody has to
+        // read. The darkened accent is 4.6:1 and still unmistakably the same
+        // mark colour.
+        className="tabular ml-0.5 inline-block align-super text-[0.7em] font-medium text-accent-strong underline decoration-accent-strong/40 underline-offset-2 transition-colors hover:decoration-accent-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
       >
         <span className="sr-only">See </span>
         {product.ref}

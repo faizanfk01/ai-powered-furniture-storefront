@@ -19,6 +19,9 @@ import { useEffect, useState } from "react";
  * times it is not: silence that lasts long enough to look broken is the thing
  * being designed against, and a message that changes proves the panel is still
  * alive in a way a looping animation cannot.
+ *
+ * RESTYLED ONLY. The three stages, their timings and the live region are
+ * unchanged; the marks beside the label are now dots rather than ruler ticks.
  */
 
 const STAGES = [
@@ -42,28 +45,23 @@ export function ChatThinking() {
     // announced when it changes. That matters more here than anywhere else in
     // the panel: a screen-reader user gets no spinner, and without this the
     // wait is entirely silent.
-    <div role="status" className="flex items-center gap-3">
-      {/* The measure, animated: brass ticks filling left to right, which is
-          the site's own ornament doing a job rather than a borrowed spinner.
+    <div role="status" className="flex items-center gap-2.5 px-1">
+      {/* Three dots, the plain and universally read version of "working".
+          It was the measure's brass ruler ticks — the site's own ornament
+          doing a job, which was right when the ornament was the identity.
           Decorative, so it is hidden from the accessibility tree — the label
           beside it is what a screen reader should read, once. */}
-      <span aria-hidden="true" className="flex items-end gap-[3px]">
-        {[0, 1, 2, 3].map((tick) => (
+      <span aria-hidden="true" className="flex items-center gap-1">
+        {[0, 1, 2].map((dot) => (
           <span
-            key={tick}
-            className="w-px animate-[chat-tick_1.2s_ease-in-out_infinite] bg-brass"
-            style={{
-              height: `${0.35 + tick * 0.15}rem`,
-              animationDelay: `${tick * 0.15}s`,
-              // So scaleY shortens the tick from the top, like a ruler mark,
-              // rather than shrinking it toward its own middle.
-              transformOrigin: "bottom",
-            }}
+            key={dot}
+            className="size-1.5 animate-[chat-dot_1.2s_ease-in-out_infinite] rounded-full bg-muted"
+            style={{ animationDelay: `${dot * 0.16}s` }}
           />
         ))}
       </span>
 
-      <span className="spec-label text-muted">{STAGES[stage].label}</span>
+      <span className="text-sm text-muted">{STAGES[stage].label}</span>
     </div>
   );
 }

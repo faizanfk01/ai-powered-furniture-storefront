@@ -2,8 +2,6 @@
 
 import { useEffect, useId, useRef } from "react";
 
-import { Measure } from "@/components/ui/measure";
-
 import { isBackdropClick } from "./backdrop-click";
 import { ChatConversation, type ChatHandle } from "./chat-conversation";
 
@@ -71,15 +69,18 @@ export function ProductChatModal({
       // Nearly full height on a phone so the transcript has room; a centred
       // card from `sm` up. Positioning and the entry transition are in the
       // .chat-modal rules in app/globals.css.
-      className="chat-modal w-[min(34rem,calc(100vw-2rem))] max-h-[min(40rem,calc(100dvh-2rem))] border border-ink/15 shadow-2xl shadow-ink/30"
+      className="chat-modal w-[min(34rem,calc(100vw-2rem))] max-h-[min(40rem,calc(100dvh-2rem))] rounded-2xl border border-hairline shadow-2xl shadow-ink/20"
     >
-      <div className="flex items-start justify-between gap-4 bg-ink-deep px-5 py-4 text-paper">
+      {/* The same ink header the drawer wears, so the two surfaces are
+          recognisably one assistant in two places. What differs is the title:
+          this one names the piece, and the shape of the container says the
+          rest. */}
+      <div className="flex items-center justify-between gap-4 bg-ink px-4 py-3.5 text-paper sm:px-5">
         <div className="min-w-0">
-          <Measure width="w-12" />
-          <p className="spec-label mt-2.5 text-paper/55">Ask AI about</p>
+          <p className="text-sm text-paper/60">Ask AI about</p>
           <h2
             id={`${modalId}-title`}
-            className="display-wide mt-1 text-base leading-tight font-medium uppercase"
+            className="display-wide mt-0.5 truncate text-base leading-tight font-semibold"
           >
             {productName}
           </h2>
@@ -88,9 +89,20 @@ export function ProductChatModal({
         <button
           type="button"
           onClick={onClose}
-          className="spec-label -mr-2 -mt-1 shrink-0 px-2 py-2 text-paper/70 transition-colors hover:text-paper focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
+          className="-mr-2 inline-flex size-9 shrink-0 items-center justify-center rounded-lg text-paper/70 transition-colors hover:bg-paper/10 hover:text-paper focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
         >
-          Close
+          <span className="sr-only">Close</span>
+          <svg
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+            className="size-5"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.75"
+            strokeLinecap="round"
+          >
+            <path d="M6 6l12 12M18 6L6 18" />
+          </svg>
         </button>
       </div>
 

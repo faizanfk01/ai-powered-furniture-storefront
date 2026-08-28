@@ -305,23 +305,28 @@ body {
   }
 }
 
-/* The thinking indicator in the chat panel: the measure's ticks, rising and
-   settling. Defined here rather than inline because Tailwind v4 has no
-   arbitrary @keyframes — `animate-[chat-tick_...]` names this.
+/* The thinking indicator in the chat panel: three dots, rising and settling.
+   Defined here rather than inline because Tailwind v4 has no arbitrary
+   @keyframes — `animate-[chat-dot_...]` names this.
+
+   It was `chat-tick`, which squashed the measure's ruler marks on their Y
+   axis. The ruler is gone from the chat panel with the rest of the showroom
+   ornament, and a scaleY on a round dot makes an ellipse — so this scales
+   uniformly instead.
 
    Reduced motion is handled by the block below, which cuts the duration to
-   0.01ms. The ticks then settle on the keyframe at 100% — dimmed and short,
+   0.01ms. The dots then settle on the keyframe at 100% — dimmed and small,
    but present and completely still. That is the right resting state: the
    label beside them is what actually says the assistant is working. */
-@keyframes chat-tick {
+@keyframes chat-dot {
   0%,
   100% {
     opacity: 0.25;
-    transform: scaleY(0.6);
+    transform: scale(0.7);
   }
   50% {
     opacity: 1;
-    transform: scaleY(1);
+    transform: scale(1);
   }
 }
 

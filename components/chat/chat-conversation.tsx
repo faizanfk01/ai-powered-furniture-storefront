@@ -4,6 +4,8 @@ import { useEffect, useId, useImperativeHandle, useRef, useState } from "react";
 import type { ReactNode, Ref } from "react";
 
 import { WhatsAppIcon } from "@/components/site/whatsapp-icon";
+import { Button } from "@/components/ui/button";
+import { storefrontControlClass } from "@/components/ui/field";
 import type { ChatProduct } from "@/lib/ai/facts";
 import {
   CHAT_MAX_HISTORY,
@@ -246,7 +248,7 @@ export function ChatConversation({
       {/* TRANSCRIPT */}
       <div
         ref={transcriptRef}
-        className="flex-1 space-y-5 overflow-y-auto px-5 py-5"
+        className="flex-1 space-y-4 overflow-y-auto px-4 py-4 sm:px-5"
       >
         {empty && emptyState((prompt) => void send(prompt, entries))}
 
@@ -255,7 +257,7 @@ export function ChatConversation({
             announced — several screen readers only watch regions that were
             already in the tree. Mounting it with the panel means the first
             reply is announced like every one after it. */}
-        <div role="log" aria-live="polite" className="space-y-5">
+        <div role="log" aria-live="polite" className="space-y-4">
           {entries.map((entry) => (
             <TranscriptEntry key={entry.id} entry={entry} onRetry={retry} />
           ))}
@@ -269,8 +271,8 @@ export function ChatConversation({
           The assistant answers questions; it does not take orders, and neither
           container should ever look like it does. */}
       <div
-        className="border-t border-hairline bg-hairline/25 px-5 pt-4 pb-4"
-        style={{ paddingBottom: "calc(1rem + env(safe-area-inset-bottom))" }}
+        className="border-t border-hairline bg-surface px-4 pt-3 pb-3 sm:px-5"
+        style={{ paddingBottom: "calc(0.75rem + env(safe-area-inset-bottom))" }}
       >
         <form
           onSubmit={(event) => {
@@ -295,21 +297,20 @@ export function ChatConversation({
             // rather than something that happens.
             aria-invalid={overLimit || undefined}
             aria-describedby={overLimit ? `${fieldId}-limit` : undefined}
-            className={`min-w-0 flex-1 border bg-paper px-3 py-2.5 text-sm text-ink placeholder:text-muted/70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass ${
-              overLimit ? "border-brass" : "border-ink/20"
-            }`}
+            className={`${composerControl(overLimit)} min-w-0 flex-1 text-sm`}
           />
-          <button
+          <Button
             type="submit"
+            size="sm"
             disabled={pending || draft.trim() === "" || overLimit}
-            className="shrink-0 bg-ink px-4 font-display text-xs font-medium tracking-wide text-paper uppercase transition-colors hover:bg-ink-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass disabled:cursor-not-allowed disabled:bg-ink/25"
+            className="shrink-0"
           >
             Send
-          </button>
+          </Button>
         </form>
 
         {overLimit && (
-          <p id={`${fieldId}-limit`} className="spec-label mt-2 text-brass">
+          <p id={`${fieldId}-limit`} className="mt-2 text-xs text-accent-strong">
             {draft.length - CHAT_MAX_MESSAGE_LENGTH} characters over — please
             shorten
           </p>
@@ -319,12 +320,12 @@ export function ChatConversation({
           href={latestHandoff}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-3 flex items-center gap-2 text-xs text-muted transition-colors hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
+          className="mt-2.5 flex items-center gap-2 rounded-lg px-1 py-1 text-xs text-muted transition-colors hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
         >
           <WhatsAppIcon className="size-4 shrink-0" />
           <span>
             To order or confirm a price, message us on{" "}
-            <span className="font-mono">{WHATSAPP_DISPLAY}</span>
+            <span className="tabular">{WHATSAPP_DISPLAY}</span>
           </span>
         </a>
       </div>
@@ -333,6 +334,24 @@ export function ChatConversation({
 }
 
 // ---------------------------------------------------------------------------
+
+/**
+ * The composer input, with the border swapped once the draft is over length.
+ *
+ * IT REPLACES THE BORDER UTILITY, IT DOES NOT APPEND ONE. Two border-color
+ * classes on one element are resolved by CSS source order, not by the order
+ * they were written into the string, so appending would leave the field
+ * looking untouched while the counter underneath said it was too long. Same
+ * trap, same fix as components/reviews/review-form.tsx.
+ */
+function composerControl(overLimit: boolean) {
+  if (!overLimit) return storefrontControlClass;
+
+  return storefrontControlClass
+    .replace("border-line-strong", "border-accent-strong")
+    .replace("hover:border-muted/50", "hover:border-accent-strong")
+    .replace("focus:border-ink", "focus:border-accent-strong");
+}
 
 function TranscriptEntry({
   entry,
@@ -344,7 +363,10 @@ function TranscriptEntry({
   if (entry.kind === "user") {
     return (
       <div className="flex justify-end">
-        <p className="max-w-[85%] bg-ink px-3.5 py-2.5 text-sm leading-relaxed text-paper">
+        {/* The customer's own words, in the brand dark. `rounded-br-md` docks
+            the corner nearest the composer, which is the convention every
+            messaging app has settled on for "this one is yours". */}
+        <p className="max-w-[85%] rounded-2xl rounded-br-md bg-ink px-3.5 py-2.5 text-sm leading-relaxed text-paper">
           {entry.text}
         </p>
       </div>
@@ -360,8 +382,14 @@ function TranscriptEntry({
     );
 
     return (
-      <div className="space-y-3">
-        <ChatReply text={entry.text} products={entry.products} />
+      <div className="space-y-2.5">
+        {/* The mirror of the customer's bubble: light ground, docked on the
+            left. The cited cards sit outside it rather than inside, so they
+            read as things attached to the answer rather than part of the
+            sentence. */}
+        <div className="max-w-[92%] rounded-2xl rounded-bl-md bg-surface px-3.5 py-3">
+          <ChatReply text={entry.text} products={entry.products} />
+        </div>
 
         {cited.length > 0 && (
           <ul className="space-y-2">
@@ -380,38 +408,39 @@ function TranscriptEntry({
   // arrow function, TypeScript cannot know `entry.retryable` is still non-null.
   const { retryable } = entry;
 
-  // NOTICE. Brass rule rather than red: this is not an error the customer
-  // made, and dressing a rate limit as a fault makes a working site look
-  // broken. It says what happened, offers the retry when retrying could help,
-  // and puts WhatsApp directly in reach — which is the actual answer to "the
-  // assistant cannot help you right now".
+  // NOTICE. The accent, not red: this is not an error the customer made, and
+  // dressing a rate limit as a fault makes a working site look broken. It says
+  // what happened, offers the retry when retrying could help, and puts
+  // WhatsApp directly in reach — which is the actual answer to "the assistant
+  // cannot help you right now".
+  //
+  // Restyled into the tinted panel the storefront uses for a calm aside — the
+  // same one carrying the AI summary and the provisional-hours caution. It was
+  // a left rule in brass, which is a margin mark, and a margin mark on a chat
+  // turn reads as an error gutter.
   return (
-    <div className="border-l-2 border-brass bg-hairline/30 py-3 pr-3 pl-4">
-      <p className="spec-label text-brass">
+    <div className="rounded-xl border border-brass/30 bg-accent-soft p-3.5">
+      <p className="text-sm font-semibold text-accent-strong">
         {entry.failure === "BUSY" ? "Busy" : "Unavailable"}
       </p>
-      <p className="mt-2 text-sm leading-relaxed text-ink">{entry.text}</p>
+      <p className="mt-1.5 text-sm leading-relaxed text-ink">{entry.text}</p>
 
-      <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+      <div className="mt-3 flex flex-wrap items-center gap-2">
         {retryable && (
-          <button
+          <Button
             type="button"
+            size="sm"
+            variant="outline"
             onClick={() => onRetry(entry.id, retryable)}
-            className="spec-label border border-ink/25 px-3 py-1.5 text-ink transition-colors hover:border-ink hover:bg-ink/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
           >
             Try again
-          </button>
+          </Button>
         )}
 
-        <a
-          href={GENERIC_WHATSAPP}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="spec-label inline-flex items-center gap-2 border border-ink/25 px-3 py-1.5 text-ink transition-colors hover:border-ink hover:bg-ink/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
-        >
+        <Button size="sm" variant="outline" href={GENERIC_WHATSAPP}>
           <WhatsAppIcon className="size-3.5" />
           Message us
-        </a>
+        </Button>
       </div>
     </div>
   );

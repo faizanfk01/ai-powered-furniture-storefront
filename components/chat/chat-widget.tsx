@@ -3,7 +3,6 @@
 import { usePathname } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
 
-import { Measure } from "@/components/ui/measure";
 import { SITE } from "@/lib/site";
 
 import { isBackdropClick } from "./backdrop-click";
@@ -109,20 +108,21 @@ export function ChatWidget() {
       }}
       // Full width on a phone, a fixed column on anything larger. The
       // height, position and slide come from .chat-drawer.
-      className="chat-drawer w-full shadow-2xl shadow-ink/30 sm:w-[26rem] sm:border-l sm:border-ink/15"
+      className="chat-drawer w-full shadow-2xl shadow-ink/20 sm:w-[26rem] sm:border-l sm:border-hairline"
     >
-      {/* HEADER — an ink band, so the drawer reads as a different mode of
-          the site rather than a card floating on the page. */}
-      <div className="flex items-start justify-between gap-4 bg-ink-deep px-5 py-4 text-paper">
-        <div>
-          <Measure width="w-12" />
+      {/* HEADER — the same ink as the site header directly above it, so the
+          drawer reads as an extension of the site's chrome rather than a
+          separate mode. Sentence case: the ruler ticks and the tracked-out
+          capitals were the showroom identity's signage voice. */}
+      <div className="flex items-center justify-between gap-4 bg-ink px-4 py-3.5 text-paper sm:px-5">
+        <div className="min-w-0">
           <h2
             id={`${panelId}-title`}
-            className="display-wide mt-2.5 text-base leading-tight font-medium uppercase"
+            className="display-wide text-base leading-tight font-semibold"
           >
             Ask {SITE.name}
           </h2>
-          <p className="spec-label mt-1 text-paper/55">
+          <p className="mt-0.5 text-sm text-paper/60">
             Answers from our catalogue
           </p>
         </div>
@@ -130,9 +130,20 @@ export function ChatWidget() {
         <button
           type="button"
           onClick={() => setOpen(false)}
-          className="spec-label -mr-2 -mt-1 shrink-0 px-2 py-2 text-paper/70 transition-colors hover:text-paper focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
+          className="-mr-2 inline-flex size-9 shrink-0 items-center justify-center rounded-lg text-paper/70 transition-colors hover:bg-paper/10 hover:text-paper focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
         >
-          Close
+          <span className="sr-only">Close</span>
+          <svg
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+            className="size-5"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.75"
+            strokeLinecap="round"
+          >
+            <path d="M6 6l12 12M18 6L6 18" />
+          </svg>
         </button>
       </div>
 
@@ -161,21 +172,21 @@ export function ChatWidget() {
 function EntryState({ onPick }: { onPick: (prompt: string) => void }) {
   return (
     <div>
-      <p className="leading-relaxed text-ink">
+      <p className="leading-relaxed text-muted">
         Ask about our furniture, find something in your budget, or ask how to
         order. Every answer comes from our own catalogue — if we don&rsquo;t
         have something, it will say so.
       </p>
 
-      <p className="spec-label mt-6 text-muted">Try asking</p>
+      <p className="mt-5 text-sm font-semibold text-ink">Try asking</p>
 
-      <ul className="mt-3 space-y-2">
+      <ul className="mt-2.5 space-y-2">
         {EXAMPLE_PROMPTS.map((prompt) => (
           <li key={prompt}>
             <button
               type="button"
               onClick={() => onPick(prompt)}
-              className="w-full border border-hairline bg-hairline/30 px-3 py-2.5 text-left text-sm text-ink transition-colors hover:border-ink/25 hover:bg-hairline/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
+              className="w-full rounded-xl border border-hairline bg-paper px-3.5 py-2.5 text-left text-sm text-ink shadow-sm transition-[box-shadow,border-color] hover:border-line-strong hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
             >
               {prompt}
             </button>

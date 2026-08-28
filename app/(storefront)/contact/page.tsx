@@ -16,8 +16,11 @@ import {
 
 export const metadata: Metadata = {
   title: "Contact",
-  description:
-    "Standard Furniture, Mardan. Showroom at Shen Gul Plaza, workshop at Sir Anjam Khan Market, Baghdada. Message us on WhatsApp at +92 300 905 9052.",
+  // Interpolated rather than typed out. This description had the number
+  // written into it by hand, so it kept the old grouping when the display
+  // format changed in lib/site.ts and the page showed two different spellings
+  // of one number — the exact drift the constant exists to prevent.
+  description: `Standard Furniture, Mardan. Showroom at Shen Gul Plaza, workshop at Sir Anjam Khan Market, Baghdada. Message us on WhatsApp at ${WHATSAPP_DISPLAY}.`,
 };
 
 /**
@@ -133,18 +136,29 @@ export default function ContactPage() {
 
       {/* ------------------------------------------------------------------
           HOURS.
-          `HOURS.confirmed` is false, and this page is the one somebody reads
-          before driving across town — so provisional times are labelled as
-          provisional and paired with a way to check, rather than presented as
-          fact in a slightly smaller font. When the real hours land, the flag
-          flips and the caution disappears on its own.
+          `HOURS.confirmed` is TRUE now, so the times below are stated as fact
+          and the caution panel that used to sit beside them is not rendered.
+          That happened on its own when the flag flipped in lib/site.ts — this
+          page asks the question rather than hardcoding an answer, which is the
+          whole reason the flag exists.
 
-          The caution now sits in a tinted panel beside the times rather than
-          under a tracked-out capital label. Same words, and it is harder to
-          skim past.
+          The block is kept rather than deleted. If the shop changes its hours
+          and they need confirming again, flipping the flag back has to bring
+          the caution with it; deleting it now would mean the next unconfirmed
+          hours are presented as fact.
+
+          THE COLUMN COUNT FOLLOWS THE CAUTION. Two columns exist to pair the
+          times with the warning beside them. With no warning there is nothing
+          to pair, and a half-width card against an empty column reads as a
+          layout that lost something — so the confirmed state is a single card
+          at a readable measure instead.
          ------------------------------------------------------------------ */}
       <Section eyebrow="When we are open" heading="Opening hours">
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8">
+        <div
+          className={`grid grid-cols-1 gap-6 ${
+            HOURS.confirmed ? "max-w-md" : "lg:grid-cols-2 lg:gap-8"
+          }`}
+        >
           <Card className="divide-y divide-hairline px-5 sm:px-6">
             {HOURS.lines.map((line) => (
               <p key={line} className="tabular py-3.5 text-ink">

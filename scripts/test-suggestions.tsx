@@ -14,8 +14,7 @@
  * neutral question, it is an advertisement for a service nobody said we
  * provide, and the honest grounded answer that follows arrives too late to
  * unask it. So section B is an audit of the chip vocabulary against the things
- * this business has not said — including its opening hours, which lib/site.ts
- * marks unconfirmed and lib/ai/facts.ts deliberately withholds from the model.
+ * this business has not said.
  *
  * Section D proves the routing claim structurally rather than by assertion:
  * there is one fetch in the client chat path and it points at /api/chat.
@@ -212,9 +211,10 @@ function selectionSuite() {
  * Subjects this business has never made a claim about. A chip that raises one
  * is putting words in the shop's mouth, whatever the assistant then answers.
  *
- * `hours` is in here for a specific reason: HOURS.confirmed is false in
- * lib/site.ts, so lib/ai/facts.ts tells the model it does not know them. A
- * chip asking when we open would walk a customer straight into that gap.
+ * `hours` is a leftover from when HOURS.confirmed was false and facts.ts told
+ * the model it did not know them. They are confirmed now, so an hours chip
+ * would be safe — the pattern stays because no such chip has been written, and
+ * this file should fail loudly if one appears without that decision being made.
  */
 const FORBIDDEN_PREMISE = [
   ["delivery or shipping", /\b(deliver|delivery|shipping|courier|ship it)\b/i],

@@ -7,10 +7,12 @@ import {
   LOCATIONS,
   NAV_LINKS,
   SITE,
+  SOCIAL_LINKS,
   WHATSAPP_DISPLAY,
   whatsappUrl,
 } from "@/lib/site";
 
+import { SOCIAL_ICONS } from "./social-icons";
 import { WhatsAppIcon } from "./whatsapp-icon";
 import { Wordmark } from "./wordmark";
 
@@ -62,6 +64,37 @@ export function SiteFooter() {
               <p className="mt-3 text-sm text-paper/50 tabular">
                 {WHATSAPP_DISPLAY}
               </p>
+
+              {/* Where the shop already is, off this site.
+                  Icons rather than labelled links: two words in a column that
+                  already holds a tagline, a button and a phone number would
+                  read as more navigation, and these are not navigation. The
+                  accessible name comes from the sr-only span, so the link is
+                  announced as "TikTok" rather than as nothing.
+                  `size-10` is a 40px target — these are small marks, and a
+                  small mark is not an excuse for a small tap area. */}
+              <ul className="mt-5 flex items-center gap-2">
+                {SOCIAL_LINKS.map((social) => {
+                  const Icon = SOCIAL_ICONS[social.label];
+                  if (!Icon) return null;
+
+                  return (
+                    <li key={social.label}>
+                      <a
+                        href={social.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex size-10 items-center justify-center rounded-lg text-paper/60 transition-colors hover:bg-paper/10 hover:text-paper focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
+                      >
+                        <Icon />
+                        <span className="sr-only">
+                          {social.label} (opens in a new tab)
+                        </span>
+                      </a>
+                    </li>
+                  );
+                })}
+              </ul>
             </div>
 
             {/* Both places. Neither is "the" address. */}

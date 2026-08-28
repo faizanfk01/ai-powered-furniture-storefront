@@ -101,7 +101,7 @@ const PRODUCTS: ChatProduct[] = [
 
 const FACTS = [
   "BUSINESS: Standard Furniture, a furniture and interior decor business in Mardan.",
-  "HOW TO ORDER: every enquiry, quote and order happens over WhatsApp on +92 300 905 9052.",
+  "HOW TO ORDER: every enquiry, quote and order happens over WhatsApp on +92 300 9059052.",
   'PRODUCT [P1]: Karachi 3-Seater Fabric Sofa. Sofas. Rs 118,000. In stock. 84" W x 36" D x 30" H. Sheesham frame, woven fabric.',
   'PRODUCT [P2]: Swat Two-Seater Sofa. Sofas. Rs 96,000. Made to order. 62" W x 34" D x 30" H.',
 ].join("\n");
@@ -192,7 +192,7 @@ function groundingSuite() {
     ],
     [
       "the shop phone number in bold (the U+202F regression)",
-      "Message us on WhatsApp at **+92 300 905 9052** and we will confirm.",
+      "Message us on WhatsApp at **+92 300 9059052** and we will confirm.",
     ],
     [
       "a numbered list of steps",

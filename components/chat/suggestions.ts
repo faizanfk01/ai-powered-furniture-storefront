@@ -33,10 +33,14 @@ import type { ChatProduct } from "@/lib/ai/facts";
  * that pieces have prices and stock states, that we build to a customer's own
  * measurements, that there is a showroom, and that ordering happens on
  * WhatsApp. Deliberately absent, because the business has not said them:
- * delivery, charges, warranty, returns, discounts, payment plans — and
- * OPENING HOURS, which lib/site.ts explicitly marks unconfirmed and which
- * facts.ts therefore withholds from the model. A chip inviting a question we
- * have decided not to answer is worse than no chip.
+ * delivery, charges, warranty, returns, discounts and payment plans.
+ *
+ * OPENING HOURS used to be on that list because lib/site.ts marked them
+ * unconfirmed and facts.ts withheld them from the model entirely. They are
+ * confirmed now, so an hours chip would be safe to add — it simply has not
+ * been, and the premise audit in scripts/test-suggestions.tsx still asserts
+ * none of these chips mention them. Adding one is a copy decision, not a
+ * safety one, which is the only thing that changed.
  *
  * WHATSAPP. "How do I place an order?" is the chip that leads there, and it
  * leads there by being answered: rule 6 of the answer prompt says WhatsApp is

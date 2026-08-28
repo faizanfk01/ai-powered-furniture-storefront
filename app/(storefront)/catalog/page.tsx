@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 
 import { CatalogFilters } from "@/components/catalog/catalog-filters";
 import { ProductCard } from "@/components/catalog/product-card";
@@ -206,53 +205,6 @@ export default async function CatalogPage({
               </div>
             </div>
           )}
-
-          {/* Every category as a real link, so a crawler — and anyone without
-              JavaScript — can reach the filtered views the select produces.
-              Pills rather than a row of tracked-out capitals: this is a second
-              way to use the filter above, and it should look like controls. */}
-          <nav
-            aria-label="Categories"
-            className="mt-14 border-t border-hairline pt-8"
-          >
-            <h2 className="text-sm font-semibold text-ink">
-              Browse by category
-            </h2>
-            <ul className="mt-3 flex flex-wrap gap-2">
-              <li>
-                <Link
-                  href="/catalog"
-                  aria-current={!params.category ? "true" : undefined}
-                  className={`inline-block rounded-full border px-3.5 py-1.5 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass ${
-                    !params.category
-                      ? "border-ink bg-ink text-paper"
-                      : "border-hairline bg-paper text-muted hover:border-line-strong hover:text-ink"
-                  }`}
-                >
-                  All
-                </Link>
-              </li>
-              {categories.map((category) => {
-                const active = params.category === category.slug;
-
-                return (
-                  <li key={category.id}>
-                    <Link
-                      href={`/catalog?category=${category.slug}`}
-                      aria-current={active ? "true" : undefined}
-                      className={`inline-block rounded-full border px-3.5 py-1.5 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass ${
-                        active
-                          ? "border-ink bg-ink text-paper"
-                          : "border-hairline bg-paper text-muted hover:border-line-strong hover:text-ink"
-                      }`}
-                    >
-                      {category.name}
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </nav>
         </div>
       </Container>
     </>

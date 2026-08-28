@@ -34,14 +34,18 @@ import type { SearchedProduct } from "../product-search";
 /**
  * Static, so it costs one string concat rather than a query.
  *
- * The opening-hours line is the interesting one. lib/site.ts marks HOURS as an
- * unconfirmed placeholder — a factual claim somebody would act on by driving
- * to Shen Gul Plaza. A page can render that behind a caveat; a chat assistant
- * asked "what time do you open?" cannot, because the caveat is exactly what
- * gets dropped in conversation. So while `confirmed` is false the hours are
- * not given to the model at all, and it is told to hand the question to
- * WhatsApp instead. Flip HOURS.confirmed and this starts answering — no other
- * edit needed.
+ * The opening-hours line is the interesting one. Opening hours are a factual
+ * claim somebody acts on by driving to Shen Gul Plaza. A page can render an
+ * unconfirmed one behind a caveat; a chat assistant asked "what time do you
+ * open?" cannot, because the caveat is exactly what gets dropped in
+ * conversation. So while `HOURS.confirmed` was false the hours were not given
+ * to the model at all and it was told to hand the question to WhatsApp.
+ *
+ * The business has since confirmed them, the flag in lib/site.ts is true, and
+ * the assistant now answers the question from the real hours — which is the
+ * branch below doing what it was written for, with no edit here. The false
+ * branch stays because the next time hours change and need confirming, it has
+ * to come back on its own.
  */
 export const BUSINESS_FACTS = [
   `BUSINESS: ${SITE.name}, a furniture and interior decor business in ${SITE.town}, ${SITE.region}, Pakistan.`,

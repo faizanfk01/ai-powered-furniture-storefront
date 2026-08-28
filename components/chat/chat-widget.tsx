@@ -36,12 +36,6 @@ import { useChat } from "./chat-context";
  * differently; they are not meant to answer differently.
  */
 
-const EXAMPLE_PROMPTS = [
-  "What sofas do you have?",
-  "Show me tables under Rs 30,000",
-  "Where is your showroom?",
-] as const;
-
 export function ChatWidget() {
   // Open state lives in the provider so a future header entry can open the
   // drawer too. The transcript stays inside ChatConversation — nothing outside
@@ -114,7 +108,7 @@ export function ChatWidget() {
           drawer reads as an extension of the site's chrome rather than a
           separate mode. Sentence case: the ruler ticks and the tracked-out
           capitals were the showroom identity's signage voice. */}
-      <div className="flex items-center justify-between gap-4 bg-ink px-4 py-3.5 text-paper sm:px-5">
+      <div className="flex shrink-0 items-center justify-between gap-4 bg-ink px-4 py-3.5 text-paper sm:px-5">
         <div className="min-w-0">
           <h2
             id={`${panelId}-title`}
@@ -149,50 +143,37 @@ export function ChatWidget() {
 
       <ChatConversation
         active={open}
+        scope={{ kind: "site" }}
         placeholder="Ask about a piece, a budget, or how to order"
         inputLabel="Ask a question about our furniture"
-        emptyState={(ask) => <EntryState onPick={ask} />}
+        emptyState={() => <EntryState />}
       />
     </dialog>
   );
 }
 
 /**
- * The global drawer's entry state.
+ * The global drawer's entry state — the sentence, and nothing else.
  *
- * An empty chat box asks the customer to guess what it can do, and most people
- * guess wrong — either something it cannot answer, or nothing at all. So the
- * three examples are not decoration: they are the scope of the assistant,
- * shown rather than described, one from each thing it can actually do (a
- * category, a budget, the business itself).
+ * The three example questions that used to live here as a stacked button list
+ * are now quick-reply chips, rendered by ChatConversation from
+ * components/chat/suggestions.ts. They did not change and neither did what
+ * they are for: they are the scope of the assistant, shown rather than
+ * described, one from each thing it can actually do (a category, a budget, the
+ * business itself), because an empty chat box asks the customer to guess and
+ * most people guess wrong.
  *
- * They are buttons, so tapping one asks it. A phone keyboard is the largest
- * obstacle between a customer and their first question.
+ * Moving them was the point of the change. The product modal opened on a blank
+ * box for exactly the same reason and had no examples at all, and a second
+ * copy of a prompt list is a second list to keep safe. One source now feeds
+ * both surfaces, and the same chips appear again under each reply.
  */
-function EntryState({ onPick }: { onPick: (prompt: string) => void }) {
+function EntryState() {
   return (
-    <div>
-      <p className="leading-relaxed text-muted">
-        Ask about our furniture, find something in your budget, or ask how to
-        order. Every answer comes from our own catalogue, so if we don&rsquo;t
-        have something it will tell you.
-      </p>
-
-      <p className="mt-5 text-sm font-semibold text-ink">Try asking</p>
-
-      <ul className="mt-2.5 space-y-2">
-        {EXAMPLE_PROMPTS.map((prompt) => (
-          <li key={prompt}>
-            <button
-              type="button"
-              onClick={() => onPick(prompt)}
-              className="w-full rounded-xl border border-hairline bg-paper px-3.5 py-2.5 text-left text-sm text-ink shadow-sm transition-[box-shadow,border-color] hover:border-line-strong hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
-            >
-              {prompt}
-            </button>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <p className="leading-relaxed text-muted">
+      Ask about our furniture, find something in your budget, or ask how to
+      order. Every answer comes from our own catalogue, so if we don&rsquo;t
+      have something it will tell you.
+    </p>
   );
 }

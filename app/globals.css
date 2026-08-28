@@ -70,6 +70,45 @@ body {
   font-family: var(--font-body);
 }
 
+/* ---------------------------------------------------------------------------
+   THE PAGE DOES NOT SCROLL WHILE A CHAT DIALOG IS OPEN.
+   ---------------------------------------------------------------------------
+   A modal <dialog> makes the page behind it INERT — no focus, no clicks — but
+   it does not stop it scrolling. Chrome, Safari and Firefox all keep the
+   document scrollable underneath, so a wheel or a swipe anywhere outside the
+   transcript moved the storefront behind the open drawer while the drawer,
+   being position: fixed, stayed put.
+
+   That is where the second scrollbar came from. It was never a nested overflow
+   inside the panel: it was the document's own scrollbar, still live, sitting
+   next to the drawer's. And it is where the "empty space below the content"
+   came from too — the page behind was being scrolled to its end while the
+   drawer stayed still, so the backdrop filled with whatever was past the
+   footer.
+
+   components/site/mobile-nav.tsx already locks the body for exactly this
+   reason when its panel opens. The chat containers never did.
+
+   DONE IN CSS RATHER THAN IN AN EFFECT. `:has()` reads the dialog's own [open]
+   attribute, which is the single source of truth the browser maintains — so
+   the lock cannot desync from the panel the way a `useEffect` mirroring React
+   state can when a dialog is closed by Escape, by a backdrop click, or by the
+   close-on-navigation pass. There is also nothing to clean up, which is the
+   other half of that class of bug.
+
+   `scrollbar-gutter: stable` is not decoration. Without it, removing the
+   document scrollbar widens the viewport by its width and the whole storefront
+   jumps sideways as the drawer opens. Reserving the gutter permanently costs
+   nothing on a page that scrolls and keeps the layout still. */
+html {
+  scrollbar-gutter: stable;
+}
+
+html:has(dialog.chat-drawer[open]),
+html:has(dialog.chat-modal[open]) {
+  overflow: hidden;
+}
+
 /* Numbers that sit in a column — prices in a list, dimensions in a spec table —
    line up when their digits share a width. Inter ships tabular figures; this is
    the switch. Applied where numbers are compared, not globally, because
@@ -166,6 +205,17 @@ body {
      animate between. */
   display: none;
   flex-direction: column;
+
+  /* THE PANEL ITSELF NEVER SCROLLS. The UA stylesheet gives every <dialog>
+     `overflow: auto`, which quietly made this element a second scroll
+     container wrapping the transcript's own — two nested scrollers, and a
+     panel that could be scrolled past its content into blank space if its
+     children ever measured taller than the viewport. `.chat-modal` below has
+     always declared this; the drawer was the one that did not, and the two
+     should not differ on something this load-bearing.
+
+     The transcript inside is the only thing on this surface that scrolls. */
+  overflow: hidden;
 
   /* Overrides the centred, auto-margined box a dialog is by default. */
   position: fixed;

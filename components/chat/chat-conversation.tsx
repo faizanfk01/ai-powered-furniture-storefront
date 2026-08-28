@@ -19,6 +19,12 @@ import type { ChatMessageInput } from "@/lib/validations/chat";
 import { ChatProductCard } from "./chat-product-card";
 import { ChatReply } from "./chat-reply";
 import { ChatThinking } from "./chat-thinking";
+import { SuggestionChips } from "./suggestion-chips";
+import {
+  followUpSuggestions,
+  starterSuggestions,
+  type ChatScope,
+} from "./suggestions";
 
 /**
  * A conversation with the assistant — transcript, composer, and everything
@@ -48,6 +54,13 @@ type Entry =
       /** Refs the reply actually cited — the ones worth showing as cards. */
       citations: number[];
       whatsappUrl: string;
+      /**
+       * PRODUCTS | BUSINESS | OFF_TOPIC, copied from the API's own retrieval
+       * metadata. Only the quick-reply chips read it: a question about the
+       * shop and a product search that found nothing both come back with no
+       * rows, and they want different things offered next.
+       */
+      topic: string;
     }
   | {
       kind: "notice";
@@ -81,6 +94,7 @@ export type ChatHandle = {
 
 export function ChatConversation({
   active,
+  scope,
   emptyState,
   placeholder,
   inputLabel,
@@ -88,6 +102,16 @@ export function ChatConversation({
 }: {
   /** True while the container is open. Drives autofocus and scrolling. */
   active: boolean;
+  /**
+   * What this conversation is about — the whole site, or one product.
+   *
+   * Only the quick-reply chips use it, and it lives here rather than in the
+   * containers so both surfaces cannot drift into offering different chips
+   * for the same situation. Same reasoning as everything else in this file:
+   * the drawer and the modal are meant to look different and behave
+   * identically.
+   */
+  scope: ChatScope;
   /** Rendered when nothing has been asked yet. Gets a callback to ask. */
   emptyState: (ask: (prompt: string) => void) => ReactNode;
   placeholder: string;
@@ -181,6 +205,7 @@ export function ChatConversation({
             products: result.data.products,
             citations: result.data.citations,
             whatsappUrl: result.data.whatsappUrl,
+            topic: result.data.retrieval.topic,
           }
         : {
             kind: "notice",
@@ -243,14 +268,72 @@ export function ChatConversation({
   const empty = entries.length === 0;
   const overLimit = draft.length > CHAT_MAX_MESSAGE_LENGTH;
 
+  /**
+   * QUICK REPLIES. A chip is a pre-written message and nothing else: `onPick`
+   * below is the same `send` the composer's form calls, so a tap and a typed
+   * message are indistinguishable by the time either reaches POST /api/chat,
+   * and both are retrieved and grounded identically. See suggestions.ts.
+   *
+   * Offered under the NEWEST reply only. Chips under every historical turn
+   * would stack a column of stale questions down the transcript, and the one
+   * that matters is the one next to the answer just given.
+   *
+   * Not offered while a reply is in flight — ChatThinking already occupies
+   * that moment, and send() would ignore the tap anyway — and never under a
+   * degradation notice, which carries its own "Try again" and "Message us"
+   * pair and should not be crowded with questions the assistant just failed
+   * to answer.
+   */
+  const newest = entries[entries.length - 1];
+  const followUps =
+    !pending && newest?.kind === "assistant"
+      ? followUpSuggestions(
+          scope,
+          {
+            products: newest.products,
+            citations: newest.citations,
+            topic: newest.topic,
+          },
+          entries.filter((entry) => entry.kind === "user").map((entry) => entry.text),
+        )
+      : [];
+
   return (
     <>
       {/* TRANSCRIPT */}
       <div
         ref={transcriptRef}
-        className="flex-1 space-y-4 overflow-y-auto px-4 py-4 sm:px-5"
+        // THE ONLY SCROLL AREA ON EITHER SURFACE.
+        //
+        // `min-h-0` is belt and braces rather than a fix: a flex item's
+        // automatic minimum size is already 0 once it has a non-visible
+        // overflow, so this element could always shrink. It is written down
+        // because the day someone changes `overflow-y-auto` here for anything
+        // else, `min-height: auto` comes back, the transcript stops shrinking,
+        // and the panel starts overflowing again — which is a long way to
+        // travel from an innocent-looking edit.
+        //
+        // `overscroll-contain` stops a swipe that reaches the end of the
+        // transcript from chaining to the document behind it. The CSS in
+        // app/globals.css locks that document while a chat dialog is open, so
+        // this is the second of two independent guards against the same
+        // scroll leak — which is the right number for the one gesture every
+        // customer on a phone will make.
+        className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain px-4 py-4 sm:px-5"
       >
-        {empty && emptyState((prompt) => void send(prompt, entries))}
+        {empty && (
+          <div className="space-y-5">
+            {emptyState((prompt) => void send(prompt, entries))}
+
+            {/* The starters. Both containers get them from the same place, so
+                a blank panel is never a blank box in either one. */}
+            <SuggestionChips
+              label="Try asking"
+              suggestions={starterSuggestions(scope)}
+              onPick={(prompt) => void send(prompt, entries)}
+            />
+          </div>
+        )}
 
         {/* Rendered unconditionally, even while empty. A live region that
             appears at the same moment its first content does is not reliably
@@ -264,6 +347,20 @@ export function ChatConversation({
         </div>
 
         {pending && <ChatThinking />}
+
+        {/* Outside the log region above on purpose: these are controls, not
+            transcript, and a live region that re-announces three buttons every
+            time a reply lands is noise on top of the reply itself. The label
+            is screen-reader only — after an answer the chips read as what they
+            are without being introduced. */}
+        {followUps.length > 0 && (
+          <SuggestionChips
+            label="Suggested questions"
+            labelHidden
+            suggestions={followUps}
+            onPick={(prompt) => void send(prompt, entries)}
+          />
+        )}
       </div>
 
       {/* COMPOSER + the WhatsApp line, which stays visible in every state
@@ -271,7 +368,11 @@ export function ChatConversation({
           The assistant answers questions; it does not take orders, and neither
           container should ever look like it does. */}
       <div
-        className="border-t border-hairline bg-surface px-4 pt-3 pb-3 sm:px-5"
+        // `shrink-0` so the composer and the WhatsApp line under it keep their
+        // full height at every viewport. They are the fixed bottom band of the
+        // panel: the transcript above absorbs whatever height is left over,
+        // and it is the only band that is allowed to.
+        className="shrink-0 border-t border-hairline bg-surface px-4 pt-3 pb-3 sm:px-5"
         style={{ paddingBottom: "calc(0.75rem + env(safe-area-inset-bottom))" }}
       >
         <form

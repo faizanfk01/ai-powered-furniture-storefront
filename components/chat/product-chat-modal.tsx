@@ -75,7 +75,7 @@ export function ProductChatModal({
           recognisably one assistant in two places. What differs is the title:
           this one names the piece, and the shape of the container says the
           rest. */}
-      <div className="flex items-center justify-between gap-4 bg-ink px-4 py-3.5 text-paper sm:px-5">
+      <div className="flex shrink-0 items-center justify-between gap-4 bg-ink px-4 py-3.5 text-paper sm:px-5">
         <div className="min-w-0">
           <p className="text-sm text-paper/60">Ask AI about</p>
           <h2
@@ -109,6 +109,11 @@ export function ProductChatModal({
       <ChatConversation
         ref={chatRef}
         active={open}
+        // Scoped to this piece, so the quick-reply chips are about it —
+        // materials, a different size, whether it is in stock. Same chip
+        // machinery as the drawer, different set. See components/chat/
+        // suggestions.ts.
+        scope={{ kind: "product", productName }}
         placeholder={`Ask about the ${productName}`}
         inputLabel={`Ask a question about the ${productName}`}
         // Only reached if the opening question somehow never ran — the modal

@@ -61,7 +61,19 @@ export function ContactBuilder() {
         </Field>
       </div>
 
-      <div className="lg:sticky lg:top-28 lg:self-start">
+      {/* Plain flow — no sticky.
+          This column used to be `lg:sticky lg:top-28`, which pinned the
+          preview 112px from the top of the viewport and let the form scroll
+          past underneath it. The intent was to keep the draft in sight while
+          you typed; the effect was a panel that detached from its own section
+          and floated over the page, which reads as a bug rather than a
+          convenience. The section is short enough that both columns fit
+          without it.
+
+          `lg:pr-4` keeps the panel off the container's right edge, so it sits
+          as a panel on the page rather than as something aligned flush to the
+          page boundary. */}
+      <div className="lg:pr-4">
         <WhatsAppHandoff
           message={buildContactMessage(draft)}
           ready={contactIsReady(draft)}

@@ -48,7 +48,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "Standard Furniture — Mardan",
+    default: "Standard Furniture, Mardan",
     template: "%s · Standard Furniture",
   },
   description:

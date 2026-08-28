@@ -75,8 +75,8 @@ export type ChatTurnResult =
 const FALLBACK_MESSAGE: Record<ChatFailureKind, string> = {
   BUSY: "The assistant is busy right now. Please try again in a moment, or message us on WhatsApp.",
   UNAVAILABLE:
-    "The assistant is unavailable at the moment. Please message us on WhatsApp and we will answer you directly.",
-  INVALID: "That message could not be sent. Please try rephrasing it.",
+    "The assistant is not working right now. Message us on WhatsApp and we will answer you ourselves.",
+  INVALID: "That message could not be sent. Try wording it a bit differently.",
 };
 
 function failure(

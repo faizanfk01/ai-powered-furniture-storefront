@@ -10,7 +10,7 @@ import { LOCATIONS, OFFERINGS, SITE, whatsappUrl } from "@/lib/site";
 export const metadata: Metadata = {
   title: "About",
   description:
-    "Standard Furniture keeps a showroom in Shen Gul Plaza and a workshop in Baghdada, Mardan — one place to see the work, one place where it is made.",
+    "Standard Furniture keeps a showroom in Shen Gul Plaza and a workshop in Baghdada, Mardan. One place to see the work, one place where it is made.",
 };
 
 /**
@@ -37,22 +37,22 @@ const PROCESS = [
   {
     step: "01",
     title: "Measure",
-    body: "The room decides the piece, not the other way round. Wall to wall, doorway widths, where the light falls and where somebody has to walk past.",
+    body: "The room decides the piece, not the other way round. Wall to wall, how wide the door is, where the light falls, and where people have to walk past.",
   },
   {
     step: "02",
     title: "Draw",
-    body: "Dimensions and materials agreed before anything is cut — the same W × D × H that ends up printed against the piece in our catalogue.",
+    body: "We agree the sizes and the materials before anything is cut. The same width, depth and height you see printed against every piece in our catalogue.",
   },
   {
     step: "03",
     title: "Build",
-    body: "Made in Baghdada by the people who will deliver it. Made-to-order pieces typically take three to four weeks.",
+    body: "Made in Baghdada by the same people who will bring it to you. Made-to-order pieces usually take three to four weeks.",
   },
   {
     step: "04",
     title: "Fit",
-    body: "Delivered and put in place. Wall panelling and wallpaper are fitted by the same team that brings the furniture.",
+    body: "We bring it and put it where it goes. Wall panelling and wallpaper go up with the same team that brings the furniture.",
   },
 ];
 
@@ -78,9 +78,9 @@ export default function AboutPage() {
 
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted">
               Most furniture shops sell you something that arrived on a lorry.
-              Standard Furniture keeps a showroom on one side of Mardan and the
-              workshop that supplies it on the other — so the piece you sit on
-              and the piece we build for you come from the same hands.
+              We keep a showroom on one side of Mardan and the workshop that
+              supplies it on the other. The piece you sit on and the piece we
+              build for you come from the same hands.
             </p>
           </div>
         </Container>
@@ -94,7 +94,7 @@ export default function AboutPage() {
         tone="surface"
         eyebrow="Two addresses"
         heading="Where to find us"
-        lede="They do different jobs, and it is worth knowing which one you want before you set off."
+        lede="They do different jobs, so it helps to know which one you want before you set off."
       >
         {/* Real cards with real gaps. `gap-px` on a hairline ground drew a
             two-cell table; these are two places, not two rows of data. */}
@@ -117,8 +117,8 @@ export default function AboutPage() {
 
                 <p className="mt-4 leading-relaxed text-muted">
                   {location.label === "Showroom"
-                    ? "Sit on it, open the drawers, see the finish under real light. Bring the measurements of your room and we will tell you honestly whether a piece will fit."
-                    : "Where the cutting, joinery, upholstery and finishing happen. Customers are welcome — seeing a piece half-built is the fastest way to understand what you are paying for."}
+                    ? "Sit on it, open the drawers, look at the finish in real light. Bring your room's measurements and we will tell you straight whether a piece will fit."
+                    : "This is where the cutting, joinery, upholstery and finishing happen. Customers are welcome. Seeing a piece half-built is the quickest way to understand what you are paying for."}
                 </p>
               </Card>
             </li>
@@ -132,8 +132,8 @@ export default function AboutPage() {
          ------------------------------------------------------------------ */}
       <Section
         eyebrow="How a piece happens"
-        heading="Made to measure, literally"
-        lede="Every piece in the catalogue can be rebuilt to different dimensions, in a different wood or a different fabric. This is what that involves."
+        heading="Made to measure"
+        lede="Every piece in the catalogue can be built to different sizes, in another wood or another fabric. Here is how that works."
       >
         <ol className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {PROCESS.map((stage) => (
@@ -159,7 +159,7 @@ export default function AboutPage() {
         tone="surface"
         eyebrow="What we make"
         heading="Four things"
-        lede="Furniture is the largest part of it, but a room is rarely only furniture."
+        lede="Furniture is the biggest part of what we do, but a room is rarely just furniture."
       >
         <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {OFFERINGS.map((offering) => (
@@ -189,27 +189,28 @@ export default function AboutPage() {
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-12">
           <div>
             <p className="text-lg leading-relaxed text-ink">
-              Every piece in our catalogue is published at its finished size —
-              width, depth and height, in inches, against the piece itself. Not
-              &ldquo;compact&rdquo; or &ldquo;spacious&rdquo;: the number.
+              Every piece in our catalogue shows its finished size. Width, depth
+              and height, in inches, right there with the piece. Not
+              &ldquo;compact&rdquo; or &ldquo;spacious&rdquo;, the actual number.
             </p>
             <p className="mt-4 leading-relaxed text-muted">
-              It is the least glamorous thing on the site and the most useful.
-              A sofa that will not turn the corner of your stairs is not a
-              bargain at any price, and the only way to know before it arrives
-              is to have been told the truth about it beforehand.
+              It is the dullest thing on the site and the most useful. A sofa
+              that will not turn the corner of your stairs is no bargain at any
+              price, and the only way to know that in advance is for someone to
+              tell you the truth.
             </p>
           </div>
 
           <div>
             <p className="text-lg leading-relaxed text-ink">
               Solid sheesham, walnut finishes, kiln-dried frames, hand-woven
-              rattan, hard-wearing woven fabrics — what a piece is made of is
-              written in its description, in the same plain terms.
+              rattan, hard-wearing woven fabrics. What a piece is made of is
+              written in its description, in the same plain words.
             </p>
             <p className="mt-4 leading-relaxed text-muted">
-              If something is built to order, the catalogue says so and gives
-              the wait. If it is in the showroom today, it says that instead.
+              If something is built to order, the catalogue says so and tells
+              you the wait. If it is in the showroom today, it says that
+              instead.
             </p>
           </div>
         </div>
@@ -227,15 +228,15 @@ export default function AboutPage() {
                 Tell us about the room
               </h2>
               <p className="mt-2 leading-relaxed text-muted">
-                Send the measurements, or a photograph of the space, and we will
-                tell you what we would build for it and what it would cost.
+                Send us the measurements, or just a photo of the space, and we
+                will tell you what we would build for it and what it would cost.
               </p>
             </div>
 
             <div className="flex shrink-0 flex-wrap gap-3">
               <Button
                 href={whatsappUrl(
-                  "Hello Standard Furniture — I would like to talk about a room.",
+                  "Hello Standard Furniture, I would like to talk about a room.",
                 )}
               >
                 <WhatsAppIcon />

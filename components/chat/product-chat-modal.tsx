@@ -117,9 +117,8 @@ export function ProductChatModal({
         // and silent looks broken.
         emptyState={() => (
           <p className="leading-relaxed text-muted">
-            Ask about materials, dimensions, or whether this piece can be made
-            to a different size. Answers come from this product&rsquo;s own
-            details.
+            Ask about materials, sizes, or whether we can make this piece to a
+            different size. Answers come from this product&rsquo;s own details.
           </p>
         )}
       />

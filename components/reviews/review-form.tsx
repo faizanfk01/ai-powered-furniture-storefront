@@ -122,7 +122,7 @@ export function ReviewForm({
     return (
       <Card padded className="sm:p-8">
         <h3 className="display-wide text-xl font-semibold">
-          Thank you — it&rsquo;s with us
+          Thanks, we have got it
         </h3>
 
         {/* The honest part. Named as a step with a person in it, not as a
@@ -131,9 +131,11 @@ export function ReviewForm({
             know why they are not there yet. */}
         <p className="mt-3 leading-relaxed text-muted">
           Your review has been sent and is{" "}
-          <strong className="font-semibold text-ink">awaiting approval</strong>{" "}
-          before it appears on the site. Someone at the shop reads every review
-          first, so it will not show up straight away.
+          <strong className="font-semibold text-ink">
+            waiting for approval
+          </strong>{" "}
+          before it shows on the site. Someone at the shop reads every review
+          first, so it will not appear straight away.
         </p>
 
         <Button
@@ -153,7 +155,7 @@ export function ReviewForm({
       <form onSubmit={handleSubmit} noValidate>
         <h3 className="display-wide text-xl font-semibold">
           {productName
-            ? `Reviewed the ${productName}?`
+            ? `Bought the ${productName}?`
             : "Been to the showroom?"}
         </h3>
         <p className="mt-2 text-sm text-muted">
@@ -354,7 +356,7 @@ function StarRating({
         ))}
 
         <span aria-hidden="true" className="tabular ml-2 text-sm text-muted">
-          {value > 0 ? `${value} / 5` : "—"}
+          {value > 0 ? `${value} / 5` : "Not rated yet"}
         </span>
       </div>
 

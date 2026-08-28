@@ -128,7 +128,7 @@ export default async function ProductPage({
 
             {madeToOrder && (
               <p className="mt-2 text-sm text-muted">
-                Built to order — allow three to four weeks.
+                Built to order. It takes three to four weeks.
               </p>
             )}
 
@@ -137,11 +137,11 @@ export default async function ProductPage({
             <div className="mt-7">
               <Button size="lg" href={enquiry} className="w-full sm:w-auto">
                 <WhatsAppIcon />
-                Enquire on WhatsApp
+                Ask us on WhatsApp
               </Button>
               <p className="mt-3 text-sm leading-relaxed text-muted">
-                Opens a chat with the workshop, with this piece and its price
-                already written in.
+                Opens a chat with the workshop. This piece and its price are
+                already written in for you.
               </p>
             </div>
 
@@ -209,15 +209,15 @@ export default async function ProductPage({
                 Want it in another size?
               </h2>
               <p className="mt-2 leading-relaxed text-muted">
-                This piece can be rebuilt to your measurements, in a different
-                fabric or a different wood. Send us the room and we will quote
-                it.
+                We can build this to your measurements, in another fabric or
+                another wood. Tell us about the room and we will give you a
+                price.
               </p>
             </div>
             <Button
               variant="outline"
               href={whatsappUrl(
-                `Hello Standard Furniture — could you build ${product.name} to different measurements?`,
+                `Hello Standard Furniture, could you build the ${product.name} to different measurements?`,
               )}
               className="shrink-0"
             >

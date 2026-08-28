@@ -32,9 +32,9 @@ export const metadata: Metadata = {
 /** What each address is actually for, in the visitor's terms. */
 const LOCATION_PURPOSE: Record<string, string> = {
   Showroom:
-    "Come to see and sit on finished pieces, talk through a room, or collect an order.",
+    "Come and sit on the finished pieces, talk through a room, or pick up an order.",
   Workshop:
-    "Come to see work in progress, discuss a build in detail, or arrange delivery.",
+    "Come and see work in progress, go through a build in detail, or sort out delivery.",
 };
 
 export default function ContactPage() {
@@ -56,15 +56,15 @@ export default function ContactPage() {
             </h1>
 
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted">
-              WhatsApp is the fastest way to reach us — it is where quotes,
-              photographs and measurements go back and forth.
+              WhatsApp is the quickest way to reach us. It is where prices,
+              photos and measurements go back and forth.
             </p>
 
             <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4">
               <Button
                 size="lg"
                 href={whatsappUrl(
-                  "Hello Standard Furniture — I have a question.",
+                  "Hello Standard Furniture, I have a question.",
                 )}
               >
                 <WhatsAppIcon />
@@ -91,7 +91,7 @@ export default function ContactPage() {
         tone="surface"
         eyebrow="Where we are"
         heading="Two addresses"
-        lede="They do different jobs — it is worth knowing which one you want before you set off."
+        lede="They do different jobs, so it helps to know which one you want before you set off."
       >
         <ul className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {LOCATIONS.map((location) => (
@@ -121,7 +121,7 @@ export default function ContactPage() {
                     Get directions
                     <span className="sr-only">
                       {" "}
-                      to the {location.label.toLowerCase()} — opens Google Maps
+                      to the {location.label.toLowerCase()}. Opens Google Maps.
                     </span>
                   </Button>
                 </div>
@@ -159,14 +159,14 @@ export default function ContactPage() {
                 Not yet confirmed
               </h3>
               <p className="mt-2 leading-relaxed text-muted">
-                These times are provisional. Message us before you travel and we
-                will tell you exactly when someone will be there.
+                We have not confirmed these times yet. Message us before you
+                travel and we will tell you exactly when someone will be there.
               </p>
               <Button
                 variant="outline"
                 className="mt-5"
                 href={whatsappUrl(
-                  "Hello Standard Furniture — are you open today?",
+                  "Hello Standard Furniture, are you open today?",
                 )}
               >
                 <WhatsAppIcon />
@@ -184,7 +184,7 @@ export default function ContactPage() {
         tone="surface"
         eyebrow="Rather write it out?"
         heading="Send us a message"
-        lede="Write it here and it opens in WhatsApp, ready to send — useful when you want to get the wording right before you tap."
+        lede="Write it here and it opens in WhatsApp, ready for you to send. Handy if you want to get the wording right first."
       >
         <ContactBuilder />
       </Section>

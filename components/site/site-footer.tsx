@@ -51,7 +51,7 @@ export function SiteFooter() {
               <Button
                 variant="outline-invert"
                 href={whatsappUrl(
-                  "Hello Standard Furniture — I have a question.",
+                  "Hello Standard Furniture, I have a question.",
                 )}
                 className="mt-5"
               >

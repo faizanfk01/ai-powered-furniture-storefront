@@ -67,7 +67,7 @@ export function FootprintPlan({
           <circle cx="8.5" cy="9.5" r="1.5" />
           <path d="M3.5 16.5l4.5-4 3.5 3 3-2.5 6 5" />
         </svg>
-        <span className="text-xs text-muted">Photograph to come</span>
+        <span className="text-xs text-muted">Photo coming soon</span>
       </div>
     );
   }

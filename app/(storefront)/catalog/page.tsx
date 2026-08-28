@@ -20,7 +20,7 @@ import { MAX_SEARCH_LIMIT } from "@/lib/validations";
 export const metadata: Metadata = {
   title: "Catalogue",
   description:
-    "Sofas, beds, tables, chairs and office sets — every piece listed at its finished size, and any of them can be rebuilt to your measurements.",
+    "Sofas, beds, tables, chairs and office sets. Every piece is listed at its finished size, and any of them can be built to your measurements.",
 };
 
 /**
@@ -86,8 +86,8 @@ export default async function CatalogPage({
           </h1>
           <p className="mt-4 max-w-xl text-lg leading-relaxed text-muted">
             Every piece is listed at its finished size. Anything here can be
-            rebuilt to your measurements — the workshop is eight minutes from
-            the showroom.
+            built to your measurements. The workshop is eight minutes from the
+            showroom.
           </p>
         </div>
       </Container>
@@ -120,12 +120,12 @@ export default async function CatalogPage({
                 {catalogueIsEmpty ? (
                   <>
                     <h2 className="display-wide text-2xl font-semibold">
-                      The catalogue is being photographed
+                      We are still photographing everything
                     </h2>
                     <p className="mt-3 leading-relaxed text-muted">
                       Nothing is listed here yet. The workshop is still building
-                      the first pieces for the site — message us and we will
-                      send you what is on the showroom floor today.
+                      the first pieces for the site. Message us and we will send
+                      you what is on the showroom floor today.
                     </p>
                   </>
                 ) : (
@@ -136,20 +136,20 @@ export default async function CatalogPage({
                     <p className="mt-3 leading-relaxed text-muted">
                       {params.q ? (
                         <>
-                          No piece in the catalogue matches{" "}
+                          Nothing in the catalogue matches{" "}
                           <span className="font-medium text-ink">
                             &ldquo;{params.q}&rdquo;
                           </span>
                           {(params.category || params.price) &&
                             " with those filters"}
-                          . We build to order, so it is worth asking — most of
-                          what we make never reaches this page.
+                          . We build to order, so it is still worth asking. A
+                          lot of what we make never reaches this page.
                         </>
                       ) : (
                         <>
-                          Nothing in the catalogue falls in that range. We build
-                          to order, so it is worth asking — most of what we make
-                          never reaches this page.
+                          Nothing in the catalogue is in that price range. We
+                          build to order, so it is still worth asking. A lot of
+                          what we make never reaches this page.
                         </>
                       )}
                     </p>
@@ -160,8 +160,8 @@ export default async function CatalogPage({
                   <Button
                     href={whatsappUrl(
                       params.q
-                        ? `Hello Standard Furniture — do you make ${params.q}?`
-                        : "Hello Standard Furniture — I am looking for a piece I could not find on your site.",
+                        ? `Hello Standard Furniture, do you make ${params.q}?`
+                        : "Hello Standard Furniture, I am looking for something I could not find on your site.",
                     )}
                   >
                     <WhatsAppIcon />
@@ -188,15 +188,15 @@ export default async function CatalogPage({
                     Not quite the size you need?
                   </h2>
                   <p className="mt-2 leading-relaxed text-muted">
-                    Every piece here can be rebuilt to different measurements,
-                    in a different fabric or a different wood. Send us the room
-                    and we will quote it.
+                    We can build any of these to different measurements, in
+                    another fabric or another wood. Tell us about the room and
+                    we will give you a price.
                   </p>
                 </div>
 
                 <Button
                   href={whatsappUrl(
-                    "Hello Standard Furniture — I would like a piece made to my own measurements.",
+                    "Hello Standard Furniture, I would like a piece made to my own measurements.",
                   )}
                   className="shrink-0"
                 >

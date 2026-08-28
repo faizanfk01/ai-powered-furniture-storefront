@@ -61,9 +61,9 @@ export function AskAiButton({ productName }: { productName: string }) {
       </Button>
 
       <p className="mt-3 text-sm leading-relaxed text-muted">
-        Answers about size, materials and options, from this page&rsquo;s own
-        details. For a price, availability or an order, the workshop answers on
-        WhatsApp.
+        It answers questions about size, materials and options, using the
+        details on this page. For a price, what is in stock, or to place an
+        order, the workshop answers on WhatsApp.
       </p>
 
       <ProductChatModal

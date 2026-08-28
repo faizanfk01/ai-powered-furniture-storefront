@@ -11,7 +11,7 @@ import { LOCATIONS, OFFERINGS, whatsappUrl } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Custom Orders",
   description:
-    "Custom furniture, interior design, 3D wallpapers and PVC panels, built to your measurements in Baghdada, Mardan. Tell us about the room and we will quote it.",
+    "Custom furniture, interior design, 3D wallpapers and PVC panels, built to your measurements in Baghdada, Mardan. Tell us about the room and we will give you a price.",
 };
 
 /**
@@ -33,13 +33,13 @@ export const metadata: Metadata = {
  */
 const SERVICE_DETAIL: Record<string, string> = {
   "Custom furniture":
-    "Any piece in the catalogue rebuilt to different measurements, or something that has never been in it. Different wood, different fabric, a wardrobe that follows a sloped ceiling.",
+    "Any piece in the catalogue built to different measurements, or something that has never been in it. Another wood, another fabric, a wardrobe that follows a sloped ceiling.",
   "Interior design":
-    "Planning a whole room rather than choosing objects for it: what goes where, what it is made of, and what it costs before anything is ordered.",
+    "Planning a whole room instead of just picking things for it. What goes where, what it is made of, and what it costs, all before anything is ordered.",
   "3D wallpapers":
-    "Textured panels and printed murals, measured to the wall and fitted by the team that delivers the furniture.",
+    "Textured panels and printed murals, measured to your wall and put up by the team that brings the furniture.",
   "PVC panels":
-    "Wall and ceiling panelling for rooms that take daily wear — kitchens, corridors, shopfronts and clinics.",
+    "Wall and ceiling panelling for rooms that take a lot of wear. Kitchens, corridors, shopfronts and clinics.",
 };
 
 export default function CustomOrdersPage() {
@@ -57,9 +57,9 @@ export default function CustomOrdersPage() {
             </h1>
 
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted">
-              Everything in our catalogue can be rebuilt to different
-              measurements — and plenty of what we make never appears there at
-              all. Describe what you need and we will tell you what it would
+              Everything in our catalogue can be built to different
+              measurements, and plenty of what we make never appears there at
+              all. Tell us what you need and we will tell you what it would
               take.
             </p>
           </div>
@@ -73,7 +73,7 @@ export default function CustomOrdersPage() {
         tone="surface"
         eyebrow="What we take on"
         heading="Four kinds of work"
-        lede="All four are measured, made and fitted by the same team — which is why they can be quoted together."
+        lede="The same team measures, makes and fits all four, so we can price them together."
       >
         <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {OFFERINGS.map((offering) => (
@@ -102,7 +102,7 @@ export default function CustomOrdersPage() {
       <Section
         eyebrow="Start the conversation"
         heading="Write us a message"
-        lede="Fill in what you know. The message builds itself on the right, and opens in WhatsApp when you are ready."
+        lede="Fill in what you know. Your message appears on the right, and opens in WhatsApp when you are ready."
       >
         <CustomOrderBuilder />
       </Section>
@@ -120,7 +120,7 @@ export default function CustomOrdersPage() {
               </h2>
               <p className="mt-2 leading-relaxed text-muted">
                 For anything built in, bring the room&apos;s measurements to the
-                showroom — or ask us to come and take them.
+                showroom, or ask us to come and take them.
               </p>
               <dl className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
                 {LOCATIONS.map((location) => (
@@ -142,7 +142,7 @@ export default function CustomOrdersPage() {
 
             <Button
               href={whatsappUrl(
-                "Hello Standard Furniture — could someone come and measure a room?",
+                "Hello Standard Furniture, could someone come and measure a room?",
               )}
               className="shrink-0"
             >

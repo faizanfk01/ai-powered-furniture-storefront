@@ -174,8 +174,8 @@ function EntryState({ onPick }: { onPick: (prompt: string) => void }) {
     <div>
       <p className="leading-relaxed text-muted">
         Ask about our furniture, find something in your budget, or ask how to
-        order. Every answer comes from our own catalogue — if we don&rsquo;t
-        have something, it will say so.
+        order. Every answer comes from our own catalogue, so if we don&rsquo;t
+        have something it will tell you.
       </p>
 
       <p className="mt-5 text-sm font-semibold text-ink">Try asking</p>

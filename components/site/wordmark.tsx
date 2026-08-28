@@ -33,7 +33,7 @@ export function Wordmark({
       <span className={`font-normal ${paper ? "text-paper/65" : "text-muted"}`}>
         Furniture
       </span>
-      <span className="sr-only">— {SITE.town}</span>
+      <span className="sr-only">, {SITE.town}</span>
     </Link>
   );
 }

@@ -63,19 +63,19 @@ export function directionsUrl(location: { lines: readonly string[] }) {
 export const OFFERINGS = [
   {
     title: "Custom furniture",
-    body: "Sofas, beds, dining and office pieces built to your room's measurements in our own workshop — not ordered in from somewhere else.",
+    body: "Sofas, beds, dining and office pieces, built to the size of your room in our own workshop. We do not order them in from anywhere else.",
   },
   {
     title: "Interior design",
-    body: "Room-by-room planning: layout, materials and finishes chosen against the space you actually have, not a catalogue photograph.",
+    body: "We plan a room at a time. Layout, materials and finishes picked for the space you actually have, not for a photo in a catalogue.",
   },
   {
     title: "3D wallpapers",
-    body: "Textured wall panels and printed murals, fitted by the same team that delivers the furniture.",
+    body: "Textured wall panels and printed murals, put up by the same team that brings your furniture.",
   },
   {
     title: "PVC panels",
-    body: "Hard-wearing wall and ceiling panelling for rooms that take daily use — kitchens, corridors, shopfronts.",
+    body: "Tough wall and ceiling panelling for rooms that get used every day. Kitchens, corridors, shopfronts.",
   },
 ] as const;
 

@@ -78,8 +78,8 @@ export function WhatsAppHandoff({
         )}
 
         <p className="mt-3 text-sm leading-relaxed text-muted">
-          Opens WhatsApp with the message above already written. You still press
-          send — nothing leaves this page.
+          Opens WhatsApp with the message above already written in. You still
+          press send yourself. Nothing leaves this page.
         </p>
       </div>
     </div>

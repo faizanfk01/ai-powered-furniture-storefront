@@ -58,7 +58,7 @@ type Entry =
       retryable: string | null;
     };
 
-const GENERIC_WHATSAPP = whatsappUrl(`Hello ${SITE.name} — I have a question.`);
+const GENERIC_WHATSAPP = whatsappUrl(`Hello ${SITE.name}, I have a question.`);
 
 let entrySeq = 0;
 const nextId = () => `entry-${++entrySeq}`;
@@ -311,8 +311,8 @@ export function ChatConversation({
 
         {overLimit && (
           <p id={`${fieldId}-limit`} className="mt-2 text-xs text-accent-strong">
-            {draft.length - CHAT_MAX_MESSAGE_LENGTH} characters over — please
-            shorten
+            {draft.length - CHAT_MAX_MESSAGE_LENGTH} characters too many.
+            Please shorten it.
           </p>
         )}
 
@@ -324,7 +324,7 @@ export function ChatConversation({
         >
           <WhatsAppIcon className="size-4 shrink-0" />
           <span>
-            To order or confirm a price, message us on{" "}
+            To order, or to check a price, message us on{" "}
             <span className="tabular">{WHATSAPP_DISPLAY}</span>
           </span>
         </a>

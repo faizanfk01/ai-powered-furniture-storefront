@@ -152,7 +152,7 @@ export function MobileNav() {
               <Button
                 variant="solid-invert"
                 href={whatsappUrl(
-                  "Hello Standard Furniture — I have a question.",
+                  "Hello Standard Furniture, I have a question.",
                 )}
                 className="w-full"
               >

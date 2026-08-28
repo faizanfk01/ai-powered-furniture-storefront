@@ -46,9 +46,9 @@ export function AiSummary({ summary }: { summary: string | null }) {
       ) : (
         <>
           <p className="mt-3 leading-relaxed text-muted">
-            A short summary of this piece hasn&rsquo;t been written yet. The
-            full description is the workshop&rsquo;s own account of how it is
-            built.
+            We haven&rsquo;t written a short summary of this piece yet. The full
+            description beside it is the workshop&rsquo;s own account of how it
+            is built.
           </p>
           <p className="mt-5 text-sm text-accent-strong">Summary coming soon</p>
         </>

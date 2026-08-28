@@ -53,7 +53,7 @@ export function CustomOrderBuilder() {
         <Field
           id="service"
           label="What do you need?"
-          hint="Pick the closest — you can explain properly below."
+          hint="Pick the closest one. You can explain it properly below."
         >
           <select
             id="service"

@@ -128,13 +128,12 @@ export default async function HomePage() {
             </p>
 
             <h1 className="display-wide mt-4 max-w-3xl text-4xl leading-[1.08] font-semibold text-balance sm:text-5xl lg:text-6xl">
-              Built in Baghdada, shown in Shen Gul Plaza.
+              We build it in Baghdada. You see it in Shen Gul Plaza.
             </h1>
 
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted">
-              Custom furniture, interior design, 3D wallpapers and PVC panels —
-              drawn to your room&rsquo;s measurements by the same team that
-              builds them.
+              Custom furniture, interior design, 3D wallpapers and PVC panels,
+              measured for your room by the same people who build it.
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
@@ -145,7 +144,7 @@ export default async function HomePage() {
                 size="lg"
                 variant="outline"
                 href={whatsappUrl(
-                  "Hello Standard Furniture — I have a question.",
+                  "Hello Standard Furniture, I have a question.",
                 )}
               >
                 <WhatsAppIcon />
@@ -192,8 +191,8 @@ export default async function HomePage() {
       {/* ------------------------------------------------------------------ */}
       <Section
         eyebrow="What we make"
-        heading="Four things, done properly"
-        lede="Everything is measured, built and fitted by the same team — the showroom and the workshop are a few minutes apart."
+        heading="Four things we do well"
+        lede="The same team measures, builds and fits all of it. The showroom and the workshop are a few minutes apart."
       >
         {/* Real cards with real gaps. The `gap-px` on a hairline ground this
             replaces drew a ruled table, which is a way of presenting data, not
@@ -225,7 +224,7 @@ export default async function HomePage() {
           width="wide"
           eyebrow="A piece from each room"
           heading="From the catalogue"
-          lede="One from every category we build. Each is listed at its finished size, and each can be rebuilt to yours."
+          lede="One piece from every category we build. Each one is listed at its finished size, and we can build it to yours."
         >
           <ul className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {featured.map((product) => (
@@ -259,7 +258,7 @@ export default async function HomePage() {
           evidence and made it look staged.
          ------------------------------------------------------------------ */}
       {testimonials.length > 0 && (
-        <Section eyebrow="In their words" heading="From the showroom floor">
+        <Section eyebrow="In their words" heading="What people tell us">
           {testimonials.length === 1 ? (
             <div className="max-w-3xl">
               <Testimonial review={testimonials[0]!} featured />
@@ -297,7 +296,7 @@ export default async function HomePage() {
       <Section
         eyebrow="Come and see it"
         heading="Two addresses, eight minutes apart"
-        lede="Sit on the sofa before you buy it, then watch the next one being built. Most customers do both in the same afternoon."
+        lede="Sit on the sofa before you buy it, then go and watch the next one being built. Most customers do both in the same afternoon."
       >
         <Card padded className="sm:p-8">
           <div className="flex flex-col gap-8 sm:flex-row sm:items-end sm:justify-between">
@@ -320,7 +319,7 @@ export default async function HomePage() {
 
             <Button
               href={whatsappUrl(
-                "Hello Standard Furniture — I would like to visit the showroom.",
+                "Hello Standard Furniture, I would like to visit the showroom.",
               )}
               className="shrink-0"
             >
@@ -338,7 +337,7 @@ export default async function HomePage() {
           >
             Browse the catalogue
           </Link>{" "}
-          to see what we build, then tell us the room.
+          to see what we build, then tell us about your room.
         </p>
       </Section>
     </>

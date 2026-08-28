@@ -10,6 +10,7 @@
     "create-admin": "tsx scripts/create-admin.ts",
     "groq-stub": "tsx scripts/groq-stub.ts",
     "test:chat": "tsx scripts/test-chat.ts",
+    "test:login": "tsx scripts/verify-login.ts",
     "test:markdown": "tsx scripts/test-markdown.tsx",
     "test:suggestions": "tsx scripts/test-suggestions.tsx",
     "test:summary": "tsx scripts/test-summary.ts",

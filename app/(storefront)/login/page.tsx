@@ -8,6 +8,7 @@ import { controlClass, Field } from "@/components/ui/field";
 import { Measure } from "@/components/ui/measure";
 
 import { login, logout } from "./actions";
+import { DEFAULT_AFTER_LOGIN } from "./redirect";
 
 /**
  * Admin sign-in.
@@ -66,7 +67,16 @@ function AuthCard({
 export default async function LoginPage(props: PageProps<"/login">) {
   const searchParams = await props.searchParams;
   const error = first(searchParams.error);
-  const callbackUrl = first(searchParams.callbackUrl) ?? "/";
+  // No ?callbackUrl means nobody was bounced here — they came to sign in and
+  // get to work, so the hidden field carries the dashboard. When the guard in
+  // proxy.ts DID bounce them, its callbackUrl wins and they return to the page
+  // they were reaching for.
+  //
+  // Not sanitised here on purpose: this value only ever reaches an attribute,
+  // where React escapes it, and the POST that carries it back is checked by
+  // safeCallbackUrl() in actions.ts. One validation, at the boundary that
+  // actually redirects.
+  const callbackUrl = first(searchParams.callbackUrl) ?? DEFAULT_AFTER_LOGIN;
 
   const session = await auth();
 

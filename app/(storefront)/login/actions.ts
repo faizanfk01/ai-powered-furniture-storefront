@@ -5,22 +5,17 @@ import { redirect } from "next/navigation";
 
 import { signIn, signOut } from "@/auth";
 
+import { DEFAULT_AFTER_LOGIN, safeCallbackUrl } from "./redirect";
+
 /**
- * Where to send the admin after a successful sign-in.
+ * The login and logout server actions.
  *
- * The value arrives from a query string via a hidden form field, so it is
- * attacker-controllable: `/login?callbackUrl=https://evil.example` would
- * otherwise turn our own login form into an open redirect that borrows this
- * site's credibility. Only same-site absolute paths are accepted.
- *
- * `//evil.example` is rejected explicitly — it starts with `/` but browsers
- * read it as a protocol-relative URL to another origin.
+ * Everything a `"use server"` module exports becomes a callable server action,
+ * so it may only export async functions. The redirect policy — the default
+ * landing page and the open-redirect guard — therefore lives beside this file
+ * in ./redirect.ts, where the login page can import the same default for its
+ * hidden field.
  */
-function safeCallbackUrl(value: FormDataEntryValue | null): string {
-  if (typeof value !== "string") return "/";
-  if (!value.startsWith("/") || value.startsWith("//")) return "/";
-  return value;
-}
 
 export async function login(formData: FormData) {
   const callbackUrl = safeCallbackUrl(formData.get("callbackUrl"));
@@ -39,7 +34,13 @@ export async function login(formData: FormData) {
     // it here would silently swallow the successful navigation.
     if (error instanceof AuthError) {
       const params = new URLSearchParams({ error: "CredentialsSignin" });
-      if (callbackUrl !== "/") params.set("callbackUrl", callbackUrl);
+      // Carried across a failed attempt so a second try still returns the
+      // admin to the page they were bounced from. Omitted when it is only the
+      // default, which keeps ?callbackUrl=/admin out of the address bar for
+      // the ordinary "typed /login, fat-fingered the password" case.
+      if (callbackUrl !== DEFAULT_AFTER_LOGIN) {
+        params.set("callbackUrl", callbackUrl);
+      }
       redirect(`/login?${params}`);
     }
     throw error;

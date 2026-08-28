@@ -48,13 +48,22 @@ const CITATION_PATTERN = /\[P(\d+)\]/g;
  * catch it, and the UI would render the brackets as literal text next to a
  * product it cannot resolve.
  *
+ * MARKDOWN IS THE SAME PROBLEM WEARING A THIRD HAT. Now that the reply may
+ * come back formatted, the model can write `[**P1**]` or `[*P9*]`. Those are
+ * not the tag this file was written to range check, so an emphasised citation
+ * would never be verified at all and a fabricated `[**P9**]` would reach the
+ * customer as literal text beside no card. The variant pattern therefore
+ * tolerates `*`, `_` and backticks in the same positions it already tolerated
+ * stray spaces in.
+ *
  * So the reply is normalised into the canonical form BEFORE anything is
  * verified. Normalising can only expose a bad citation, never create a good
  * one: `【P9】` becomes `[P9]` and then fails the range check exactly as it
  * should. Fullwidth and half-width brackets, parentheses, stray inner spaces
  * and a lowercase p are all folded in.
  */
-const CITATION_VARIANTS = /[[(【〔（]\s*[Pp]\s*(\d+)\s*[\])】〕）]/g;
+const CITATION_VARIANTS =
+  /[\[(【〔（][\s*_`]*[Pp][\s*_`]*(\d+)[\s*_`]*[\])】〕）]/g;
 
 /**
  * Invisible characters, stripped before anything else looks at the text.
@@ -111,6 +120,38 @@ function foldSpaces(text: string) {
 }
 
 /**
+ * Markdown emphasis markers, removed before any figure or name is read.
+ *
+ * THIS IS A GROUNDING CONTROL, NOT TIDYING. The reply is now allowed to come
+ * back as markdown, and `**45**,**000**` is four characters away from being a
+ * price the figure check never sees: NUMBER_PATTERN reads it as 45 and 000,
+ * both under SIGNIFICANT_FIGURE, and a fabricated Rs 45,000 walks through the
+ * one check written to stop exactly that. Stripping the markers first puts the
+ * digits back together as 45,000 and the check fires.
+ *
+ * The same strip fixes a quieter failure in withNamedProducts(): a reply that
+ * writes `**Karachi** 3-Seater Fabric Sofa` no longer matches the row's name,
+ * so the product would lose its card. Both sides are folded identically, which
+ * is the only property that makes either comparison meaningful.
+ *
+ * Applied to the ALLOW side as well as the reply side. The fact blocks contain
+ * no markdown, so this is a no-op there — but it is symmetric by construction
+ * rather than by luck, which is what stopped the whitespace bug below from
+ * being fixed twice.
+ */
+const EMPHASIS_MARKERS = /[*_`~]/g;
+
+/**
+ * The one text-folding pass every comparison in this file runs through.
+ *
+ * Whitespace first, then emphasis. Two separate lessons, one function, so a
+ * third one cannot be learned in only half the places.
+ */
+function foldForMatching(text: string) {
+  return foldSpaces(text).replace(EMPHASIS_MARKERS, "");
+}
+
+/**
  * Below this, a number is not a price.
  *
  * Deliberately not zero. Dimensions ("84\" W x 36\" D"), seat counts, storey
@@ -134,7 +175,7 @@ const SIGNIFICANT_FIGURE = 1000;
 export function significantFiguresIn(text: string): Set<number> {
   const found = new Set<number>();
 
-  for (const match of foldSpaces(text).matchAll(NUMBER_PATTERN)) {
+  for (const match of foldForMatching(text).matchAll(NUMBER_PATTERN)) {
     const value = Number(match[0].replace(/,/g, ""));
     if (Number.isFinite(value) && value >= SIGNIFICANT_FIGURE) found.add(value);
   }
@@ -168,7 +209,7 @@ export function withNamedProducts(
   products: { ref: number; name: string }[],
 ): number[] {
   const fold = (text: string) =>
-    foldSpaces(text)
+    foldForMatching(text)
       .replace(/[‐‑‒–—]/g, "-")
       .toLowerCase();
 
@@ -250,19 +291,26 @@ export function fallbackReply(products: ChatProduct[]): string {
   if (products.length === 0) {
     return [
       "I could not find anything matching that in our online catalogue.",
-      "That does not necessarily mean we cannot do it — we build custom pieces to your own measurements in our own workshop.",
+      "That does not always mean we cannot do it. We build custom pieces to your own measurements in our own workshop.",
       `Message us on WhatsApp at ${WHATSAPP_DISPLAY} and we will tell you what is possible.`,
     ].join(" ");
   }
 
+  // Written as markdown, for the same reason the model is now asked to: this
+  // is a list of products, and components/chat/chat-reply.tsx will render it
+  // as one. It stays composed from rows, so bolding a name cannot make it any
+  // less true than it already was — the formatting is applied to text that is
+  // correct by construction rather than to text that had to be checked.
   const lines = products.map(
     (product) =>
-      `${product.name} [P${product.ref}] — ${product.priceLabel}, ${product.stockLabel.toLowerCase()}`,
+      `- **${product.name}** [P${product.ref}], ${product.priceLabel}, ${product.stockLabel.toLowerCase()}`,
   );
 
   return [
     "Here is what we have on the website that matches:",
+    "",
     lines.join("\n"),
+    "",
     `To confirm availability or arrange a look at the showroom, message us on WhatsApp at ${WHATSAPP_DISPLAY}.`,
   ].join("\n");
 }

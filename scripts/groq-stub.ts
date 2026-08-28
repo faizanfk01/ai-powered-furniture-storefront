@@ -40,7 +40,30 @@ export type StubMode =
    * and citing a tag outside the retrieved range. Nothing in the prompt can
    * prevent this — it is what the grounding check is for.
    */
-  | "hallucinate";
+  | "hallucinate"
+  /**
+   * The same lie, formatted. Once the model is allowed to write markdown, the
+   * citation it invents can arrive as `[**P9**]` — which is not the token the
+   * range check looks for, so before lib/ai/grounding.ts learned to fold
+   * emphasis this reply was never range checked at all.
+   */
+  | "hallucinate-markdown"
+  /**
+   * The narrower and nastier one: a REAL citation, so the citation check
+   * passes and the figure check is the only thing left standing, and a
+   * fabricated price written as `Rs **45**,**000**`. Read without folding,
+   * that is 45 and 000 — two numbers below the significant-figure floor where
+   * there was one invented price. This mode exists to prove the figure check
+   * still fires on the whole number.
+   */
+  | "hallucinate-markdown-price"
+  /**
+   * The control. A well-formed markdown reply that cites a real retrieved
+   * product and states no figure at all, so it SHOULD pass the grounding check
+   * untouched. Without this the markdown tests only prove the check can say
+   * no, which any broken check can do.
+   */
+  | "markdown-grounded";
 
 const DEFAULT_PORT = 4599;
 
@@ -53,6 +76,48 @@ const DEFAULT_PORT = 4599;
  */
 const HALLUCINATED_REPLY =
   "Yes — the Milano Recliner [P9] is one of our best sellers at Rs 45,000, and it comes with a 5 year warranty and free delivery across Pakistan within 3 days. We can also do it in Italian leather for Rs 62,000.";
+
+/**
+ * The same three lies, wearing markdown, plus every trick the formatting makes
+ * available: the citation emphasised so it is not the token the range check
+ * matches, and one price inside a code span.
+ */
+const HALLUCINATED_MARKDOWN_REPLY = [
+  "## Our recliners",
+  "",
+  "Yes — the **Milano Recliner** [**P9**] is one of our best sellers:",
+  "",
+  "- **Milano Recliner** [**P9**], Rs **45,000**, in stock",
+  "- Italian leather option, Rs `62,000`",
+  "",
+  "It comes with a **5 year warranty** and *free delivery* across Pakistan within 3 days.",
+].join("\n");
+
+/**
+ * A correctly cited reply about a REAL retrieved product, carrying a price
+ * nobody set, split across two bold runs so the digits do not sit together.
+ * The citation check has nothing to object to here; the figure check is the
+ * only thing between this and a customer.
+ */
+const HALLUCINATED_MARKDOWN_PRICE_REPLY = [
+  "Here is what we have:",
+  "",
+  "- **Our sofa** [P1], on offer at Rs **45**,**000** this week only",
+  "",
+  "That price includes *free delivery*.",
+].join("\n");
+
+/**
+ * Formatted, cited, and true. No figure appears in it, which is what lets a
+ * fixed string be grounded against a catalogue this stub knows nothing about.
+ */
+const GROUNDED_MARKDOWN_REPLY = [
+  "Here is what we have on the website:",
+  "",
+  "- The sofa above [P1], in our showroom now",
+  "",
+  "Message us on **WhatsApp** to confirm and arrange a look.",
+].join("\n");
 
 /** A plausible extraction, so retrieval runs for real in hallucinate mode. */
 const STUB_EXTRACTION = JSON.stringify({
@@ -133,10 +198,18 @@ export function startGroqStub(
         return json(503, { error: { message: "Service Unavailable", type: "server_error" } });
       }
 
-      return json(
-        200,
-        completion(isAnswerModel ? HALLUCINATED_REPLY : STUB_EXTRACTION),
-      );
+      if (!isAnswerModel) return json(200, completion(STUB_EXTRACTION));
+
+      const reply =
+        mode === "hallucinate-markdown"
+          ? HALLUCINATED_MARKDOWN_REPLY
+          : mode === "hallucinate-markdown-price"
+            ? HALLUCINATED_MARKDOWN_PRICE_REPLY
+            : mode === "markdown-grounded"
+              ? GROUNDED_MARKDOWN_REPLY
+              : HALLUCINATED_REPLY;
+
+      return json(200, completion(reply));
     })();
   });
 

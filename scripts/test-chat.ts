@@ -440,6 +440,74 @@ async function runStubSuite(catalogue: Catalogue) {
     ]);
   }
 
+  // 1b. The same model, now hallucinating in markdown. The citation it invents
+  //     arrives as [**P9**], which is not the token the range check matches
+  //     until normaliseCitations() folds the emphasis out of it.
+  await setMode("hallucinate-markdown");
+  {
+    const { response, body } = await post(STUB_URL, {
+      message: "Do you have a recliner?",
+      history: [],
+    });
+    const chat = body as ChatBody;
+
+    console.log(`\n${"-".repeat(78)}`);
+    console.log("Upstream returned (fabricated, in markdown):");
+    console.log('  "## Our recliners … the **Milano Recliner** [**P9**] … Rs **45,000** … `62,000`"');
+    console.log(`Served to the customer:\n  ${chat.reply.replace(/\n/g, "\n  ")}`);
+
+    failures += report("markdown cannot smuggle a hallucination past the check", [
+      ok("HTTP 200 — the customer still gets an answer", response.status === 200),
+      ok(
+        "real products were retrieved, so the range check was exercised",
+        chat.products.length > 0,
+        `${chat.products.length} retrieved`,
+      ),
+      ok("flagged as not grounded", chat.grounded === false),
+      ok("the invented product name never reaches the reply", !/milano/i.test(chat.reply)),
+      ok("the invented prices never reach the reply", !/45,?000|62,?000/.test(chat.reply)),
+      ok("the invented warranty and delivery claims are gone", !/warranty|delivery/i.test(chat.reply)),
+      ok("the emphasised [**P9**] citation is gone", !/P9/.test(chat.reply)),
+      ...universalChecks(chat, catalogue),
+    ]);
+  }
+
+  // 1c. A correctly cited reply whose only lie is a price split across bold
+  //     runs. The citation check passes, so this isolates the figure check —
+  //     the one markdown could genuinely have blinded.
+  await setMode("hallucinate-markdown-price");
+  {
+    const { response, body } = await post(STUB_URL, {
+      message: "What sofas do you have?",
+      history: [],
+    });
+    const chat = body as ChatBody;
+
+    console.log(`\n${"-".repeat(78)}`);
+    console.log("Upstream returned (real citation, price split across bold runs):");
+    console.log('  "- **Our sofa** [P1], on offer at Rs **45**,**000** this week only"');
+    console.log(`Served to the customer:\n  ${chat.reply.replace(/\n/g, "\n  ")}`);
+
+    failures += report("a price split by markdown is still caught", [
+      ok("HTTP 200", response.status === 200),
+      ok(
+        "real products were retrieved, so [P1] was a valid citation",
+        chat.products.length > 0,
+        `${chat.products.length} retrieved`,
+      ),
+      ok("flagged as not grounded", chat.grounded === false),
+      ok("the invented price never reaches the reply", !/45\s*,?\s*000/.test(chat.reply)),
+      ok("the invented offer never reaches the reply", !/offer|this week/i.test(chat.reply)),
+      ok(
+        "every price in the served reply is a real row price",
+        [...chat.reply.matchAll(/Rs\s*([\d,]+)/g)]
+          .map((match) => Number(match[1]!.replace(/,/g, "")))
+          .every((value) => chat.products.some((product) => product.price === value)),
+      ),
+      ...universalChecks(chat, catalogue),
+    ]);
+  }
+
   // 2. Rate limited on the answer model only — the realistic free-tier shape.
   await setMode("429-answer");
   {

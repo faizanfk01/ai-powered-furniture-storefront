@@ -1,6 +1,5 @@
 import { WhatsAppIcon } from "@/components/site/whatsapp-icon";
 import { Button } from "@/components/ui/button";
-import { Measure } from "@/components/ui/measure";
 import { whatsappUrl } from "@/lib/site";
 
 /**
@@ -19,6 +18,12 @@ import { whatsappUrl } from "@/lib/site";
  *     delivery ("Send", "Submit"),
  *   - and there is no success state anywhere, because we never learn whether
  *     the message was sent.
+ *
+ * RESTYLED ONLY. Every rule above still holds and every string is unchanged.
+ * The preview is now the same tinted panel the AI summary and the catalogue's
+ * CTA use, and the draft is set in Inter rather than the old mono spec face —
+ * it is a message someone is about to send a person, and it should look like
+ * one. `whitespace-pre-line` stays, because the line breaks are the message's.
  */
 export function WhatsAppHandoff({
   message,
@@ -35,21 +40,20 @@ export function WhatsAppHandoff({
 }) {
   return (
     <div>
-      <div className="border border-hairline bg-hairline/25 p-6 sm:p-8">
-        <Measure width="w-16" />
-        <h3 className="spec-label mt-4 text-muted">Your message</h3>
+      <div className="rounded-xl border border-hairline bg-surface p-6 sm:p-8">
+        <h3 className="text-sm font-semibold text-ink">Your message</h3>
 
         {/* polite, not assertive: the draft updates on every keystroke and
             should not interrupt someone mid-sentence. */}
         <p
           aria-live="polite"
-          className="mt-4 font-mono text-sm leading-relaxed whitespace-pre-line text-ink"
+          className="mt-3 leading-relaxed whitespace-pre-line text-ink"
         >
           {ready ? message : <span className="text-muted">{emptyHint}</span>}
         </p>
       </div>
 
-      <div className="mt-6">
+      <div className="mt-5">
         {ready ? (
           <Button href={whatsappUrl(message)} className="w-full sm:w-auto">
             <WhatsAppIcon />
@@ -58,16 +62,22 @@ export function WhatsAppHandoff({
         ) : (
           // Not `disabled`: a disabled button leaves the tab order, so a
           // keyboard user would never find it or hear why it is not ready.
+          //
+          // Dimmed with `opacity-50` rather than by overriding the variant's
+          // background. Two background utilities on one element are resolved
+          // by CSS source order, not by the order they are written — the same
+          // trap that silently swallowed the review form's error border. An
+          // opacity utility competes with nothing.
           <Button
             aria-disabled="true"
-            className="w-full cursor-not-allowed bg-ink/25 hover:bg-ink/25 sm:w-auto"
+            className="w-full cursor-not-allowed opacity-50 hover:bg-ink sm:w-auto"
           >
             <WhatsAppIcon />
             {label}
           </Button>
         )}
 
-        <p className="mt-3 text-sm text-muted">
+        <p className="mt-3 text-sm leading-relaxed text-muted">
           Opens WhatsApp with the message above already written. You still press
           send — nothing leaves this page.
         </p>

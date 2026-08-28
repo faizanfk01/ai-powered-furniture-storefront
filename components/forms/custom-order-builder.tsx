@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { controlClass, Field } from "@/components/ui/field";
+import { Field, storefrontControlClass } from "@/components/ui/field";
 import {
   buildCustomOrderMessage,
   customOrderIsReady,
@@ -46,7 +46,7 @@ export function CustomOrderBuilder() {
   const ready = customOrderIsReady(draft);
 
   return (
-    <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-16">
+    <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-12">
       {/* No onSubmit, no action: there is nothing to submit. The fields feed
           the draft, and the link below is the only way out of here. */}
       <div className="flex flex-col gap-6">
@@ -59,7 +59,7 @@ export function CustomOrderBuilder() {
             id="service"
             value={draft.service}
             onChange={(event) => update("service", event.target.value)}
-            className={controlClass}
+            className={storefrontControlClass}
           >
             <option value="">Choose a service</option>
             {OFFERINGS.map((offering) => (
@@ -83,7 +83,7 @@ export function CustomOrderBuilder() {
             value={draft.description}
             onChange={(event) => update("description", event.target.value)}
             placeholder="A wardrobe for a bedroom with a sloped ceiling, in a dark wood to match an existing bed."
-            className={`${controlClass} resize-y`}
+            className={`${storefrontControlClass} resize-y`}
           />
         </Field>
 
@@ -101,7 +101,7 @@ export function CustomOrderBuilder() {
             // The site's own notation, so the shop reads it the way it reads
             // every dimension in the catalogue.
             placeholder={'84" W x 36" D x 30" H'}
-            className={`${controlClass} font-mono`}
+            className={storefrontControlClass}
           />
         </Field>
       </div>

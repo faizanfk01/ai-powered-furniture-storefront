@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { controlClass, Field } from "@/components/ui/field";
+import { Field, storefrontControlClass } from "@/components/ui/field";
 import {
   buildContactMessage,
   contactIsReady,
@@ -30,7 +30,7 @@ export function ContactBuilder() {
   }
 
   return (
-    <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-16">
+    <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-12">
       <div className="flex flex-col gap-6">
         <Field
           id="contact-name"
@@ -45,7 +45,7 @@ export function ContactBuilder() {
             value={draft.name}
             onChange={(event) => update("name", event.target.value)}
             placeholder="Ayesha Khan"
-            className={controlClass}
+            className={storefrontControlClass}
           />
         </Field>
 
@@ -56,7 +56,7 @@ export function ContactBuilder() {
             value={draft.message}
             onChange={(event) => update("message", event.target.value)}
             placeholder="Do you deliver to Charsadda, and is there a charge for it?"
-            className={`${controlClass} resize-y`}
+            className={`${storefrontControlClass} resize-y`}
           />
         </Field>
       </div>

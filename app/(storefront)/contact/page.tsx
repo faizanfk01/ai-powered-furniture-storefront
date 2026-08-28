@@ -5,7 +5,6 @@ import { WhatsAppIcon } from "@/components/site/whatsapp-icon";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Container } from "@/components/ui/container";
-import { Measure } from "@/components/ui/measure";
 import { Section } from "@/components/ui/section";
 import {
   directionsUrl,
@@ -45,25 +44,25 @@ export default function ContactPage() {
           The number, first. Everything else on this page is a way of
           arranging a conversation that this button starts immediately.
          ------------------------------------------------------------------ */}
-      <section className="bg-ink-deep text-paper">
+      <section>
         <Container>
-          <div className="py-20 sm:py-24">
-            <Measure />
+          <div className="py-16 sm:py-24">
+            <p className="text-sm font-medium text-accent-strong">
+              Mardan, Pakistan
+            </p>
 
-            <p className="spec-label mt-6 text-brass">Mardan, Pakistan</p>
-
-            <h1 className="display-wide mt-4 text-4xl leading-[1.05] font-semibold uppercase sm:text-6xl">
+            <h1 className="display-wide mt-4 text-4xl leading-[1.08] font-semibold sm:text-5xl lg:text-6xl">
               Get in touch
             </h1>
 
-            <p className="mt-6 max-w-xl text-lg leading-relaxed text-paper/75">
+            <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted">
               WhatsApp is the fastest way to reach us — it is where quotes,
               photographs and measurements go back and forth.
             </p>
 
-            <div className="mt-10 flex flex-wrap items-center gap-6">
+            <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4">
               <Button
-                variant="solid-invert"
+                size="lg"
                 href={whatsappUrl(
                   "Hello Standard Furniture — I have a question.",
                 )}
@@ -76,7 +75,7 @@ export default function ContactPage() {
                   and on a phone this dials. */}
               <a
                 href={`tel:+${WHATSAPP_DISPLAY.replace(/\D/g, "")}`}
-                className="spec-label text-paper/70 underline decoration-paper/30 underline-offset-8 transition-colors hover:text-brass hover:decoration-brass"
+                className="tabular text-ink underline decoration-line-strong underline-offset-4 transition-colors hover:decoration-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brass"
               >
                 {WHATSAPP_DISPLAY}
               </a>
@@ -89,22 +88,21 @@ export default function ContactPage() {
           The two addresses, with directions.
          ------------------------------------------------------------------ */}
       <Section
+        tone="surface"
         eyebrow="Where we are"
         heading="Two addresses"
         lede="They do different jobs — it is worth knowing which one you want before you set off."
       >
-        <ul className="grid grid-cols-1 gap-px bg-hairline md:grid-cols-2">
+        <ul className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {LOCATIONS.map((location) => (
             <li key={location.label}>
-              <Card className="flex h-full flex-col border-0 p-8 sm:p-10">
-                <Measure width="w-16" />
-
-                <h3 className="display-wide mt-5 text-2xl font-medium uppercase">
+              <Card padded className="flex h-full flex-col sm:p-8">
+                <h3 className="display-wide text-xl font-semibold">
                   {location.label}
                 </h3>
-                <p className="mt-2 text-muted">{location.role}</p>
+                <p className="mt-1 text-sm text-muted">{location.role}</p>
 
-                <address className="mt-6 text-lg not-italic text-ink">
+                <address className="mt-4 text-lg not-italic text-ink">
                   {location.lines.map((line) => (
                     <span key={line} className="block">
                       {line}
@@ -113,12 +111,12 @@ export default function ContactPage() {
                 </address>
 
                 {LOCATION_PURPOSE[location.label] && (
-                  <p className="mt-4 leading-relaxed text-muted">
+                  <p className="mt-3 leading-relaxed text-muted">
                     {LOCATION_PURPOSE[location.label]}
                   </p>
                 )}
 
-                <div className="mt-auto pt-8">
+                <div className="mt-auto pt-6">
                   <Button variant="outline" href={directionsUrl(location)}>
                     Get directions
                     <span className="sr-only">
@@ -140,29 +138,33 @@ export default function ContactPage() {
           provisional and paired with a way to check, rather than presented as
           fact in a slightly smaller font. When the real hours land, the flag
           flips and the caution disappears on its own.
+
+          The caution now sits in a tinted panel beside the times rather than
+          under a tracked-out capital label. Same words, and it is harder to
+          skim past.
          ------------------------------------------------------------------ */}
       <Section eyebrow="When we are open" heading="Opening hours">
-        <div className="grid grid-cols-1 gap-10 border-t border-hairline pt-10 lg:grid-cols-2 lg:gap-16">
-          <div>
-            <dl className="font-mono text-lg text-ink">
-              {HOURS.lines.map((line) => (
-                <dd key={line} className="border-b border-hairline py-3">
-                  {line}
-                </dd>
-              ))}
-            </dl>
-          </div>
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8">
+          <Card className="divide-y divide-hairline px-5 sm:px-6">
+            {HOURS.lines.map((line) => (
+              <p key={line} className="tabular py-3.5 text-ink">
+                {line}
+              </p>
+            ))}
+          </Card>
 
           {!HOURS.confirmed && (
-            <div>
-              <p className="spec-label text-brass">Not yet confirmed</p>
-              <p className="mt-4 text-lg leading-relaxed text-ink">
+            <div className="rounded-xl border border-hairline bg-surface p-6 sm:p-8">
+              <h3 className="display-wide text-lg font-semibold text-accent-strong">
+                Not yet confirmed
+              </h3>
+              <p className="mt-2 leading-relaxed text-muted">
                 These times are provisional. Message us before you travel and we
                 will tell you exactly when someone will be there.
               </p>
               <Button
                 variant="outline"
-                className="mt-6"
+                className="mt-5"
                 href={whatsappUrl(
                   "Hello Standard Furniture — are you open today?",
                 )}
@@ -179,6 +181,7 @@ export default function ContactPage() {
           The optional written enquiry.
          ------------------------------------------------------------------ */}
       <Section
+        tone="surface"
         eyebrow="Rather write it out?"
         heading="Send us a message"
         lede="Write it here and it opens in WhatsApp, ready to send — useful when you want to get the wording right before you tap."

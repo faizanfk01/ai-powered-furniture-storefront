@@ -1,11 +1,14 @@
 import { NextResponse } from "next/server";
 
-import { handleApiError, readJson, validationFailed } from "@/lib/api";
+import { handleApiError, readJson, requireAdmin, validationFailed } from "@/lib/api";
 import { db } from "@/lib/db";
 import { reviewUpdateSchema } from "@/lib/validations";
 
 // ---------------------------------------------------------------------------
-// ADMIN — guarded by the proxy.ts path matcher; see the note in ../route.ts.
+// ADMIN — guarded by the proxy.ts path matcher AND by requireAdmin() in each
+// handler; see the note in ../route.ts for why both. These two verbs edit and
+// destroy customer-written content, so neither should depend on a path matcher
+// alone staying correct.
 // ---------------------------------------------------------------------------
 
 const NOT_FOUND_MESSAGE = "Review not found";
@@ -22,6 +25,9 @@ export async function PATCH(
   request: Request,
   context: RouteContext<"/api/admin/reviews/[id]">,
 ) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
   const { id } = await context.params;
 
   const body = await readJson(request);
@@ -50,6 +56,9 @@ export async function DELETE(
   _request: Request,
   context: RouteContext<"/api/admin/reviews/[id]">,
 ) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
   const { id } = await context.params;
 
   try {

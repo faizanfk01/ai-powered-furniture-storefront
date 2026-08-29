@@ -1,17 +1,22 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-import { handleApiError, validationFailed } from "@/lib/api";
+import { handleApiError, requireAdmin, validationFailed } from "@/lib/api";
 import { db } from "@/lib/db";
 import { reviewStatusSchema } from "@/lib/validations";
 
 // ---------------------------------------------------------------------------
-// ADMIN. Protected by the `/api/admin/:path*` matcher in proxy.ts — a single
-// path-prefix guard rather than a per-route check. An unauthenticated request
-// never reaches these handlers.
+// ADMIN. Guarded twice, on purpose — the same belt-and-braces the presign and
+// summary routes use.
 //
-// requireAdmin() from lib/api.ts is for the other case: a mutating handler
-// that shares a path with a public GET, which no matcher can separate.
+// The `/api/admin/:path*` matcher in proxy.ts is the primary guard and already
+// stops an unauthenticated request before these handlers run. requireAdmin()
+// is here as the second layer because the matcher lives in an array in another
+// file, where an edit could drop this prefix without a single line in this
+// file changing to show that the moderation queue had just become public —
+// and this is the only route in the app that returns unapproved review text.
+//
+// It costs a JWT verification with no database round trip.
 // ---------------------------------------------------------------------------
 
 /**
@@ -21,6 +26,9 @@ import { reviewStatusSchema } from "@/lib/validations";
  * done. This is the only route that returns unapproved review text.
  */
 export async function GET(request: NextRequest) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
   const statusParam = request.nextUrl.searchParams.get("status");
 
   const status = statusParam

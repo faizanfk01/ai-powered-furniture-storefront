@@ -53,6 +53,12 @@ function check(label: string, pass: boolean, detail?: string) {
   console.log(`  ${pass ? "[ok]  " : "[FAIL]"} ${label}${detail ? `  -> ${detail}` : ""}`);
 }
 
+/** A caller address of its own per attempt — see submitLogin. */
+function freshIp() {
+  const octet = () => 1 + Math.floor(Math.random() * 254);
+  return `198.51.${octet()}.${octet()}`;
+}
+
 /** A fresh cookie jar per attempt — each sign-in starts from nothing. */
 function makeJar() {
   const jar = new Map<string, string>();
@@ -120,10 +126,18 @@ async function submitLogin(opts: {
   form.set("email", opts.email);
   form.set("password", opts.password);
 
+  // A FRESH ADDRESS PER SUBMISSION. The login form is rate limited to 5
+  // attempts per 15 minutes per IP (lib/rate-limit.ts), and this script makes
+  // exactly five — so without this it passes once and then fails for the next
+  // quarter of an hour, which looks like a broken login rather than a spent
+  // budget. Each check here is about the CREDENTIAL path, so isolating them
+  // from the limiter is what keeps them measuring what they claim to.
+  // scripts/verify-rate-limit.ts is where the limit itself is exercised.
   const response = await fetch(loginUrl, {
     method: "POST",
     body: form,
     redirect: "manual",
+    headers: { "x-forwarded-for": freshIp() },
   });
   jar.absorb(response);
 

@@ -20,7 +20,13 @@ import type { NextAuthConfig } from "next-auth";
 export const authConfig = {
   // Credentials can only issue a JWT — Auth.js does not support database
   // sessions for it, and schema.prisma has no Session table.
-  session: { strategy: "jwt" },
+  //
+  // maxAge is set rather than left to Auth.js, whose default is 30 days. With
+  // no Session table there is nothing to revoke against: a token stays valid
+  // until it expires, so its lifetime IS the exposure window for a copied
+  // cookie — and signing out or rotating the password does not shorten it.
+  // Seven days, in seconds.
+  session: { strategy: "jwt", maxAge: 7 * 24 * 60 * 60 },
 
   pages: { signIn: "/login" },
 

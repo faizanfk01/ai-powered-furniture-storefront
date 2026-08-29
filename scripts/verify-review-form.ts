@@ -30,10 +30,26 @@ function check(label: string, pass: boolean, detail?: string) {
 type Issue = { path: string; message: string };
 type ErrorBody = { error?: { code?: string; message?: string; issues?: Issue[] } };
 
+/**
+ * A FRESH ADDRESS PER SUBMISSION. POST /api/reviews is rate limited to 4 per
+ * hour per IP (lib/rate-limit.ts) and this script makes exactly four — the
+ * limiter runs before validation, so the deliberately-invalid payloads below
+ * are counted too. Without this the script passes once and then fails for an
+ * hour, which reads like a broken form rather than a spent budget.
+ * scripts/verify-rate-limit.ts is where the limit itself is exercised.
+ */
+function freshIp() {
+  const octet = () => 1 + Math.floor(Math.random() * 254);
+  return `198.51.${octet()}.${octet()}`;
+}
+
 async function post(payload: unknown) {
   const response = await fetch(`${BASE}/api/reviews`, {
     method: "POST",
-    headers: { "content-type": "application/json" },
+    headers: {
+      "content-type": "application/json",
+      "x-forwarded-for": freshIp(),
+    },
     body: JSON.stringify(payload),
   });
   let body: unknown = null;

@@ -4,6 +4,7 @@ import type { z } from "zod";
 import { auth } from "@/auth";
 
 import { Prisma } from "./generated/prisma/client";
+import { rateLimitHeaders, type RateLimitVerdict } from "./rate-limit";
 
 // ---------------------------------------------------------------------------
 // Error shape
@@ -36,7 +37,12 @@ export type ApiErrorCode =
   // well-formed and the caller did nothing wrong — the content could not be
   // processed. Distinct from AI_UNAVAILABLE because the fix is different, and
   // the admin screen says so: regenerate, do not wait.
-  | "AI_UNGROUNDED";
+  | "AI_UNGROUNDED"
+  // 429 from our own per-IP limiter (lib/rate-limit.ts). Deliberately NOT
+  // AI_BUSY: that code means an upstream refused us and the caller did nothing
+  // wrong, this one means the caller is the problem. /api/chat is the one
+  // exception and reuses AI_BUSY on purpose — see the note in its route.
+  | "RATE_LIMITED";
 
 export type ApiErrorBody = {
   error: {
@@ -60,6 +66,26 @@ export function apiError(
 
 export function notFound(message = "Not found") {
   return apiError(404, "NOT_FOUND", message);
+}
+
+/**
+ * 429 for a caller who has exceeded a per-IP limit.
+ *
+ * Carries `retry-after` so a client can wait the right amount rather than
+ * guessing, plus the advisory `ratelimit-*` headers. The message is passed in
+ * rather than generated here: "slow down" means something different to a
+ * visitor writing a review than to an admin uploading photos, and the endpoint
+ * is the only place that knows which one is reading it.
+ */
+export function rateLimited(message: string, verdict: RateLimitVerdict) {
+  const response = apiError(429, "RATE_LIMITED", message);
+
+  response.headers.set("retry-after", String(verdict.retryAfterSeconds));
+  for (const [name, value] of Object.entries(rateLimitHeaders(verdict))) {
+    response.headers.set(name, value);
+  }
+
+  return response;
 }
 
 /**

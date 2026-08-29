@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { apiError, handleApiError, readJson, validationFailed } from "@/lib/api";
 import { runChat } from "@/lib/ai/chat";
 import type { GroqFailure } from "@/lib/ai/groq";
+import { checkRateLimit, clientIp, rateLimitHeaders } from "@/lib/rate-limit";
 import { WHATSAPP_DISPLAY } from "@/lib/site";
 import { chatRequestSchema } from "@/lib/validations";
 
@@ -66,6 +67,31 @@ function respondToFailure(failure: GroqFailure) {
 }
 
 export async function POST(request: Request) {
+  // FIRST — before the body is even read, and long before anything reaches
+  // Groq. A rejected caller must cost us a Redis round trip and nothing else.
+  const ip = clientIp(request.headers);
+  const verdict = await checkRateLimit("chat", ip);
+
+  if (!verdict.allowed) {
+    // AI_BUSY, NOT the RATE_LIMITED code the other endpoints use. Not an
+    // oversight — the widget already knows this shape: lib/chat-client.ts maps
+    // any 429 to kind "BUSY", reads `retry-after`, and shows the message with
+    // a retry affordance. Inventing a new code here would mean a new failure
+    // kind, a new branch in the widget, and a customer-facing string that says
+    // "rate limited" instead of "one moment". The existing degradation path is
+    // the right one; this just enters it for a different reason.
+    const response = apiError(
+      429,
+      "AI_BUSY",
+      `You are sending messages faster than the assistant can answer. Please wait a moment and try again, or message us on WhatsApp at ${WHATSAPP_DISPLAY}.`,
+    );
+    response.headers.set("retry-after", String(verdict.retryAfterSeconds));
+    for (const [name, value] of Object.entries(rateLimitHeaders(verdict))) {
+      response.headers.set(name, value);
+    }
+    return response;
+  }
+
   const body = await readJson(request);
   if (!body.ok) return body.response;
 
@@ -88,12 +114,17 @@ export async function POST(request: Request) {
 }
 
 // ---------------------------------------------------------------------------
-// NOT DONE HERE, ON PURPOSE — per-IP throttling.
+// PER-IP THROTTLING — now done, at the top of the handler.
 //
-// The caps in chatRequestSchema bound the cost of one request; they do nothing
-// about ten thousand of them. Before this goes public it wants a per-IP limit
-// in front of it. It is not built now because the only correct place for it is
-// the edge (proxy.ts or the host's own rate limiting): an in-memory counter in
-// a route handler resets on every deploy and is per-instance, which reads like
-// protection without being any.
+// This note used to say it was deliberately not built, because the only
+// correct place for it was the edge: an in-memory counter in a route handler
+// resets on every deploy and is per-instance, which reads like protection
+// without being any. That objection was about the MECHANISM, not the location,
+// and lib/rate-limit.ts answers it — the counter lives in Upstash Redis, so it
+// is shared across instances and survives a deploy. Keeping the check in the
+// handler rather than in proxy.ts also keeps it visible in the file whose
+// budget it protects.
+//
+// The caps in chatRequestSchema still bound the cost of ONE request; the limit
+// above bounds how many of them one address may send.
 // ---------------------------------------------------------------------------

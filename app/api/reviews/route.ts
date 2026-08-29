@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-import { handleApiError, readJson, validationFailed } from "@/lib/api";
+import { handleApiError, rateLimited, readJson, validationFailed } from "@/lib/api";
 import { db } from "@/lib/db";
+import { checkRateLimit, clientIp } from "@/lib/rate-limit";
 import { reviewCreateSchema } from "@/lib/validations";
 
 // ---------------------------------------------------------------------------
@@ -44,6 +45,20 @@ export async function GET(request: NextRequest) {
  * and stays invisible until an admin approves it through /api/admin/reviews.
  */
 export async function POST(request: Request) {
+  // Before the body is parsed and before anything reaches Postgres. This is
+  // the only unauthenticated endpoint in the app that WRITES a row, so the
+  // limit is what stands between it and unbounded storage growth.
+  const ip = clientIp(request.headers);
+  const verdict = await checkRateLimit("review", ip);
+
+  if (!verdict.allowed) {
+    const minutes = Math.max(1, Math.ceil(verdict.retryAfterSeconds / 60));
+    return rateLimited(
+      `Thanks — you have already sent us several reviews. Please try again in about ${minutes} minute${minutes === 1 ? "" : "s"}.`,
+      verdict,
+    );
+  }
+
   const body = await readJson(request);
   if (!body.ok) return body.response;
 

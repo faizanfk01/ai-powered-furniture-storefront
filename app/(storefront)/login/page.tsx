@@ -110,8 +110,13 @@ export default async function LoginPage(props: PageProps<"/login">) {
   return (
     <AuthCard caption="Administrator sign in">
       {error ? (
-        // One message for every failure mode. Distinguishing "no such account"
+        // TWO messages, and the split leaks nothing. Every CREDENTIAL failure
+        // still collapses to one sentence — distinguishing "no such account"
         // from "wrong password" would let anyone test which addresses exist.
+        // "Too many attempts" is a different fact about the CALLER, not about
+        // the account: the limiter in actions.ts is keyed on IP and never sees
+        // the submitted email, so this message is identical whether the address
+        // is the real admin's or invented.
         //
         // Brass, not red: this is the site's one warm mark and the colour every
         // other warning in the admin already uses. `role="alert"` is what
@@ -120,7 +125,9 @@ export default async function LoginPage(props: PageProps<"/login">) {
           role="alert"
           className="mb-6 border border-brass/50 bg-brass/10 px-4 py-3 text-sm leading-relaxed text-ink"
         >
-          Invalid email or password.
+          {error === "RateLimited"
+            ? "Too many sign-in attempts from this connection. Please wait a few minutes and try again."
+            : "Invalid email or password."}
         </p>
       ) : null}
 

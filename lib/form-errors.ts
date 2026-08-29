@@ -122,10 +122,15 @@ export function mapApiError(
         formError: `${message}. Your session may have expired — sign in again and resubmit.`,
       };
 
-    // NOT_FOUND, INVALID_JSON, INTERNAL_ERROR and anything added later. Shown
-    // verbatim rather than reworded: the API's message is more specific than
-    // anything this layer could invent, and swallowing it is the one outcome
-    // that must not happen.
+    // NOT_FOUND, INVALID_JSON, INTERNAL_ERROR, RATE_LIMITED and anything added
+    // later. Shown verbatim rather than reworded: the API's message is more
+    // specific than anything this layer could invent, and swallowing it is the
+    // one outcome that must not happen.
+    //
+    // RATE_LIMITED lands here deliberately rather than in a case of its own.
+    // The route already builds the whole sentence including the wait ("try
+    // again in about 45 minutes"), and it names no field — a banner is exactly
+    // right, and a dedicated case would only restate this branch.
     default:
       return { fieldErrors: {}, formError: message };
   }

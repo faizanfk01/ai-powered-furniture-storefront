@@ -3,12 +3,14 @@ import { NextResponse } from "next/server";
 import {
   handleApiError,
   notFound,
+  rateLimited,
   readJson,
   requireAdmin,
   validationFailed,
 } from "@/lib/api";
 import { db } from "@/lib/db";
 import { buildImageKey, presignImageUpload, publicUrl } from "@/lib/r2";
+import { checkRateLimit, clientIp } from "@/lib/rate-limit";
 import { imagePresignSchema } from "@/lib/validations";
 
 // ---------------------------------------------------------------------------
@@ -48,6 +50,22 @@ export async function POST(
 ) {
   const denied = await requireAdmin();
   if (denied) return denied;
+
+  // AFTER the auth guard, not before it. proxy.ts already rejects every
+  // unauthenticated request to /api/admin/* before this file runs, so a limit
+  // placed ahead of requireAdmin() could only ever count traffic that was
+  // already blocked — spending a Redis command per request to learn nothing.
+  // What this DOES bound is a signed-in session (or a stolen one) minting
+  // upload credentials in a loop, which is the R2 bill nobody would notice.
+  const ip = clientIp(request.headers);
+  const verdict = await checkRateLimit("presign", ip);
+
+  if (!verdict.allowed) {
+    return rateLimited(
+      `Too many uploads at once. Please wait ${verdict.retryAfterSeconds} seconds and try the remaining files again.`,
+      verdict,
+    );
+  }
 
   const { id } = await context.params;
 

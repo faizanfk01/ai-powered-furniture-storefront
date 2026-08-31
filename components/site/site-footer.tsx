@@ -40,7 +40,7 @@ export function SiteFooter() {
   return (
     <footer className="mt-auto bg-ink-deep text-paper">
       <Container>
-        <div className="py-14 sm:py-16">
+        <div className="py-12 sm:py-14 lg:py-16">
           <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-12 lg:gap-8">
             {/* Identity and the one action. */}
             <div className="sm:col-span-2 lg:col-span-4">
@@ -133,7 +133,7 @@ export function SiteFooter() {
           {/* Sitemap and the legal line. The nav stays on the LEFT: the
               floating chat launcher is fixed to the bottom-right corner, and
               anything put on that side of this row ends up underneath it. */}
-          <div className="mt-12 flex flex-col gap-4 border-t border-paper/10 pt-6 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mt-10 flex flex-col gap-4 border-t border-paper/10 pt-6 sm:mt-12 sm:flex-row sm:items-center sm:justify-between">
             <nav aria-label="Footer">
               <ul className="flex flex-wrap gap-x-6 gap-y-2">
                 {NAV_LINKS.map((link) => (

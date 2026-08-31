@@ -62,6 +62,17 @@
   --font-display: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-body: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  /* ONE BREAKPOINT ABOVE TAILWIND'S OWN.
+     Tailwind stops at 2xl / 96rem (1536px), which means every utility the
+     framework gives us treats a 1920px monitor and a 1536px one as the same
+     screen. They are not: that is the range where the content column sat in a
+     field of empty margin, because nothing could be told to grow past it.
+     `3xl` is where the container widths in components/ui/container.tsx open up
+     and where the catalogue grid takes its fifth column.
+
+     120rem = 1920px, the common large-desktop width, not an arbitrary number. */
+  --breakpoint-3xl: 120rem;
 }
 
 body {

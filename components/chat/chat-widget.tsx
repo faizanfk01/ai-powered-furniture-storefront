@@ -122,9 +122,11 @@ export function ChatWidget() {
       onClick={(event) => {
         if (isBackdropClick(event)) setOpen(false);
       }}
-      // Full width on a phone, a fixed column on anything larger. The
-      // height, position and slide come from .chat-drawer.
-      className="chat-drawer w-full shadow-2xl shadow-ink/20 sm:w-[26rem] sm:border-l sm:border-hairline"
+      // Full width on a phone, a fixed column on anything larger, one step
+      // wider again on a large monitor — 26rem beside a 1728px catalogue is a
+      // slot, not a panel. The height, position and slide come from
+      // .chat-drawer.
+      className="chat-drawer w-full shadow-2xl shadow-ink/20 sm:w-[26rem] sm:border-l sm:border-hairline xl:w-[28rem] 3xl:w-[32rem]"
     >
       {/* HEADER — the same ink as the site header directly above it, so the
           drawer reads as an extension of the site's chrome rather than a

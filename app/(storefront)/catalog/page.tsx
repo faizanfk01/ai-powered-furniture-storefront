@@ -76,14 +76,14 @@ export default async function CatalogPage({
           oversized header rather than as a page beginning.
          ------------------------------------------------------------------ */}
       <Container width="wide">
-        <div className="pt-12 pb-8 sm:pt-16 sm:pb-10">
+        <div className="pt-8 pb-6 sm:pt-12 sm:pb-8 lg:pt-16 lg:pb-10">
           <p className="text-sm font-medium text-accent-strong">
             Everything we make
           </p>
-          <h1 className="display-wide mt-3 text-4xl font-semibold sm:text-5xl">
+          <h1 className="display-wide mt-2 text-3xl font-semibold sm:mt-3 sm:text-4xl lg:text-5xl">
             Catalogue
           </h1>
-          <p className="mt-4 max-w-xl text-lg leading-relaxed text-muted">
+          <p className="mt-3 max-w-xl text-base leading-relaxed text-muted sm:mt-4 sm:text-lg">
             Every piece is listed at its finished size. Anything here can be
             built to your measurements. The workshop is eight minutes from the
             showroom.
@@ -92,7 +92,7 @@ export default async function CatalogPage({
       </Container>
 
       <Container width="wide">
-        <div className="pb-16 sm:pb-20">
+        <div className="pb-12 sm:pb-16 lg:pb-20">
           <CatalogFilters
             categories={categories}
             params={params}
@@ -100,10 +100,13 @@ export default async function CatalogPage({
           />
 
           {products.length > 0 && (
-            // Four columns at xl — the reason Container has a `wide`. A
-            // three-up grid on a 1440px screen gives each card more width than
-            // the photograph inside it has resolution for.
-            <ul className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            // Four columns at xl, five at 3xl — the reason Container has a
+            // `wide`, and the reason that `wide` now keeps growing past
+            // Tailwind's last breakpoint. A three-up grid on a 1440px screen
+            // gives each card more width than the photograph inside it has
+            // resolution for; a four-up grid on a 1920px one does the same
+            // thing again, one screen size later.
+            <ul className="mt-6 grid grid-cols-1 gap-4 sm:mt-8 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4 3xl:grid-cols-5">
               {products.map((product) => (
                 <li key={product.id}>
                   <ProductCard product={product} />
@@ -114,11 +117,11 @@ export default async function CatalogPage({
 
           {/* Two different nothings, and they need different words. */}
           {products.length === 0 && (
-            <Card padded className="mt-8 sm:p-10">
+            <Card padded className="mt-6 sm:mt-8 lg:p-10">
               <div className="max-w-lg">
                 {catalogueIsEmpty ? (
                   <>
-                    <h2 className="display-wide text-2xl font-semibold">
+                    <h2 className="display-wide text-xl font-semibold sm:text-2xl">
                       We are still photographing everything
                     </h2>
                     <p className="mt-3 leading-relaxed text-muted">
@@ -129,7 +132,7 @@ export default async function CatalogPage({
                   </>
                 ) : (
                   <>
-                    <h2 className="display-wide text-2xl font-semibold">
+                    <h2 className="display-wide text-xl font-semibold sm:text-2xl">
                       Nothing matches that
                     </h2>
                     <p className="mt-3 leading-relaxed text-muted">
@@ -180,13 +183,13 @@ export default async function CatalogPage({
           {/* One CTA for the whole grid rather than one per card: ten green
               glyphs down the page would be the loudest thing on it. */}
           {products.length > 0 && (
-            <div className="mt-14 rounded-xl border border-hairline bg-surface p-6 sm:p-8">
+            <div className="mt-10 rounded-xl border border-hairline bg-surface p-5 sm:mt-14 sm:p-6 lg:p-8">
               <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
                 <div className="max-w-md">
                   <h2 className="display-wide text-xl font-semibold sm:text-2xl">
                     Not quite the size you need?
                   </h2>
-                  <p className="mt-2 leading-relaxed text-muted">
+                  <p className="mt-2 text-sm leading-relaxed text-muted sm:text-base">
                     We can build any of these to different measurements, in
                     another fabric or another wood. Tell us about the room and
                     we will give you a price.

@@ -58,7 +58,10 @@ export function Testimonial({
   featured?: boolean;
 }) {
   return (
-    <Card padded className={`h-full ${featured ? "sm:p-8" : ""}`}>
+    // `lg:p-8`, not `sm:p-8`. Card's own padding now ramps p-4/sm:p-5/lg:p-6,
+    // and an override at `sm` would be overruled again by the base's own `lg`
+    // step — a bigger card that quietly got smaller on a wider screen.
+    <Card padded className={`h-full ${featured ? "lg:p-8" : ""}`}>
       <figure className="flex h-full flex-col">
         <Rating value={review.rating} />
 

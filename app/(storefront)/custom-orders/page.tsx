@@ -47,16 +47,16 @@ export default function CustomOrdersPage() {
     <>
       <section>
         <Container>
-          <div className="py-16 sm:py-24 lg:py-28">
+          <div className="py-12 sm:py-20 lg:py-24 xl:py-28">
             <p className="text-sm font-medium text-accent-strong">
               Made to your room
             </p>
 
-            <h1 className="display-wide mt-4 max-w-3xl text-4xl leading-[1.08] font-semibold text-balance sm:text-5xl lg:text-6xl">
+            <h1 className="display-wide mt-3 max-w-3xl text-3xl leading-[1.08] font-semibold text-balance sm:mt-4 sm:text-4xl md:text-5xl lg:text-6xl 2xl:max-w-4xl">
               Tell us the room. We will build for it.
             </h1>
 
-            <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted">
+            <p className="mt-5 max-w-xl text-base leading-relaxed text-muted sm:mt-6 sm:text-lg">
               Everything in our catalogue can be built to different
               measurements, and plenty of what we make never appears there at
               all. Tell us what you need and we will tell you what it would
@@ -75,18 +75,18 @@ export default function CustomOrdersPage() {
         heading="Four kinds of work"
         lede="The same team measures, makes and fits all four, so we can price them together."
       >
-        <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:gap-5">
           {OFFERINGS.map((offering) => (
             <li key={offering.title}>
-              <Card padded className="flex h-full flex-col sm:p-8">
-                <h3 className="display-wide text-xl font-semibold">
+              <Card padded className="flex h-full flex-col lg:p-8">
+                <h3 className="display-wide text-lg font-semibold sm:text-xl">
                   {offering.title}
                 </h3>
-                <p className="mt-2 leading-relaxed text-ink">
+                <p className="mt-2 text-sm leading-relaxed text-ink sm:text-base">
                   {offering.body}
                 </p>
                 {SERVICE_DETAIL[offering.title] && (
-                  <p className="mt-3 leading-relaxed text-muted">
+                  <p className="mt-3 text-sm leading-relaxed text-muted sm:text-base">
                     {SERVICE_DETAIL[offering.title]}
                   </p>
                 )}
@@ -112,13 +112,13 @@ export default function CustomOrdersPage() {
           rather than a second dark band above the dark footer.
          ------------------------------------------------------------------ */}
       <Section>
-        <div className="rounded-xl border border-hairline bg-surface p-6 sm:p-8">
+        <div className="rounded-xl border border-hairline bg-surface p-5 sm:p-6 lg:p-8">
           <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-lg">
-              <h2 className="display-wide text-xl font-semibold sm:text-2xl">
+              <h2 className="display-wide text-lg font-semibold sm:text-xl lg:text-2xl">
                 Or come and measure with us
               </h2>
-              <p className="mt-2 leading-relaxed text-muted">
+              <p className="mt-2 text-sm leading-relaxed text-muted sm:text-base">
                 For anything built in, bring the room&apos;s measurements to the
                 showroom, or ask us to come and take them.
               </p>

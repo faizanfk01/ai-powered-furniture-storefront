@@ -120,7 +120,7 @@ export function ReviewForm({
 
   if (submitted) {
     return (
-      <Card padded className="sm:p-8">
+      <Card padded className="lg:p-8">
         <h3 className="display-wide text-xl font-semibold">
           Thanks, we have got it
         </h3>
@@ -151,7 +151,7 @@ export function ReviewForm({
   }
 
   return (
-    <Card padded className="sm:p-8">
+    <Card padded className="lg:p-8">
       <form onSubmit={handleSubmit} noValidate>
         <h3 className="display-wide text-xl font-semibold">
           {productName

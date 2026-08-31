@@ -49,21 +49,21 @@ export default function ContactPage() {
          ------------------------------------------------------------------ */}
       <section>
         <Container>
-          <div className="py-16 sm:py-24">
+          <div className="py-12 sm:py-20 lg:py-24">
             <p className="text-sm font-medium text-accent-strong">
               Mardan, Pakistan
             </p>
 
-            <h1 className="display-wide mt-4 text-4xl leading-[1.08] font-semibold sm:text-5xl lg:text-6xl">
+            <h1 className="display-wide mt-3 text-3xl leading-[1.08] font-semibold sm:mt-4 sm:text-4xl md:text-5xl lg:text-6xl">
               Get in touch
             </h1>
 
-            <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted">
+            <p className="mt-5 max-w-xl text-base leading-relaxed text-muted sm:mt-6 sm:text-lg">
               WhatsApp is the quickest way to reach us. It is where prices,
               photos and measurements go back and forth.
             </p>
 
-            <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4">
+            <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-4 sm:mt-8">
               <Button
                 size="lg"
                 href={whatsappUrl(
@@ -96,16 +96,16 @@ export default function ContactPage() {
         heading="Two addresses"
         lede="They do different jobs, so it helps to know which one you want before you set off."
       >
-        <ul className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <ul className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:gap-5">
           {LOCATIONS.map((location) => (
             <li key={location.label}>
-              <Card padded className="flex h-full flex-col sm:p-8">
-                <h3 className="display-wide text-xl font-semibold">
+              <Card padded className="flex h-full flex-col lg:p-8">
+                <h3 className="display-wide text-lg font-semibold sm:text-xl">
                   {location.label}
                 </h3>
                 <p className="mt-1 text-sm text-muted">{location.role}</p>
 
-                <address className="mt-4 text-lg not-italic text-ink">
+                <address className="mt-4 text-base not-italic text-ink sm:text-lg">
                   {location.lines.map((line) => (
                     <span key={line} className="block">
                       {line}
@@ -114,7 +114,7 @@ export default function ContactPage() {
                 </address>
 
                 {LOCATION_PURPOSE[location.label] && (
-                  <p className="mt-3 leading-relaxed text-muted">
+                  <p className="mt-3 text-sm leading-relaxed text-muted sm:text-base">
                     {LOCATION_PURPOSE[location.label]}
                   </p>
                 )}
@@ -159,7 +159,7 @@ export default function ContactPage() {
             HOURS.confirmed ? "max-w-md" : "lg:grid-cols-2 lg:gap-8"
           }`}
         >
-          <Card className="divide-y divide-hairline px-5 sm:px-6">
+          <Card className="divide-y divide-hairline px-4 sm:px-5 lg:px-6">
             {HOURS.lines.map((line) => (
               <p key={line} className="tabular py-3.5 text-ink">
                 {line}
@@ -168,8 +168,8 @@ export default function ContactPage() {
           </Card>
 
           {!HOURS.confirmed && (
-            <div className="rounded-xl border border-hairline bg-surface p-6 sm:p-8">
-              <h3 className="display-wide text-lg font-semibold text-accent-strong">
+            <div className="rounded-xl border border-hairline bg-surface p-5 sm:p-6 lg:p-8">
+              <h3 className="display-wide text-base font-semibold text-accent-strong sm:text-lg">
                 Not yet confirmed
               </h3>
               <p className="mt-2 leading-relaxed text-muted">

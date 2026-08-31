@@ -51,10 +51,18 @@ export function Section({
         : "bg-paper text-ink";
 
   return (
-    <section className={`${ground} py-16 sm:py-20 lg:py-24 ${className}`}>
+    <section
+      // FOUR STEPS, NOT THREE. The band used to open at py-16 — 64px of air
+      // above and below every section, on a 390px phone as well as on a
+      // monitor. Stacked down a page that is most of what made the small-screen
+      // layout feel like a desktop page being viewed through a magnifier. It
+      // now starts at 48px and reaches the old top end at xl, where there is
+      // actually screen to spend on it.
+      className={`${ground} py-12 sm:py-16 lg:py-20 xl:py-24 ${className}`}
+    >
       <Container width={width}>
         {(eyebrow || heading) && (
-          <header className="mb-10 sm:mb-12">
+          <header className="mb-8 sm:mb-10 lg:mb-12">
             {eyebrow && (
               // Sentence case, like the heading under it. `spec-label` set
               // this in tracked-out capitals, which was the last of the
@@ -70,14 +78,18 @@ export function Section({
               // Sentence case, not uppercase. A tracked capital heading was
               // signage; this is a storefront, where the heading is read
               // rather than displayed. Weight and size carry it instead.
-              <h2 className="display-wide mt-3 text-3xl font-semibold sm:text-4xl">
+              // Three sizes rather than two. text-3xl (30px) as the floor put
+              // a section heading within a couple of pixels of the page's own
+              // h1 on a phone, which is both a hierarchy problem and most of
+              // why the small screens read as zoomed.
+              <h2 className="display-wide mt-3 text-2xl font-semibold sm:text-3xl lg:text-4xl">
                 {heading}
               </h2>
             )}
 
             {lede && (
               <p
-                className={`mt-4 max-w-2xl text-lg leading-relaxed ${
+                className={`mt-3 max-w-2xl text-base leading-relaxed sm:mt-4 sm:text-lg ${
                   dark ? "text-paper/70" : "text-muted"
                 }`}
               >

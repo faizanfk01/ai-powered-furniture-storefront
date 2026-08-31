@@ -122,21 +122,29 @@ export default async function HomePage() {
          ------------------------------------------------------------------ */}
       <section>
         <Container>
-          <div className="py-16 sm:py-24 lg:py-28">
+          {/* FOUR STEPS ON BOTH AXES. The hero opened at py-16 / text-4xl,
+              which is a laptop hero shown unchanged on a phone — 64px of air
+              over a 36px headline on a 390px screen, which is most of what
+              made the small end feel magnified. It starts at 48px / 30px now
+              and reaches the old desktop size at md, where the screen is
+              actually wide enough to carry it. The max-w-3xl cap grows too:
+              a 1920px monitor should not hold this sentence to the same 768px
+              column a laptop does. */}
+          <div className="py-12 sm:py-20 lg:py-24 xl:py-28">
             <p className="text-sm font-medium text-accent-strong">
               {SITE.town}, {SITE.region}
             </p>
 
-            <h1 className="display-wide mt-4 max-w-3xl text-4xl leading-[1.08] font-semibold text-balance sm:text-5xl lg:text-6xl">
+            <h1 className="display-wide mt-3 max-w-3xl text-3xl leading-[1.08] font-semibold text-balance sm:mt-4 sm:text-4xl md:text-5xl lg:text-6xl 2xl:max-w-4xl">
               We build it in Baghdada. You see it in Shen Gul Plaza.
             </h1>
 
-            <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted">
+            <p className="mt-5 max-w-xl text-base leading-relaxed text-muted sm:mt-6 sm:text-lg">
               Custom furniture, interior design, 3D wallpapers and PVC panels,
               measured for your room by the same people who build it.
             </p>
 
-            <div className="mt-8 flex flex-wrap gap-3">
+            <div className="mt-7 flex flex-wrap gap-3 sm:mt-8">
               <Button size="lg" href="/catalog">
                 Browse the catalogue
               </Button>
@@ -164,7 +172,7 @@ export default async function HomePage() {
          ------------------------------------------------------------------ */}
       <section className="border-y border-hairline bg-surface">
         <Container>
-          <dl className="grid grid-cols-1 gap-8 py-10 sm:grid-cols-2 sm:gap-12">
+          <dl className="grid grid-cols-1 gap-6 py-8 sm:grid-cols-2 sm:gap-12 sm:py-10">
             {LOCATIONS.map((location) => (
               <div key={location.label}>
                 <dt className="text-sm font-semibold text-ink">
@@ -197,7 +205,7 @@ export default async function HomePage() {
         {/* Real cards with real gaps. The `gap-px` on a hairline ground this
             replaces drew a ruled table, which is a way of presenting data, not
             a way of presenting four things you can buy. */}
-        <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:gap-5">
           {OFFERINGS.map((offering) => (
             <li key={offering.title}>
               <Card padded className="h-full">
@@ -226,7 +234,10 @@ export default async function HomePage() {
           heading="From the catalogue"
           lede="One piece from every category we build. Each one is listed at its finished size, and we can build it to yours."
         >
-          <ul className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {/* A fifth column at 3xl, which is where `wide` reaches 108rem and a
+              four-up grid starts handing each card more width than the
+              photograph inside it has resolution for. */}
+          <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4 3xl:grid-cols-5">
             {featured.map((product) => (
               <li key={product.id}>
                 <ProductCard product={product} />
@@ -264,7 +275,7 @@ export default async function HomePage() {
               <Testimonial review={testimonials[0]!} featured />
             </div>
           ) : (
-            <ul className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <ul className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:gap-5">
               {testimonials.map((review) => (
                 <li key={review.id}>
                   <Testimonial review={review} />
@@ -298,7 +309,7 @@ export default async function HomePage() {
         heading="Two addresses, eight minutes apart"
         lede="Sit on the sofa before you buy it, then go and watch the next one being built. Most customers do both in the same afternoon."
       >
-        <Card padded className="sm:p-8">
+        <Card padded className="lg:p-8">
           <div className="flex flex-col gap-8 sm:flex-row sm:items-end sm:justify-between">
             <dl className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-12">
               {LOCATIONS.map((location) => (

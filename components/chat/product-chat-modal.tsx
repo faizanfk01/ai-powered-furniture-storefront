@@ -69,7 +69,15 @@ export function ProductChatModal({
       // Nearly full height on a phone so the transcript has room; a centred
       // card from `sm` up. Positioning and the entry transition are in the
       // .chat-modal rules in app/globals.css.
-      className="chat-modal w-[min(34rem,calc(100vw-2rem))] max-h-[min(40rem,calc(100dvh-2rem))] rounded-2xl border border-hairline shadow-2xl shadow-ink/20"
+      //
+      // `max-w-[calc(100%-2rem)]` RATHER THAN `100vw`. This dialog is
+      // position: fixed, so its percentage resolves against the initial
+      // containing block — the viewport WITHOUT the scrollbar. `100vw`
+      // includes the scrollbar, and app/globals.css reserves one permanently
+      // via `scrollbar-gutter: stable`, so the old expression was up to 15px
+      // wider than the space actually available on the narrowest phones. The
+      // inset margin is now exactly 1rem a side at every width.
+      className="chat-modal w-[34rem] max-h-[min(40rem,calc(100dvh-2rem))] max-w-[calc(100%-2rem)] rounded-2xl border border-hairline shadow-2xl shadow-ink/20"
     >
       {/* The same ink header the drawer wears, so the two surfaces are
           recognisably one assistant in two places. What differs is the title:

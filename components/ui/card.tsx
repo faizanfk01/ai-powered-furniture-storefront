@@ -22,14 +22,23 @@ export function Card({
   children: ReactNode;
   /** Hover treatment for a card that is a link target. */
   interactive?: boolean;
-  /** The common inner padding, so call sites stop re-deciding it. */
+  /**
+   * The common inner padding, so call sites stop re-deciding it.
+   *
+   * It ramps p-4 / sm:p-5 / lg:p-6. A call site that wants a roomier card
+   * overrides at `lg` or above (`lg:p-8`), never at `sm` — an `sm:` override
+   * is beaten again by this ramp's own `lg` step, which would make the card
+   * shrink as the screen got wider.
+   */
   padded?: boolean;
   className?: string;
 }) {
   return (
     <div
       className={`rounded-xl border border-hairline bg-paper shadow-sm ${
-        padded ? "p-5 sm:p-6" : ""
+        // Was p-5 flat until sm. 20px of padding inside a card that is itself
+        // inside a 16px page gutter spends a tenth of a 360px phone on air.
+        padded ? "p-4 sm:p-5 lg:p-6" : ""
       } ${
         interactive
           ? // A real lift, but a small one — 1px and a slightly deeper shadow.

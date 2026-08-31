@@ -68,7 +68,12 @@ export default async function AdminProductsPage() {
         // container rather than a card layout that hides the columns you came
         // to compare.
         <div className="overflow-x-auto border border-hairline">
-          <table className="w-full border-collapse text-left text-sm">
+          {/* min-w so the six columns SCROLL on a narrow screen rather than
+              compressing into it. Without it `w-full` squeezed the product
+              name into four wrapped lines and made every row four times as
+              tall — the wrapper already had overflow-x-auto, but a table that
+              fits never triggers it. */}
+          <table className="w-full min-w-[46rem] border-collapse text-left text-sm">
             <thead>
               <tr className="border-b border-hairline bg-hairline/40">
                 <Th>Product</Th>

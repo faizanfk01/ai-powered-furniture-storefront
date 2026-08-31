@@ -104,7 +104,7 @@ export function MobileNav() {
           id="mobile-nav-panel"
           className="fixed inset-x-0 top-[var(--header-height)] bottom-0 z-50 overflow-y-auto bg-ink text-paper"
         >
-          <div className="px-4 py-6 sm:px-6">
+          <div className="px-4 py-5 sm:px-6 sm:py-6">
             <nav aria-label="Main">
               {/* Divided rows rather than a stack of tracked-out capitals:
                   a phone nav is a list, and a list is what people expect to
@@ -121,7 +121,10 @@ export function MobileNav() {
                       <Link
                         href={link.href}
                         aria-current={active ? "page" : undefined}
-                        className={`block py-4 text-lg font-medium transition-colors ${
+                        // py-3.5 keeps a 48px row — comfortably past the 44px
+                        // minimum tap target — while giving the panel back the
+                        // height a phone actually has.
+                        className={`block py-3.5 text-base font-medium transition-colors sm:text-lg ${
                           active ? "text-brass" : "text-paper hover:text-brass"
                         }`}
                       >

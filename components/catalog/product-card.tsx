@@ -61,9 +61,12 @@ export function ProductCard({ product }: { product: SearchedProduct }) {
               alt={image.alt || product.name}
               fill
               // Matches the grid: one column on phones, two at sm, three at
-              // lg, four at xl. Without this every card downloads a
-              // full-width image.
-              sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+              // lg, four at xl, five at 3xl. Without this every card downloads
+              // a full-width image. The 3xl entry is not decoration — a fifth
+              // column makes each card NARROWER, so leaving it out would have
+              // the widest screens fetching the largest images for the
+              // smallest cards on the site.
+              sizes="(min-width: 1920px) 20vw, (min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
               // A slow, small zoom on hover. The card itself only lifts 1px,
               // so this is what actually says the photograph is a door.
               className="object-cover transition-transform duration-500 group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
@@ -73,7 +76,7 @@ export function ProductCard({ product }: { product: SearchedProduct }) {
           <FootprintPlan dimensions={product.dimensions} />
         )}
 
-        <div className="flex flex-1 flex-col p-4 sm:p-5">
+        <div className="flex flex-1 flex-col p-3.5 sm:p-4 lg:p-5">
           <div className="flex items-center justify-between gap-3">
             <span className="text-xs text-muted">{product.category.name}</span>
             <span

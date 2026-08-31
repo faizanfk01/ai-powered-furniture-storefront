@@ -60,7 +60,9 @@ export default async function AdminCategoriesPage() {
         </div>
       ) : (
         <div className="overflow-x-auto border border-hairline">
-          <table className="w-full border-collapse text-left text-sm">
+          {/* See the note on the products table: min-w makes the wrapper's
+              overflow-x-auto do something on a narrow screen. */}
+          <table className="w-full min-w-[32rem] border-collapse text-left text-sm">
             <thead>
               <tr className="border-b border-hairline bg-hairline/40">
                 <th scope="col" className="spec-label px-4 py-2.5 font-normal text-muted">

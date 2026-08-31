@@ -46,9 +46,24 @@ export default async function AdminLayout({ children }: LayoutProps<"/"> ) {
     <div className="flex min-h-full flex-col lg:flex-row">
       {/* Sidebar. Static — no collapse toggle, because the admin is used on a
           desktop and a hamburger would be one more thing to build and break.
-          On a phone it becomes a header strip above the content. */}
-      <aside className="flex shrink-0 flex-col bg-ink-deep text-paper lg:h-screen lg:w-60 lg:sticky lg:top-0">
-        <div className="border-b border-paper/10 px-5 py-4">
+
+          ON A PHONE IT IS A STRIP, WHICH IT WAS ONLY EVER CLAIMED TO BE.
+          The rail is a column at every width in the markup, so below `lg` it
+          stacked the brand, four nav rows, the signed-in address, a sign-out
+          button and a back-link into 380px of dark chrome ABOVE the page — on
+          a 700px phone, more than half the screen before the first product
+          row. Nothing was wrong with the desktop rail; what was missing was a
+          second arrangement of the same four blocks.
+
+          It wraps into two short rows now: brand and sign-out on the first,
+          the nav and the storefront link on the second. `order-*` is what puts
+          the account block beside the brand without moving it in the DOM — it
+          belongs after the nav for a screen reader and for the desktop rail,
+          where it is deliberately the last thing and furthest from a
+          mis-click. Every `order` is reset at lg, where source order is
+          already the right order. */}
+      <aside className="flex shrink-0 flex-wrap items-center border-b border-paper/10 bg-ink-deep text-paper lg:sticky lg:top-0 lg:h-screen lg:w-60 lg:flex-col lg:flex-nowrap lg:items-stretch lg:border-b-0">
+        <div className="order-1 px-4 py-3 sm:px-5 lg:order-none lg:w-full lg:border-b lg:border-paper/10 lg:px-5 lg:py-4">
           <Link
             href="/admin"
             className="display-wide text-sm font-semibold tracking-[0.08em] uppercase focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
@@ -57,8 +72,14 @@ export default async function AdminLayout({ children }: LayoutProps<"/"> ) {
           </Link>
         </div>
 
-        <nav aria-label="Admin" className="flex-1 px-2 py-4">
-          <ul className="flex flex-col gap-0.5">
+        <nav
+          aria-label="Admin"
+          className="order-3 w-full border-t border-paper/10 px-2 py-1.5 lg:order-none lg:w-auto lg:flex-1 lg:border-t-0 lg:py-4"
+        >
+          {/* A scrolling row on a phone, the same column on a desktop. The row
+              scrolls rather than wraps so the strip stays one line tall
+              whatever gets added to it later. */}
+          <ul className="flex flex-row gap-1 overflow-x-auto [scrollbar-width:none] lg:flex-col lg:gap-0.5 lg:overflow-visible">
             <li>
               <AdminNavLink href="/admin" label="Dashboard" exact />
             </li>
@@ -77,25 +98,29 @@ export default async function AdminLayout({ children }: LayoutProps<"/"> ) {
         {/* Who is signed in, and the way out. Pinned to the bottom of the
             sidebar on desktop: it is the least-used control here and should
             not sit where a mis-click can reach it. */}
-        <div className="border-t border-paper/10 px-5 py-4">
-          <p className="spec-label text-paper/40">Signed in</p>
-          <p className="mt-1 truncate text-sm text-paper/80">
+        <div className="order-2 ml-auto px-4 py-3 sm:px-5 lg:order-none lg:ml-0 lg:w-full lg:border-t lg:border-paper/10 lg:px-5 lg:py-4">
+          {/* Who it is stays on the desktop rail, where there is a column to
+              put it in. On the phone strip the sign-out button is the only
+              part that has to be reachable, and the address would push it off
+              the row. */}
+          <p className="spec-label hidden text-paper/40 lg:block">Signed in</p>
+          <p className="mt-1 hidden truncate text-sm text-paper/80 lg:block">
             {session?.user?.email ?? "Unknown"}
           </p>
 
           {/* A form posting to the server action, not a link: signing out is a
               state change and must not be reachable by a prefetch or a GET. */}
-          <form action={logout} className="mt-3">
+          <form action={logout} className="lg:mt-3">
             <button
               type="submit"
-              className="w-full border border-paper/25 px-3 py-2 font-display text-xs font-medium tracking-wide text-paper/80 uppercase transition-colors hover:border-paper/60 hover:text-paper focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
+              className="w-full border border-paper/25 px-3 py-2 font-display text-xs font-medium tracking-wide whitespace-nowrap text-paper/80 uppercase transition-colors hover:border-paper/60 hover:text-paper focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
             >
               Sign out
             </button>
           </form>
         </div>
 
-        <div className="border-t border-paper/10 px-5 py-3">
+        <div className="order-4 w-full border-t border-paper/10 px-4 py-2 sm:px-5 lg:order-none lg:px-5 lg:py-3">
           <Link
             href="/"
             className="text-xs text-paper/45 transition-colors hover:text-paper/80"

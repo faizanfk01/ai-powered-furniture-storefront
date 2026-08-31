@@ -12,6 +12,11 @@ import { SITE } from "@/lib/site";
  *
  * The two words stay in separate spans so "Furniture" can sit a step back in
  * weight. That is the whole of the ornament now.
+ *
+ * Three sizes rather than two, starting a step smaller. The name is the widest
+ * fixed thing in the header bar, and at 320px the old text-lg floor was what
+ * tipped the row over its gutters. `whitespace-nowrap` is deliberate: the two
+ * words are one mark and must never wrap to a second line inside the bar.
  */
 export function Wordmark({
   tone = "ink",
@@ -25,7 +30,7 @@ export function Wordmark({
   return (
     <Link
       href="/"
-      className={`inline-flex items-baseline gap-[0.3em] text-lg font-semibold tracking-[-0.02em] transition-opacity hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brass sm:text-xl ${
+      className={`inline-flex items-baseline gap-[0.3em] text-base font-semibold whitespace-nowrap tracking-[-0.02em] transition-opacity hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brass sm:text-lg lg:text-xl ${
         paper ? "text-paper" : "text-ink"
       } ${className}`}
     >

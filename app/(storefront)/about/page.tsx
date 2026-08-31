@@ -67,16 +67,16 @@ export default function AboutPage() {
          ------------------------------------------------------------------ */}
       <section>
         <Container>
-          <div className="py-16 sm:py-24 lg:py-28">
+          <div className="py-12 sm:py-20 lg:py-24 xl:py-28">
             <p className="text-sm font-medium text-accent-strong">
               {SITE.town}, {SITE.region}
             </p>
 
-            <h1 className="display-wide mt-4 max-w-3xl text-4xl leading-[1.08] font-semibold text-balance sm:text-5xl lg:text-6xl">
+            <h1 className="display-wide mt-3 max-w-3xl text-3xl leading-[1.08] font-semibold text-balance sm:mt-4 sm:text-4xl md:text-5xl lg:text-6xl 2xl:max-w-4xl">
               One place to see it. One place where it is made.
             </h1>
 
-            <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted">
+            <p className="mt-5 max-w-xl text-base leading-relaxed text-muted sm:mt-6 sm:text-lg">
               Most furniture shops sell you something that arrived on a lorry.
               We keep a showroom on one side of Mardan and the workshop that
               supplies it on the other. The piece you sit on and the piece we
@@ -98,16 +98,16 @@ export default function AboutPage() {
       >
         {/* Real cards with real gaps. `gap-px` on a hairline ground drew a
             two-cell table; these are two places, not two rows of data. */}
-        <ul className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <ul className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:gap-5">
           {LOCATIONS.map((location) => (
             <li key={location.label}>
-              <Card padded className="flex h-full flex-col sm:p-8">
-                <h3 className="display-wide text-xl font-semibold">
+              <Card padded className="flex h-full flex-col lg:p-8">
+                <h3 className="display-wide text-lg font-semibold sm:text-xl">
                   {location.label}
                 </h3>
                 <p className="mt-1 text-sm text-muted">{location.role}</p>
 
-                <address className="mt-4 text-lg not-italic text-ink">
+                <address className="mt-4 text-base not-italic text-ink sm:text-lg">
                   {location.lines.map((line) => (
                     <span key={line} className="block">
                       {line}
@@ -115,7 +115,7 @@ export default function AboutPage() {
                   ))}
                 </address>
 
-                <p className="mt-4 leading-relaxed text-muted">
+                <p className="mt-4 text-sm leading-relaxed text-muted sm:text-base">
                   {location.label === "Showroom"
                     ? "Sit on it, open the drawers, look at the finish in real light. Bring your room's measurements and we will tell you straight whether a piece will fit."
                     : "This is where the cutting, joinery, upholstery and finishing happen. Customers are welcome. Seeing a piece half-built is the quickest way to understand what you are paying for."}
@@ -135,7 +135,7 @@ export default function AboutPage() {
         heading="Made to measure"
         lede="Every piece in the catalogue can be built to different sizes, in another wood or another fabric. Here is how that works."
       >
-        <ol className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <ol className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:gap-5">
           {PROCESS.map((stage) => (
             <li key={stage.step}>
               <Card padded className="h-full">
@@ -161,7 +161,7 @@ export default function AboutPage() {
         heading="Four things"
         lede="Furniture is the biggest part of what we do, but a room is rarely just furniture."
       >
-        <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:gap-5">
           {OFFERINGS.map((offering) => (
             <li key={offering.title}>
               <Card padded className="h-full">
@@ -186,14 +186,14 @@ export default function AboutPage() {
         heading="The measurements are the promise"
         width="default"
       >
-        <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-12">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-12">
           <div>
-            <p className="text-lg leading-relaxed text-ink">
+            <p className="text-base leading-relaxed text-ink sm:text-lg">
               Every piece in our catalogue shows its finished size. Width, depth
               and height, in inches, right there with the piece. Not
               &ldquo;compact&rdquo; or &ldquo;spacious&rdquo;, the actual number.
             </p>
-            <p className="mt-4 leading-relaxed text-muted">
+            <p className="mt-4 text-sm leading-relaxed text-muted sm:text-base">
               It is the dullest thing on the site and the most useful. A sofa
               that will not turn the corner of your stairs is no bargain at any
               price, and the only way to know that in advance is for someone to
@@ -202,12 +202,12 @@ export default function AboutPage() {
           </div>
 
           <div>
-            <p className="text-lg leading-relaxed text-ink">
+            <p className="text-base leading-relaxed text-ink sm:text-lg">
               Solid sheesham, walnut finishes, kiln-dried frames, hand-woven
               rattan, hard-wearing woven fabrics. What a piece is made of is
               written in its description, in the same plain words.
             </p>
-            <p className="mt-4 leading-relaxed text-muted">
+            <p className="mt-4 text-sm leading-relaxed text-muted sm:text-base">
               If something is built to order, the catalogue says so and tells
               you the wait. If it is in the showroom today, it says that
               instead.
@@ -221,13 +221,13 @@ export default function AboutPage() {
           rather than a second dark band above the dark footer.
          ------------------------------------------------------------------ */}
       <Section>
-        <div className="rounded-xl border border-hairline bg-surface p-6 sm:p-8">
+        <div className="rounded-xl border border-hairline bg-surface p-5 sm:p-6 lg:p-8">
           <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
             <div className="max-w-lg">
-              <h2 className="display-wide text-xl font-semibold sm:text-2xl">
+              <h2 className="display-wide text-lg font-semibold sm:text-xl lg:text-2xl">
                 Tell us about the room
               </h2>
-              <p className="mt-2 leading-relaxed text-muted">
+              <p className="mt-2 text-sm leading-relaxed text-muted sm:text-base">
                 Send us the measurements, or just a photo of the space, and we
                 will tell you what we would build for it and what it would cost.
               </p>

@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Great_Vibes, Inter } from "next/font/google";
 
 import "./globals.css";
 
@@ -46,6 +46,28 @@ const inter = Inter({
   display: "swap",
 });
 
+/**
+ * ONE TYPEFACE, AND ONE EXCEPTION — the script half of the wordmark.
+ *
+ * "One typeface" above is still the rule for everything that is prose, and
+ * this does not weaken it: Great Vibes has exactly one caller, the word
+ * "Standard" in components/site/wordmark.tsx. It is a logo face, not a text
+ * face. Nothing else on the site may use it, which is why it is not added to
+ * the `font-display` / `font-body` / `font-mono` trio in globals.css — those
+ * are role tokens that pages reach for freely, and a script face reachable by
+ * a `font-` utility would eventually end up on a heading.
+ *
+ * 400 is the only weight it ships. `font-semibold` on the wordmark link would
+ * otherwise make the browser synthesise a fake bold by smearing the strokes,
+ * so the script span resets the weight itself.
+ */
+const greatVibes = Great_Vibes({
+  variable: "--font-great-vibes",
+  subsets: ["latin"],
+  weight: "400",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: {
     default: "Standard Furniture, Mardan",
@@ -77,7 +99,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${inter.variable} h-full antialiased`}
+      className={`${inter.variable} ${greatVibes.variable} h-full antialiased`}
     >
       <body className="min-h-full">{children}</body>
     </html>

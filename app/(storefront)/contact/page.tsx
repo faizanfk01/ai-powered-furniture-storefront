@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 
 import { ContactBuilder } from "@/components/forms/contact-builder";
+import { PageHero } from "@/components/site/page-hero";
 import { WhatsAppIcon } from "@/components/site/whatsapp-icon";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
 import {
   directionsUrl,
@@ -47,45 +47,41 @@ export default function ContactPage() {
           The number, first. Everything else on this page is a way of
           arranging a conversation that this button starts immediately.
          ------------------------------------------------------------------ */}
-      <section>
-        <Container>
-          <div className="py-12 sm:py-20 lg:py-24">
-            <p className="text-sm font-medium text-accent-strong">
-              Mardan, Pakistan
-            </p>
+      <PageHero
+        src="/hero/contact_page.jpg"
+        alt="A walnut console table in the showroom, its drawer fronts and mitred corner lit by daylight from the window, with a glazed pot and a shallow bowl set on top."
+      >
+        <p className="text-sm font-medium text-brass">Mardan, Pakistan</p>
 
-            <h1 className="display-wide mt-3 text-3xl leading-[1.08] font-semibold sm:mt-4 sm:text-4xl md:text-5xl lg:text-6xl">
-              Get in touch
-            </h1>
+        <h1 className="display-wide mt-3 text-3xl leading-[1.08] font-semibold text-paper sm:mt-4 sm:text-4xl md:text-5xl lg:text-6xl">
+          Get in touch
+        </h1>
 
-            <p className="mt-5 max-w-xl text-base leading-relaxed text-muted sm:mt-6 sm:text-lg">
-              WhatsApp is the quickest way to reach us. It is where prices,
-              photos and measurements go back and forth.
-            </p>
+        <p className="mt-5 max-w-xl text-base leading-relaxed text-paper/85 sm:mt-6 sm:text-lg">
+          WhatsApp is the quickest way to reach us. It is where prices, photos
+          and measurements go back and forth.
+        </p>
 
-            <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-4 sm:mt-8">
-              <Button
-                size="lg"
-                href={whatsappUrl(
-                  "Hello Standard Furniture, I have a question.",
-                )}
-              >
-                <WhatsAppIcon />
-                Message on WhatsApp
-              </Button>
+        <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-4 sm:mt-8">
+          <Button
+            size="lg"
+            variant="solid-invert"
+            href={whatsappUrl("Hello Standard Furniture, I have a question.")}
+          >
+            <WhatsAppIcon />
+            Message on WhatsApp
+          </Button>
 
-              {/* A tel: link as well as the chat: not everyone uses WhatsApp,
-                  and on a phone this dials. */}
-              <a
-                href={`tel:+${WHATSAPP_DISPLAY.replace(/\D/g, "")}`}
-                className="tabular text-ink underline decoration-line-strong underline-offset-4 transition-colors hover:decoration-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brass"
-              >
-                {WHATSAPP_DISPLAY}
-              </a>
-            </div>
-          </div>
-        </Container>
-      </section>
+          {/* A tel: link as well as the chat: not everyone uses WhatsApp,
+              and on a phone this dials. */}
+          <a
+            href={`tel:+${WHATSAPP_DISPLAY.replace(/\D/g, "")}`}
+            className="tabular text-paper underline decoration-paper/40 underline-offset-4 transition-colors hover:decoration-paper focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brass"
+          >
+            {WHATSAPP_DISPLAY}
+          </a>
+        </div>
+      </PageHero>
 
       {/* ------------------------------------------------------------------
           The two addresses, with directions.

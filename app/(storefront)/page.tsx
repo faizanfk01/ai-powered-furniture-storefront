@@ -7,6 +7,7 @@ import {
   Testimonial,
   type TestimonialReview,
 } from "@/components/home/testimonial";
+import { PageHero } from "@/components/site/page-hero";
 import { WhatsAppIcon } from "@/components/site/whatsapp-icon";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -110,58 +111,49 @@ export default async function HomePage() {
           HERO — the approved thesis. A workshop that keeps a showroom, in a
           named town.
 
-          ON WHITE NOW. It was a full ink band opening with the ruler mark and
-          the name set as signage at 8xl uppercase — an editorial cover, which
-          is what the showroom identity wanted. A storefront opens on its own
-          page ground and leads with what it sells; the brand dark is spent on
-          the header and the footer, which is where a customer looks for it.
+          ON THE WORK NOW. This was a plain white opening, which kept the
+          brand dark for the header and the footer and let the page lead with
+          its words. It leads with the workshop instead: a furniture business
+          is judged on what it makes, and the fastest way to say "we build
+          this" is a photograph of it being built. The ink did not go away —
+          it became the scrim the picture is read through, so the band still
+          continues the header rather than interrupting it.
 
           The headline is the second half of the old lede, promoted. No new
           claim is made here: the workshop-and-showroom pair was already the
           hero's copy, it was just sitting underneath a wordmark.
          ------------------------------------------------------------------ */}
-      <section>
-        <Container>
-          {/* FOUR STEPS ON BOTH AXES. The hero opened at py-16 / text-4xl,
-              which is a laptop hero shown unchanged on a phone — 64px of air
-              over a 36px headline on a 390px screen, which is most of what
-              made the small end feel magnified. It starts at 48px / 30px now
-              and reaches the old desktop size at md, where the screen is
-              actually wide enough to carry it. The max-w-3xl cap grows too:
-              a 1920px monitor should not hold this sentence to the same 768px
-              column a laptop does. */}
-          <div className="py-12 sm:py-20 lg:py-24 xl:py-28">
-            <p className="text-sm font-medium text-accent-strong">
-              {SITE.town}, {SITE.region}
-            </p>
+      <PageHero
+        src="/hero/home_page.jpg"
+        alt="A pair of hands steadying a walnut board on the bench as a hand plane lifts a curl of shaving from it, offcuts stacked in the light of the workshop window."
+      >
+        <p className="text-sm font-medium text-brass">
+          {SITE.town}, {SITE.region}
+        </p>
 
-            <h1 className="display-wide mt-3 max-w-3xl text-3xl leading-[1.08] font-semibold text-balance sm:mt-4 sm:text-4xl md:text-5xl lg:text-6xl 2xl:max-w-4xl">
-              We build it in Baghdada. You see it in Shen Gul Plaza.
-            </h1>
+        <h1 className="display-wide mt-3 max-w-3xl text-3xl leading-[1.08] font-semibold text-paper text-balance sm:mt-4 sm:text-4xl md:text-5xl lg:text-6xl 2xl:max-w-4xl">
+          We build it in Baghdada. You see it in Shen Gul Plaza.
+        </h1>
 
-            <p className="mt-5 max-w-xl text-base leading-relaxed text-muted sm:mt-6 sm:text-lg">
-              Custom furniture, interior design, 3D wallpapers and PVC panels,
-              measured for your room by the same people who build it.
-            </p>
+        <p className="mt-5 max-w-xl text-base leading-relaxed text-paper/85 sm:mt-6 sm:text-lg">
+          Custom furniture, interior design, 3D wallpapers and PVC panels,
+          measured for your room by the same people who build it.
+        </p>
 
-            <div className="mt-7 flex flex-wrap gap-3 sm:mt-8">
-              <Button size="lg" href="/catalog">
-                Browse the catalogue
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                href={whatsappUrl(
-                  "Hello Standard Furniture, I have a question.",
-                )}
-              >
-                <WhatsAppIcon />
-                Message on WhatsApp
-              </Button>
-            </div>
-          </div>
-        </Container>
-      </section>
+        <div className="mt-7 flex flex-wrap gap-3 sm:mt-8">
+          <Button size="lg" variant="solid-invert" href="/catalog">
+            Browse the catalogue
+          </Button>
+          <Button
+            size="lg"
+            variant="outline-invert"
+            href={whatsappUrl("Hello Standard Furniture, I have a question.")}
+          >
+            <WhatsAppIcon />
+            Message on WhatsApp
+          </Button>
+        </div>
+      </PageHero>
 
       {/* ------------------------------------------------------------------
           THE TWO ADDRESSES — kept directly under the hero, because the pair IS

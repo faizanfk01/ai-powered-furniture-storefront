@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 
+import { PageHero } from "@/components/site/page-hero";
 import { WhatsAppIcon } from "@/components/site/whatsapp-icon";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
 import { LOCATIONS, OFFERINGS, SITE, whatsappUrl } from "@/lib/site";
 
@@ -60,31 +60,35 @@ export default function AboutPage() {
   return (
     <>
       {/* ------------------------------------------------------------------
-          The thesis, stated plainly — and now on white, like every other page
-          on the site. The ink band with the ruler mark and the heading set as
-          uppercase signage was the showroom identity's cover treatment; the
-          brand dark is spent on the header and the footer.
+          The thesis, stated plainly, over the one photograph that argues it
+          without a caption: a finished sideboard in the foreground and the
+          bench it came off behind. Same darkened-photograph hero as the other
+          three pages — see components/site/page-hero.tsx for the overlay and
+          why it is one component rather than four agreeing.
          ------------------------------------------------------------------ */}
-      <section>
-        <Container>
-          <div className="py-12 sm:py-20 lg:py-24 xl:py-28">
-            <p className="text-sm font-medium text-accent-strong">
-              {SITE.town}, {SITE.region}
-            </p>
+      <PageHero
+        src="/hero/about_page.jpg"
+        alt="A finished walnut sideboard dressed with a lamp and two bowls in the foreground, and behind it the workshop it came from, with rough-sawn boards stacked on a trestle."
+        // Biased low. Centred, the band's wide crop keeps the dark upper wall
+        // and loses the sideboard entirely — which is half the argument this
+        // page makes, and half of what the alt text promises.
+        position="object-[50%_72%]"
+      >
+        <p className="text-sm font-medium text-brass">
+          {SITE.town}, {SITE.region}
+        </p>
 
-            <h1 className="display-wide mt-3 max-w-3xl text-3xl leading-[1.08] font-semibold text-balance sm:mt-4 sm:text-4xl md:text-5xl lg:text-6xl 2xl:max-w-4xl">
-              One place to see it. One place where it is made.
-            </h1>
+        <h1 className="display-wide mt-3 max-w-3xl text-3xl leading-[1.08] font-semibold text-paper text-balance sm:mt-4 sm:text-4xl md:text-5xl lg:text-6xl 2xl:max-w-4xl">
+          One place to see it. One place where it is made.
+        </h1>
 
-            <p className="mt-5 max-w-xl text-base leading-relaxed text-muted sm:mt-6 sm:text-lg">
-              Most furniture shops sell you something that arrived on a lorry.
-              We keep a showroom on one side of Mardan and the workshop that
-              supplies it on the other. The piece you sit on and the piece we
-              build for you come from the same hands.
-            </p>
-          </div>
-        </Container>
-      </section>
+        <p className="mt-5 max-w-xl text-base leading-relaxed text-paper/85 sm:mt-6 sm:text-lg">
+          Most furniture shops sell you something that arrived on a lorry. We
+          keep a showroom on one side of Mardan and the workshop that supplies
+          it on the other. The piece you sit on and the piece we build for you
+          come from the same hands.
+        </p>
+      </PageHero>
 
       {/* ------------------------------------------------------------------
           The two places, at equal weight. This is the whole argument, so it
@@ -191,7 +195,8 @@ export default function AboutPage() {
             <p className="text-base leading-relaxed text-ink sm:text-lg">
               Every piece in our catalogue shows its finished size. Width, depth
               and height, in inches, right there with the piece. Not
-              &ldquo;compact&rdquo; or &ldquo;spacious&rdquo;, the actual number.
+              &ldquo;compact&rdquo; or &ldquo;spacious&rdquo;, the actual
+              number.
             </p>
             <p className="mt-4 text-sm leading-relaxed text-muted sm:text-base">
               It is the dullest thing on the site and the most useful. A sofa

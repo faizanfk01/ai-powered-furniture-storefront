@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 
 import { CustomOrderBuilder } from "@/components/forms/custom-order-builder";
+import { PageHero } from "@/components/site/page-hero";
 import { WhatsAppIcon } from "@/components/site/whatsapp-icon";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
 import { LOCATIONS, OFFERINGS, whatsappUrl } from "@/lib/site";
 
@@ -45,26 +45,23 @@ const SERVICE_DETAIL: Record<string, string> = {
 export default function CustomOrdersPage() {
   return (
     <>
-      <section>
-        <Container>
-          <div className="py-12 sm:py-20 lg:py-24 xl:py-28">
-            <p className="text-sm font-medium text-accent-strong">
-              Made to your room
-            </p>
+      <PageHero
+        src="/hero/custom_orders.jpg"
+        alt="A pencil drawing of a chair frame on the bench beside a folding rule, a tape measure and a squared-off length of walnut, with chisels and a mallet laid out behind."
+        position="object-[50%_65%]"
+      >
+        <p className="text-sm font-medium text-brass">Made to your room</p>
 
-            <h1 className="display-wide mt-3 max-w-3xl text-3xl leading-[1.08] font-semibold text-balance sm:mt-4 sm:text-4xl md:text-5xl lg:text-6xl 2xl:max-w-4xl">
-              Tell us the room. We will build for it.
-            </h1>
+        <h1 className="display-wide mt-3 max-w-3xl text-3xl leading-[1.08] font-semibold text-paper text-balance sm:mt-4 sm:text-4xl md:text-5xl lg:text-6xl 2xl:max-w-4xl">
+          Tell us the room. We will build for it.
+        </h1>
 
-            <p className="mt-5 max-w-xl text-base leading-relaxed text-muted sm:mt-6 sm:text-lg">
-              Everything in our catalogue can be built to different
-              measurements, and plenty of what we make never appears there at
-              all. Tell us what you need and we will tell you what it would
-              take.
-            </p>
-          </div>
-        </Container>
-      </section>
+        <p className="mt-5 max-w-xl text-base leading-relaxed text-paper/85 sm:mt-6 sm:text-lg">
+          Everything in our catalogue can be built to different measurements,
+          and plenty of what we make never appears there at all. Tell us what
+          you need and we will tell you what it would take.
+        </p>
+      </PageHero>
 
       {/* ------------------------------------------------------------------
           The four services, in more depth than the home page gives them.

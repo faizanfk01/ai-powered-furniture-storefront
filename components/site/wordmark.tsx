@@ -66,7 +66,7 @@ import { SITE } from "@/lib/site";
  * holds at all three breakpoints instead of needing a value per step.
  */
 const SCRIPT =
-  "font-[family-name:var(--font-great-vibes)] translate-y-[0.36em] text-[1.7em] leading-none font-normal tracking-normal";
+  "font-[family-name:var(--font-great-vibes)] translate-y-[0.36em] text-[1.5em] leading-none font-normal tracking-normal";
 
 export function Wordmark({
   tone = "ink",
@@ -114,7 +114,7 @@ export function Wordmark({
         height={512}
         priority
         sizes="80px"
-        className="size-[2.4em] shrink-0 self-center object-contain"
+        className="size-[2.0em] shrink-0 self-center object-contain"
       />
 
       <span className={SCRIPT}>Standard</span>

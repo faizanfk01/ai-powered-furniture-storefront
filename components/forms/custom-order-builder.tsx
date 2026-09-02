@@ -82,7 +82,7 @@ export function CustomOrderBuilder() {
             rows={5}
             value={draft.description}
             onChange={(event) => update("description", event.target.value)}
-            placeholder="A wardrobe for a bedroom with a sloped ceiling, in a dark wood to match an existing bed."
+            placeholder="Tell us about your custom order here"
             className={`${storefrontControlClass} resize-y`}
           />
         </Field>
@@ -100,7 +100,6 @@ export function CustomOrderBuilder() {
             onChange={(event) => update("dimensions", event.target.value)}
             // The site's own notation, so the shop reads it the way it reads
             // every dimension in the catalogue.
-            placeholder={'84" W x 36" D x 30" H'}
             className={storefrontControlClass}
           />
         </Field>

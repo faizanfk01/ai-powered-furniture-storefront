@@ -44,7 +44,7 @@ export function ContactBuilder() {
             autoComplete="name"
             value={draft.name}
             onChange={(event) => update("name", event.target.value)}
-            placeholder="Ayesha Khan"
+            placeholder="Type your name here"
             className={storefrontControlClass}
           />
         </Field>
@@ -55,7 +55,7 @@ export function ContactBuilder() {
             rows={6}
             value={draft.message}
             onChange={(event) => update("message", event.target.value)}
-            placeholder="Do you deliver to Charsadda, and is there a charge for it?"
+            placeholder="Type your message here"
             className={`${storefrontControlClass} resize-y`}
           />
         </Field>

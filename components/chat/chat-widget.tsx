@@ -168,7 +168,7 @@ export function ChatWidget() {
       <ChatConversation
         active={open}
         scope={{ kind: "site" }}
-        placeholder="Ask about a piece, a budget, or how to order"
+        placeholder="Ask here"
         inputLabel="Ask a question about our furniture"
         emptyState={() => <EntryState />}
       />

@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Great_Vibes, Inter } from "next/font/google";
 
+import { RouteProgress } from "@/components/site/route-progress";
+
 import "./globals.css";
 
 /**
@@ -101,7 +103,24 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${inter.variable} ${greatVibes.variable} h-full antialiased`}
     >
-      <body className="min-h-full">{children}</body>
+      <body className="min-h-full">
+        {/* HERE, not in the storefront layout, so a route change is
+            acknowledged everywhere the app navigates — including the admin
+            tool, and including a crossing between the two. It is the one piece
+            of chrome the showroom and the admin genuinely share: the argument
+            for keeping those layouts unalike is about what each surface is
+            FOR, and "the click registered" is not a matter of taste.
+
+            A client component in a server layout, which costs this file
+            nothing: only route-progress.tsx crosses to the browser. It also
+            deliberately does not call useSearchParams(), which would pull this
+            layout — and every static page under it — out of static rendering.
+
+            Renders an empty, invisible, out-of-flow div until something
+            navigates. */}
+        <RouteProgress />
+        {children}
+      </body>
     </html>
   );
 }

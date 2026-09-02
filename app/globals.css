@@ -330,6 +330,102 @@ html:has(dialog.chat-modal[open]) {
 }
 
 /* ---------------------------------------------------------------------------
+   The route progress bar
+   ---------------------------------------------------------------------------
+   The thin brass line across the top of the window during a route change. The
+   state machine that drives `data-phase` is components/site/route-progress.tsx;
+   this is every pixel of it.
+
+   IN CSS RATHER THAN IN UTILITIES because the whole component is four states
+   and the transitions BETWEEN them, and a `data-[phase=running]:` variant
+   carrying a cubic-bezier and a two-property transition — times four, times
+   the reduced-motion overrides — is unreadable in a className. Same argument
+   as .chat-drawer and .chat-modal above.
+
+   NO LAYOUT SHIFT, BY CONSTRUCTION. Fixed, so it is out of flow and reserves
+   nothing; `scaleX` rather than `width`, so the animation runs on the
+   compositor and never touches layout; `pointer-events: none`, so a bar
+   sitting over the header cannot eat a click on the nav beneath it.
+
+   z-index 60 clears everything this site stacks — the sticky header is 40 and
+   the storefront layout's own top layer is 50. It does NOT clear an open chat
+   dialog, and should not: showModal() puts that in the browser's top layer,
+   above every z-index there is, which is the correct order for a modal.
+   --------------------------------------------------------------------------- */
+.route-progress {
+  position: fixed;
+  inset-block-start: 0;
+  inset-inline: 0;
+  z-index: 60;
+  height: 2px;
+  pointer-events: none;
+
+  /* Grows from the left edge. */
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+  opacity: 0;
+
+  /* The leading edge is the solid one, so the end that moves is the end you
+     see. A flat bar of brass reads as a rule someone forgot to remove; the
+     fade gives it a direction. */
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--color-brass) 45%, transparent),
+    var(--color-brass)
+  );
+  /* Just enough bloom to lift it off the ink header underneath. */
+  box-shadow: 0 0 8px color-mix(in srgb, var(--color-brass) 50%, transparent);
+}
+
+/* One frame at zero width with transitions OFF — the value the run below
+   animates away from, and the reason a restart mid-fade is a cut rather than a
+   visible rewind. */
+.route-progress[data-phase="arming"] {
+  opacity: 1;
+  transform: scaleX(0);
+  transition: none;
+}
+
+/* Out to 85% and no further, decelerating hard. The bar must never reach the
+   right-hand edge on its own: arriving at 100% before the page does says the
+   navigation finished when it has not. */
+.route-progress[data-phase="running"] {
+  opacity: 1;
+  transform: scaleX(0.85);
+  transition: transform 620ms cubic-bezier(0, 0.55, 0.25, 1);
+}
+
+/* The page landed. Close the last 15% quickly, then fade — the fade is delayed
+   by exactly the travel time so the bar is seen to complete before it goes,
+   rather than dissolving on its way there. 170 + 200 = the FINISH_MS the
+   component waits before returning to idle. */
+.route-progress[data-phase="finishing"] {
+  opacity: 0;
+  transform: scaleX(1);
+  transition:
+    transform 170ms ease-out,
+    opacity 200ms ease-out 170ms;
+}
+
+/* REDUCED MOTION: the same information, with nothing travelling.
+   
+   The bar appears at full width, holds for the component's minimum visible
+   window, and fades. A cross-screen sweep is exactly the kind of large
+   translating movement this setting is asking us not to make; an opacity
+   change is not, so the fade stays. */
+@media (prefers-reduced-motion: reduce) {
+  .route-progress[data-phase="running"] {
+    transform: scaleX(1);
+    transition: none;
+  }
+
+  .route-progress[data-phase="finishing"] {
+    transform: scaleX(1);
+    transition: opacity 160ms linear;
+  }
+}
+
+/* ---------------------------------------------------------------------------
    The product chat modal
    ---------------------------------------------------------------------------
    The second AI container: centred, for the "Ask AI about this piece" button

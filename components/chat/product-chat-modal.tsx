@@ -6,7 +6,8 @@ import { isBackdropClick } from "./backdrop-click";
 import { ChatConversation, type ChatHandle } from "./chat-conversation";
 
 /**
- * The PRODUCT assistant: a centred modal, opened from a product page.
+ * The PRODUCT assistant, opened from a product page: a full-screen sheet on a
+ * phone, a centred modal from `sm` up.
  *
  * The second of two deliberately different containers. The global drawer slides
  * in from the edge and belongs to the whole site; this sits in the middle of
@@ -66,18 +67,39 @@ export function ProductChatModal({
       onClick={(event) => {
         if (isBackdropClick(event)) onClose();
       }}
-      // Nearly full height on a phone so the transcript has room; a centred
-      // card from `sm` up. Positioning and the entry transition are in the
-      // .chat-modal rules in app/globals.css.
+      // A FULL-SCREEN SHEET ON A PHONE, a centred card from `sm` up.
+      // Positioning and the entry transition are in the .chat-modal rules in
+      // app/globals.css.
       //
-      // `max-w-[calc(100%-2rem)]` RATHER THAN `100vw`. This dialog is
-      // position: fixed, so its percentage resolves against the initial
-      // containing block — the viewport WITHOUT the scrollbar. `100vw`
-      // includes the scrollbar, and app/globals.css reserves one permanently
-      // via `scrollbar-gutter: stable`, so the old expression was up to 15px
-      // wider than the space actually available on the narrowest phones. The
-      // inset margin is now exactly 1rem a side at every width.
-      className="chat-modal w-[34rem] max-h-[min(40rem,calc(100dvh-2rem))] max-w-[calc(100%-2rem)] rounded-2xl border border-hairline shadow-2xl shadow-ink/20"
+      // It used to be the centred card at every width, with a max-height and
+      // no height. A <dialog> is `height: fit-content`, so the box was only
+      // ever as tall as the conversation inside it: on a phone that is a
+      // small floating card in the middle of the screen, and the moment the
+      // transcript grew past the cap the header, the messages and the
+      // composer were all fighting over a few hundred pixels. The desktop
+      // version of that box is right — there is room around it. On a 320px
+      // screen there is no room around anything, and a chat that cannot show
+      // its own composer is not a chat.
+      //
+      // `h-dvh`, not `h-screen`: dvh follows the browser's collapsing toolbar,
+      // so the sheet ends at the real bottom edge rather than underneath it.
+      // The composer already pads itself by env(safe-area-inset-bottom), so
+      // going edge to edge does not put the input under the home indicator.
+      //
+      // `max-h-none` and `max-w-none` are not tidying. The UA stylesheet caps
+      // a <dialog> at `calc(100% - 6px - 2em)` in BOTH axes, so without them
+      // the sheet stops ~38px short of the screen it is supposed to fill and
+      // floats inside its own backdrop — which is most of what "tiny and
+      // cut-off" looked like.
+      //
+      // `w-full` RATHER THAN `w-screen`. This dialog is position: fixed, so
+      // its percentage resolves against the initial containing block — the
+      // viewport WITHOUT the scrollbar. `100vw` includes the scrollbar, and
+      // app/globals.css reserves one permanently via `scrollbar-gutter:
+      // stable`, so `w-screen` would be up to 15px wider than the space
+      // actually available. Same reasoning holds the `sm:` inset at exactly
+      // 1rem a side.
+      className="chat-modal h-dvh max-h-none w-full max-w-none rounded-none border-0 shadow-2xl shadow-ink/20 sm:h-auto sm:max-h-[min(40rem,calc(100dvh-2rem))] sm:w-[34rem] sm:max-w-[calc(100%-2rem)] sm:rounded-2xl sm:border sm:border-hairline"
     >
       {/* The same ink header the drawer wears, so the two surfaces are
           recognisably one assistant in two places. What differs is the title:

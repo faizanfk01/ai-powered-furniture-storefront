@@ -7,6 +7,7 @@ import {
   Testimonial,
   type TestimonialReview,
 } from "@/components/home/testimonial";
+import { TestimonialRail } from "@/components/home/testimonial-rail";
 import { PageHero } from "@/components/site/page-hero";
 import { WhatsAppIcon } from "@/components/site/whatsapp-icon";
 import { Button } from "@/components/ui/button";
@@ -228,8 +229,14 @@ export default async function HomePage() {
         >
           {/* A fifth column at 3xl, which is where `wide` reaches 108rem and a
               four-up grid starts handing each card more width than the
-              photograph inside it has resolution for. */}
-          <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4 3xl:grid-cols-5">
+              photograph inside it has resolution for.
+
+              Two on a phone, the same as the catalogue. This strip is a sample
+              OF that page, so a customer who taps through should not find the
+              shelf rearranged when they arrive. The card handles the narrower
+              width itself — its compact styles are a container query on its
+              own box, not a viewport breakpoint, so it needed nothing here. */}
+          <ul className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4 3xl:grid-cols-5">
             {featured.map((product) => (
               <li key={product.id}>
                 <ProductCard product={product} />
@@ -254,10 +261,22 @@ export default async function HomePage() {
           There is nothing for a visitor to act on here either, so an empty
           panel would be decoration standing in for evidence.
 
-          The layout still adapts to how much evidence there actually is: a
-          single approved review becomes one large pull quote, several become a
-          grid. What is gone is the ink band with a white panel inset into it —
-          a card floating in a dark frame, which put a border around the
+          The layout still adapts to how much evidence there actually is, and
+          the three cases are decided HERE rather than inside the rail, because
+          they are decisions about the section, not about the row:
+
+            0  the section is not rendered at all (above).
+            1  one large pull quote. A scroll row holding a single card is a
+               control that promises more and then does nothing when you use
+               it — worse than the plain layout it replaced.
+            2+ the rail: cards in a row, swipe or arrows for the rest.
+
+          What is gone is the grid. Six approved reviews ran two rows deep on a
+          laptop and six screens deep on a phone, which spends the page's whole
+          middle on evidence nobody asked to read in full; the rail shows two
+          or three, says there are more, and costs one band however many there
+          are. Also gone, earlier, was the ink band with a white panel inset
+          into it — a card floating in a dark frame put a border around the
           evidence and made it look staged.
          ------------------------------------------------------------------ */}
       {testimonials.length > 0 && (
@@ -267,13 +286,11 @@ export default async function HomePage() {
               <Testimonial review={testimonials[0]!} featured />
             </div>
           ) : (
-            <ul className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:gap-5">
+            <TestimonialRail>
               {testimonials.map((review) => (
-                <li key={review.id}>
-                  <Testimonial review={review} />
-                </li>
+                <Testimonial key={review.id} review={review} />
               ))}
-            </ul>
+            </TestimonialRail>
           )}
         </Section>
       )}

@@ -106,7 +106,15 @@ export default async function CatalogPage({
             // gives each card more width than the photograph inside it has
             // resolution for; a four-up grid on a 1920px one does the same
             // thing again, one screen size later.
-            <ul className="mt-6 grid grid-cols-1 gap-4 sm:mt-8 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4 3xl:grid-cols-5">
+            // TWO COLUMNS ON A PHONE, not one. A single-column catalogue on
+            // a 390px screen shows one and a half pieces per scroll, which is
+            // a product page pretending to be a grid — you cannot compare
+            // anything without scrolling, and every storefront a customer here
+            // already uses is two-up. The card adapts to the narrower width on
+            // its own (see components/catalog/product-card.tsx); the gap drops
+            // to 12px below `sm` because 16px between two 138px cards on a
+            // 320px screen is width the photographs need more.
+            <ul className="mt-6 grid grid-cols-2 gap-3 sm:mt-8 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4 3xl:grid-cols-5">
               {products.map((product) => (
                 <li key={product.id}>
                   <ProductCard product={product} />

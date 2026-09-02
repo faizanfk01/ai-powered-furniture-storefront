@@ -120,6 +120,43 @@ html:has(dialog.chat-modal[open]) {
   overflow: hidden;
 }
 
+/* A horizontal rail — the reviews row on the home page. Two things, both of
+   which need more explanation than a class name can carry.
+
+   ONE: `contain: paint`, which is what actually stops the PAGE scrolling
+   sideways. `overflow-x: auto` on the rail is not enough on its own. With six
+   cards in the row Chrome still reported documentElement.scrollWidth as 1617px
+   inside a 390px viewport and let the document be dragged 57px to the right,
+   into blank space — the rail's layout overflow reaching the viewport's own
+   scroll range even though the rail clips it. Measured, not assumed: 57px at
+   390 and 43px at 320, gone the moment this line is added, and unaffected by
+   `overflow-y: hidden`, by clipping the wrapper, or by dropping the padding.
+   Paint containment says the descendants never paint outside this box, and
+   that is the promise that keeps the overflow from propagating.
+
+   The cards' shadows survive it because the rail carries `py-1 -my-1`: paint
+   containment clips at the padding box, and the padding is where the shadow
+   falls.
+
+   TWO: the scrollbar.
+
+   Kept rather than hidden. The arrows are the affordance a mouse needs and
+   the swipe is the one a phone needs, but the scrollbar is the one that says
+   how far along the row you are and how much of it is left, and it is also
+   the only one of the three that still works if the JavaScript that draws the
+   arrows never arrives. What is wrong with it by default is only its weight:
+   a 15px system scrollbar under a row of cards reads as a browser control
+   that leaked into the page.
+
+   `scrollbar-width` and `scrollbar-color` are the standard properties, not
+   the ::-webkit- pseudo-elements. A browser that supports neither shows its
+   own scrollbar, which is the correct fallback. */
+@utility rail-scroll {
+  contain: paint;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-line-strong) transparent;
+}
+
 /* Numbers that sit in a column — prices in a list, dimensions in a spec table —
    line up when their digits share a width. Inter ships tabular figures; this is
    the switch. Applied where numbers are compared, not globally, because
@@ -332,6 +369,23 @@ html:has(dialog.chat-modal[open]) {
   display: flex;
   opacity: 1;
   transform: translateY(0) scale(1);
+}
+
+/* THE PHONE SHEET'S ONE PIECE OF GEOMETRY THAT CANNOT LIVE ON THE ELEMENT.
+   Everything else about the mobile sizing is a utility in
+   components/chat/product-chat-modal.tsx, but `margin: auto` above is
+   unlayered CSS and therefore beats any margin utility Tailwind emits.
+
+   It has to go, because the sheet is `height: 100dvh` inside a containing
+   block that is 100vh tall. Whenever the browser's toolbar is expanded those
+   two differ, and `auto` would split the difference into a sliver of backdrop
+   above and below a sheet that is meant to reach both edges. With the block
+   margins at 0 the over-constrained box resolves to `top: 0` and sits where a
+   sheet belongs. The centring comes back with the card at `sm`. */
+@media (width < 40rem) {
+  .chat-modal {
+    margin-block: 0;
+  }
 }
 
 @starting-style {
